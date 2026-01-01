@@ -65,6 +65,7 @@ class UserMemService
                 console.dir(this.userPasswords);
                 if(this.userPasswords.get(user.getName()) === password)
                 {
+                    localStorage.setItem("currentUser", user.getName());
                     successCallback(user);
                     return;
                 }
@@ -80,11 +81,22 @@ class UserMemService
         }, 500);
     }
     
-    logout(successCallback:() => void, errorCallback:() => void):void
+    logout(successCallback:() => void, errorCallback:(error:ServiceError) => void):void
     {
         setTimeout(() =>
         {
+            localStorage.setItem("currentUser", "");
             successCallback();
+        }, 500);
+    }
+
+    getCurrentUser(successCallback:(user:User|null) => void, errorCallback:(error:ServiceError) => void):void
+    {
+        setTimeout(() =>
+        {
+            let currentUserName:string|null = localStorage.getItem("currentUser");
+
+            successCallback(currentUserName ? this.getUserSync(currentUserName) : null);
         }, 500);
     }
 
