@@ -1,7 +1,9 @@
 import { User } from "../vo/User.js";
+import { ObjectAlreadyExists } from "./error/ObjectAlreadyExists.js";
 import { LoginError } from "./error/LoginError.js";
 import { ObjectNotFoundError } from "./error/ObjectNotFoundError.js";
 import { ServiceError } from "./error/ServiceError.js";
+import { InvalidValueError } from "./error/InvalidValueError.js";
 
 class UserMemService
 {
@@ -21,20 +23,34 @@ class UserMemService
         this.userPasswords.set("susi", "susisPassword");
     }
 
+    private getUserSync(emailOrUserName:string):User|null
+    {
+        for(let user of this.users)
+        {
+            if(user.getEmail() === emailOrUserName || user.getName() === emailOrUserName)
+            {
+                return user;
+            }
+        }
+
+        return null;
+    }
+
     getUser(emailOrUserName:string, successCallback:(user:User) => void, errorCallback:(error:ServiceError) => void):void
     {
         setTimeout(() =>
         {
-            for(let user of this.users)
+            let user:User|null = this.getUserSync(emailOrUserName);
+            
+            if(user !== null)
             {
-                if(user.getEmail() === emailOrUserName || user.getName() === emailOrUserName)
-                {
-                    successCallback(user);
-                    return;
-                }
+                successCallback(user);
             }
 
-            errorCallback(new ObjectNotFoundError("User<" + emailOrUserName + "> has not been found!"));
+            else
+            {
+                errorCallback(new ObjectNotFoundError("User<" + emailOrUserName + "> has not been found!"));
+            }
         }, 500);
     }
 
@@ -64,11 +80,38 @@ class UserMemService
         }, 500);
     }
     
-    logout(successCallback:() => void, errorCallback:() => void)
+    logout(successCallback:() => void, errorCallback:() => void):void
     {
         setTimeout(() =>
         {
             successCallback();
+        }, 500);
+    }
+
+    create(email:string, userName:string, password:string, successCallback:(user:User) => void,
+           errorCallback:(error:ServiceError) => void):void
+    {
+        setTimeout(() =>
+        {
+            if(email === "" || userName === "" || password === "")
+            {
+                errorCallback(new InvalidValueError("Email, user name and password are not allowed to be empty!"));
+            }
+
+            else if(this.getUserSync(email) !== null || this.getUserSync(userName) !== null)
+            {
+                errorCallback(new ObjectAlreadyExists("Email or user name already in use!"));
+            }
+
+            else
+            {
+                let user = new User(this.nextUserId++, false, email, userName, false, null, []);
+
+                this.users.push(user);
+                this.userPasswords.set(userName, password);
+
+                successCallback(user);
+            }
         }, 500);
     }
 }
