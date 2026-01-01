@@ -1,6 +1,7 @@
 import { ServiceError } from "../../service/error/ServiceError.js";
 import { serviceFactory } from "../../service/factory/ServiceFactory.js";
 import { ServiceName } from "../../service/factory/ServiceName.js";
+import { locationUtil } from "../../util/LocationUtil.js";
 import { User } from "../../vo/User.js";
 import { LoginView } from "./LoginView.js";
 import { RegisterView } from "./RegisterView.js";
@@ -25,7 +26,7 @@ export class LoginViewHandler
         {
             serviceFactory.getService(ServiceName.USER).login(emailOrUserName, password, (user:User) =>
             {
-                console.dir(user);
+                locationUtil.redirectToUserPage();
             },
         
             (error:ServiceError) =>
