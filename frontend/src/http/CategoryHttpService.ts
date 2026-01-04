@@ -1,16 +1,19 @@
 import { httpService } from "./HttpService.js";
 import { Category } from "../vo/Category.js";
-import { CategoryFactory } from "../service/factory/CategoryFactory.js";
 
 export class CategoryHttpService {
-
-  async getCategories(shallow: boolean = true): Promise<Category[]> {
-    const data = await httpService.get<any[]>(
+  getCategories(
+    shallow: boolean,
+    success: (cats: Category[]) => void,
+    error: (status: any) => void
+  ): void {
+    httpService.get<any[]>(
       "/api/categories",
-      { shallow }
+      { shallow },
+      true,
+      (data) => success(data.map(j => new Category(j.id, j.name))),
+      (status) => error(status)
     );
-
-    return data.map(CategoryFactory.fromJson);
   }
 }
 

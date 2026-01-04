@@ -58,21 +58,25 @@ class HttpService
         }
     }
 
-     get<T>(url: string, params?: any, withCredentials: boolean = true): Promise<T> {
-    return new Promise((resolve, reject) => {
-      this.sendRequest(
+    get<T>(
+        url: string,
+        params: any,
+        withCredentials: boolean,
+        success: (data: T) => void,
+        error: (status: any) => void
+    ): void {
+    this.sendRequest(
         HttpMethod.METHOD_GET,
         url,
         params ?? null,
         null,
         HttpContentType.CONTENT_TYPE_JSON,
         "json",
-        withCredentials,
-        (data: T) => resolve(data as T),
-        (status: any) => reject(status)
-      );
-    });
-  }
+        withCredentials ?? true,
+        (data: any) => success(data as T),
+        (status: any) => error(status)
+    );
+    }
 }
 
 //global httpService

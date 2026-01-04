@@ -1,4 +1,5 @@
-export enum ServiceName
-{
-    USER
+export enum ServiceName {
+  USER,
+  CATEGORY,
+  SUBCATEGORY
 }

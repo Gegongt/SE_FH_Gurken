@@ -1,11 +1,19 @@
 import { Category } from "../vo/Category.js";
 
 export class CategoryMemService {
-  async getCategories(shallow: boolean = true): Promise<Category[]> {
-    return [
-      new Category(1, "Informatik"),
-      new Category(2, "Mathematik"),
-      new Category(3, "Netzwerke"),
-    ];
+  getCategories(
+    shallow: boolean,
+    success: (cats: Category[]) => void,
+    error: (status: any) => void
+  ): void {
+    setTimeout(() => {
+      success([
+        new Category(1, "Informatik"),
+        new Category(2, "Mathematik"),
+        new Category(3, "Netzwerke"),
+      ]);
+    }, 0);
   }
 }
+
+export let categoryMemService = new CategoryMemService();

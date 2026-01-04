@@ -1,6 +1,9 @@
 import { userMemService } from "../UserMemService.js";
 import { ServiceName } from "./ServiceName.js";
 import { ServiceType } from "./ServiceType.js";
+import { categoryMemService } from "../CategoryMemService.js";
+import { subcategoryMemService } from "../SubcategoryMemService.js";
+
 
 class ServiceFactory
 {
@@ -25,6 +28,8 @@ class ServiceFactory
         switch(serviceName)
         {
             case ServiceName.USER: return userMemService;
+            case ServiceName.CATEGORY: return categoryMemService;
+            case ServiceName.SUBCATEGORY: return subcategoryMemService;
         }
     }
 }
