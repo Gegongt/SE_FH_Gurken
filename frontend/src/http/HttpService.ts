@@ -8,7 +8,8 @@ class HttpService
     {
         let xhr = new XMLHttpRequest();
 
-        let urlObject = new URL(url);
+        //let urlObject = new URL(url);
+        let urlObject = new URL(url, window.location.origin);
 
         xhr.withCredentials = withCredentials ?? false;
 
@@ -25,7 +26,7 @@ class HttpService
             xhr.responseType = responseType;
         }
     
-        xhr.open(method, urlObject);
+        xhr.open(method, urlObject.toString());
 
         xhr.onload = () =>
         {
@@ -55,6 +56,26 @@ class HttpService
         {
             xhr.send();
         }
+    }
+
+    get<T>(
+        url: string,
+        params: any,
+        withCredentials: boolean,
+        success: (data: T) => void,
+        error: (status: any) => void
+    ): void {
+    this.sendRequest(
+        HttpMethod.METHOD_GET,
+        url,
+        params ?? null,
+        null,
+        HttpContentType.CONTENT_TYPE_JSON,
+        "json",
+        withCredentials ?? true,
+        (data: any) => success(data as T),
+        (status: any) => error(status)
+    );
     }
 }
 
