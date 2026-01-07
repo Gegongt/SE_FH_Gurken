@@ -5,6 +5,9 @@ export class CategoriesView {
   private searchInput: HTMLInputElement;
   private categoryList: HTMLUListElement;
   private subcategoryList: HTMLUListElement;
+  private btnUploadFile: HTMLButtonElement;
+  private filePicker: HTMLInputElement;
+
 
   constructor() {
     const search = document.getElementById("categorySearch");
@@ -18,6 +21,9 @@ export class CategoriesView {
     this.searchInput = search;
     this.categoryList = catList;
     this.subcategoryList = subList;
+    this.btnUploadFile = document.getElementById("btnUploadFile") as HTMLButtonElement;
+    this.filePicker = document.getElementById("filePicker") as HTMLInputElement;
+
   }
 
   bindSearch(handler: (text: string) => void): void {
@@ -73,4 +79,39 @@ export class CategoriesView {
     console.error(msg);
     this.subcategoryList.innerHTML = `<li style="color:red;">${msg}</li>`;
   }
+
+  enableActions(enable: boolean): void {
+  this.btnUploadFile.disabled = !enable;
+  }
+
+  bindUploadClick(handler: () => void): void {
+    this.btnUploadFile.addEventListener("click", handler);
+  }
+
+  openFilePicker(): void {
+    this.filePicker.value = ""; 
+    this.filePicker.click();
+  }
+
+  bindFileSelected(handler: (file: File) => void): void {
+    this.filePicker.addEventListener("change", () => {
+      const f = this.filePicker.files?.[0];
+      if (f) handler(f);
+    });
+  }
+
+  bindSubcategoryClick(handler: (subcategoryId: number) => void): void {
+    this.subcategoryList.addEventListener("click", (e) => {
+      const target = e.target as HTMLElement;
+      const li = target.closest("li");
+      if (!li) return;
+
+      const idStr = li.getAttribute("data-id");
+      if (!idStr) return;
+
+      handler(Number(idStr));
+    });
+  }
+
+
 }

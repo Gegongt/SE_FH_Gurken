@@ -1,8 +1,6 @@
 import { Category } from "../../vo/Category.js";
 import { CategoriesView } from "./CategoriesView.js";
 
-// WICHTIG: Type nur als "Service-Interface" verwenden,
-// nicht hart auf HttpService typisieren, sonst bist du nicht austauschbar.
 export type CategoryService = {
   getCategories(
     shallow: boolean,
@@ -15,7 +13,7 @@ export type SubcategoryService = {
   getSubcategories(
     categoryId: number,
     shallow: boolean,
-    success: (subs: any[]) => void,   // wenn du Subcategory importieren willst: Subcategory[]
+    success: (subs: any[]) => void,   
     error: (status: any) => void
   ): void;
 };
@@ -24,6 +22,7 @@ console.log("CategoriesViewHandler init()");
 
 export class CategoriesViewHandler {
   private allCategories: Category[] = [];
+  private selectedSubcategoryId: number | null = null;
 
   constructor(
     private view: CategoriesView,
@@ -35,8 +34,12 @@ export class CategoriesViewHandler {
     // UI bindings
     this.view.bindSearch((text) => this.onSearch(text));
     this.view.bindCategoryClick((categoryId) => this.onCategoryClicked(categoryId));
+    this.view.enableActions(false);
 
-    // initial load (shallow) - CALLBACK STYLE
+    this.view.bindUploadClick(() => this.onUploadClicked());
+    this.view.bindFileSelected((file) => this.onFileSelected(file));
+    this.view.bindSubcategoryClick((subcategoryId) => this.onSubcategoryClicked(subcategoryId));
+
     this.categoryService.getCategories(
       true,
       (categories) => {
@@ -58,7 +61,6 @@ export class CategoriesViewHandler {
       return;
     }
 
-    // weil du getters nutzt:
     const filtered = this.allCategories.filter((c) =>
       c.getName().toLowerCase().includes(q)
     );
@@ -67,13 +69,15 @@ export class CategoriesViewHandler {
   }
 
   private onCategoryClicked(categoryId: number): void {
+    this.selectedSubcategoryId = null;
+    this.view.enableActions(false);
+
     this.view.renderSubcategoriesLoading();
 
     this.subcategoryService.getSubcategories(
       categoryId,
       true,
       (subs: any[]) => {
-        // wenn du Subcategory[] typisieren willst: import { Subcategory }...
         this.view.renderSubcategories(subs as any);
       },
       (status) => {
@@ -81,4 +85,28 @@ export class CategoriesViewHandler {
       }
     );
   }
+
+
+  private onSubcategoryClicked(subcategoryId: number): void {
+    this.selectedSubcategoryId = subcategoryId;
+    this.view.enableActions(true);
+    console.log("Selected subcategory:", subcategoryId);
+  }
+
+
+  private onUploadClicked(): void {
+    if (this.selectedSubcategoryId == null) {
+      this.view.renderError("Please select a subcategory first.");
+      return;
+    }
+    this.view.openFilePicker();
+  }
+
+  private onFileSelected(file: File): void {
+  if (this.selectedSubcategoryId == null) return;
+
+  console.log("Selected file:", file.name, file.size);
+
+  }
+
 }
