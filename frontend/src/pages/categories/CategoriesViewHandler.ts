@@ -1,5 +1,7 @@
 import { Category } from "../../vo/Category.js";
 import { CategoriesView } from "./CategoriesView.js";
+import { File } from "../../vo/File.js";
+import { RatingSummary, RatingValue } from "../../vo/RatingSummary.js";
 
 export type CategoryService = {
   getCategories(
@@ -18,16 +20,34 @@ export type SubcategoryService = {
   ): void;
 };
 
+export type FileService = {
+  getFiles(
+    subcategoryId: number,
+    shallow: boolean,
+    success: (files: File[]) => void,
+    error: (status: any) => void
+  ): void;
+};
+
+export type RatingService = {
+  getSummary(fileId: number, success: (s: RatingSummary) => void, error: (status:any)=>void): void;
+  rateFile(fileId: number, value: RatingValue, success: (s: RatingSummary) => void, error: (status:any)=>void): void;
+};
+
 console.log("CategoriesViewHandler init()");
 
 export class CategoriesViewHandler {
   private allCategories: Category[] = [];
   private selectedSubcategoryId: number | null = null;
+  private currentFiles: File[] = [];
 
   constructor(
     private view: CategoriesView,
     private categoryService: CategoryService,
-    private subcategoryService: SubcategoryService
+    private subcategoryService: SubcategoryService,
+    private fileService: FileService,
+    private ratingService: RatingService
+
   ) {}
 
   init(): void {
@@ -39,6 +59,7 @@ export class CategoriesViewHandler {
     this.view.bindUploadClick(() => this.onUploadClicked());
     this.view.bindFileSelected((file) => this.onFileSelected(file));
     this.view.bindSubcategoryClick((subcategoryId) => this.onSubcategoryClicked(subcategoryId));
+    this.view.bindRatingClick((fileId, value) => this.onRateClicked(fileId, value));
 
     this.categoryService.getCategories(
       true,
@@ -68,29 +89,57 @@ export class CategoriesViewHandler {
     this.view.renderCategories(filtered);
   }
 
-  private onCategoryClicked(categoryId: number): void {
-    this.selectedSubcategoryId = null;
-    this.view.enableActions(false);
+ private onCategoryClicked(categoryId: number): void {
+  this.selectedSubcategoryId = null;
+  this.view.enableActions(false);
 
-    this.view.renderSubcategoriesLoading();
+  this.currentFiles = [];            
+  this.view.renderFiles([]);
 
-    this.subcategoryService.getSubcategories(
-      categoryId,
-      true,
-      (subs: any[]) => {
-        this.view.renderSubcategories(subs as any);
-      },
-      (status) => {
-        this.view.renderError(`Failed to load subcategories: ${String(status)}`);
-      }
-    );
-  }
+  this.view.renderSubcategoriesLoading();
 
+  this.subcategoryService.getSubcategories(
+    categoryId,
+    true,
+    (subs: any[]) => {
+      this.view.renderSubcategories(subs as any);
+    },
+    (status) => {
+      this.view.renderError(`Failed to load subcategories: ${String(status)}`);
+    }
+  );
+}
 
-  private onSubcategoryClicked(subcategoryId: number): void {
+ private onSubcategoryClicked(subcategoryId: number): void {
     this.selectedSubcategoryId = subcategoryId;
     this.view.enableActions(true);
-    console.log("Selected subcategory:", subcategoryId);
+
+    this.view.renderFilesLoading();
+
+    this.fileService.getFiles(
+      subcategoryId,
+      true,
+      (files) => {
+        this.currentFiles = files;             
+        this.view.renderFiles(this.currentFiles);
+
+        for (const f of this.currentFiles) {
+          this.ratingService.getSummary(
+            f.getId(),
+            (summary) => {
+              f.setRatingSummary(summary);
+              this.view.renderFiles(this.currentFiles);
+            },
+            (_status) => {
+              // ignore errors for summaries
+            }
+          );
+        }
+      },
+      (status) => {
+        this.view.renderError(`Failed to load files: ${String(status)}`);
+      }
+    );
   }
 
 
@@ -102,11 +151,26 @@ export class CategoriesViewHandler {
     this.view.openFilePicker();
   }
 
-  private onFileSelected(file: File): void {
-  if (this.selectedSubcategoryId == null) return;
-
-  console.log("Selected file:", file.name, file.size);
+  private onFileSelected(file: globalThis.File): void {
+    if (this.selectedSubcategoryId == null) return;
+    console.log("Selected file:", file.name);
 
   }
+
+  private onRateClicked(fileId: number, value: RatingValue): void {
+    this.ratingService.rateFile(
+      fileId,
+      value,
+      (summary) => {
+        const f = this.currentFiles.find(x => x.getId() === fileId);
+        if (f) f.setRatingSummary(summary);
+        this.view.renderFiles(this.currentFiles);
+      },
+      (status) => {
+        this.view.renderError(`Rating failed: ${String(status)}`);
+      }
+    );
+  }
+
 
 }

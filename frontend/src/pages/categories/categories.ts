@@ -5,7 +5,9 @@ import { ServiceName } from "../../service/factory/ServiceName.js";
 
 const categoryService = serviceFactory.getService(ServiceName.CATEGORY);
 const subcategoryService = serviceFactory.getService(ServiceName.SUBCATEGORY);
+const fileService = serviceFactory.getService(ServiceName.FILE);
+const ratingService = serviceFactory.getService(ServiceName.RATING);
 const view = new CategoriesView();
 
-const handler = new CategoriesViewHandler(view, categoryService as any, subcategoryService as any);
+const handler = new CategoriesViewHandler(view, categoryService as any, subcategoryService as any, fileService as any, ratingService as any);
 handler.init();

@@ -3,6 +3,8 @@ import { ServiceName } from "./ServiceName.js";
 import { ServiceType } from "./ServiceType.js";
 import { categoryMemService } from "../CategoryMemService.js";
 import { subcategoryMemService } from "../SubcategoryMemService.js";
+import { fileMemService } from "../FileMemService.js";
+import { ratingMemService } from "../RatingMemService.js";
 
 
 class ServiceFactory
@@ -30,6 +32,8 @@ class ServiceFactory
             case ServiceName.USER: return userMemService;
             case ServiceName.CATEGORY: return categoryMemService;
             case ServiceName.SUBCATEGORY: return subcategoryMemService;
+            case ServiceName.FILE: return fileMemService;
+            case ServiceName.RATING: return ratingMemService;
         }
     }
 }

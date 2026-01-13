@@ -1,5 +1,7 @@
 export enum ServiceName {
   USER,
   CATEGORY,
-  SUBCATEGORY
+  SUBCATEGORY,
+  FILE, 
+  RATING
 }
