@@ -3,8 +3,14 @@ import { serviceFactory } from "../../service/factory/ServiceFactory.js";
 import { ServiceName } from "../../service/factory/ServiceName.js";
 import { locationUtil } from "../../util/LocationUtil.js";
 import { User } from "../../vo/User.js";
+import { UserView } from "./UserView.js";
+import { UserViewHandler } from "./UserViewHandler.js";
 
+const view = new UserView();
 const userService = serviceFactory.getService(ServiceName.USER);
+const handler = new UserViewHandler(view, userService as any);
+
+handler.init();
 
 userService.getCurrentUser((user:User|null) =>
 {

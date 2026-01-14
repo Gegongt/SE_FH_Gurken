@@ -1,7 +1,6 @@
 import { Category } from "../../vo/Category.js";
 import { Subcategory } from "../../vo/Subcategory.js";
 import { File } from "../../vo/File.js";
-import { RatingSummary } from "../../vo/RatingSummary.js";
 import { RatingValue } from "../../vo/RatingSummary.js";
 
 export class CategoriesView {
@@ -92,14 +91,21 @@ export class CategoriesView {
       li.setAttribute("data-file-id", String(f.getId()));
 
       const summary = f.getRatingSummary();
+      const reportedText = f.getIsReported() ? "Reported" : "Not reported";
+      const reportBtnText = f.getIsReported() ? "Unreport" : "Report";
 
       const scoreText = summary
         ? `Score: ${summary.score} (${summary.overall}) | 👍 ${summary.good} 😐 ${summary.medium} 👎 ${summary.bad}`
         : "Score: -";
 
       li.innerHTML = `
-        <span><b>${f.getName()}</b> | ${scoreText}</span>
+        <span>
+          <b>${f.getName()}</b> | ${scoreText} | <i>${reportedText}</i>
+        </span>
         <div style="margin-top:6px;">
+          <button data-action="download">Download</button>
+          <button data-action="report">${reportBtnText}</button>
+          
           <button data-action="rate" data-value="BAD">Bad</button>
           <button data-action="rate" data-value="MEDIUM">Medium</button>
           <button data-action="rate" data-value="GOOD">Good</button>
@@ -157,6 +163,20 @@ export class CategoriesView {
     });
   }
 
+  resetDetails(): void {
+    this.renderSubcategories([]);
+    this.clearFiles();     
+    this.enableActions(false);
+  }
+
+  clearFiles(): void {
+    this.fileList.innerHTML = ""; 
+  }
+
+  clearSubcategories(): void {
+    this.subcategoryList.innerHTML = "";
+  }
+
   bindRatingClick(handler: (fileId: number, value: RatingValue) => void): void {
     this.fileList.addEventListener("click", (e) => {
       const target = e.target as HTMLElement;
@@ -173,6 +193,38 @@ export class CategoriesView {
       if (!idStr) return;
 
       handler(Number(idStr), value);
+    });
+  }
+
+  bindReportClick(handler: (fileId: number) => void): void {
+    this.fileList.addEventListener("click", (e) => {
+      const target = e.target as HTMLElement;
+      const btn = target.closest("button");
+      if (!btn) return;
+
+      if (btn.getAttribute("data-action") !== "report") return;
+
+      const li = btn.closest("li");
+      const idStr = li?.getAttribute("data-file-id");
+      if (!idStr) return;
+
+      handler(Number(idStr));
+    });
+  }
+
+  bindDownloadClick(handler: (fileId: number) => void): void {
+    this.fileList.addEventListener("click", (e) => {
+      const target = e.target as HTMLElement;
+      const btn = target.closest("button");
+      if (!btn) return;
+
+      if (btn.getAttribute("data-action") !== "download") return;
+
+      const li = btn.closest("li");
+      const idStr = li?.getAttribute("data-file-id");
+      if (!idStr) return;
+
+      handler(Number(idStr));
     });
   }
 

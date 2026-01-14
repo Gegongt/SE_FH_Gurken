@@ -6,8 +6,29 @@
     </head>
 
     <body>
-        <div id = "content">
+        <div id="content"></div>
 
+            <div id="userArea">
+            <h1>User</h1>
+
+            <div id="profileArea">
+                <img id="profileImg" alt="profile" width="96" height="96" />
+                <div>
+                <div id="username"></div>
+                <button id="btnChangeProfilePic">Change profile picture</button>
+                <input id="profilePicPicker" type="file" accept="image/*" style="display:none" />
+                </div>
+            </div>
+
+            <hr />
+
+            <div id="adminArea" style="display:none;">
+                <h2>Reported Files</h2>
+                <ul id="reportedFilesList"></ul>
+
+                <h2>Blocked users</h2>
+                <ul id="blockedUsersList"></ul>
+            </div>
         </div>
 
         <script type = "module" src = "../../../dist/pages/user/user.js"></script>

@@ -1,6 +1,5 @@
 import { File as FileVO } from "../vo/File.js";
 import { User } from "../vo/User.js";
-import { Rating } from "../vo/Rating.js";
 
 export class FileMemService {
   private dummyUser = new User(3, false, "fred.mueller@stud.hcw.ac.at", "fred", false, null, []);
@@ -34,24 +33,49 @@ export class FileMemService {
     }, 150);
   }
 
-  uploadFile(
-    subcategoryId: number,
-    file: globalThis.File,
+  uploadFile(subcategoryId: number, file: globalThis.File,
     success: (created: FileVO) => void,
     error: (status: any) => void
   ): void {
     setTimeout(() => {
-      const newId = Date.now(); 
-      const created = new FileVO(newId, file.name, false, this.dummyUser, []);
-
       const list = this.filesBySubcat.get(subcategoryId) ?? [];
+
+      const created = new FileVO(
+        Date.now(),          
+        file.name,
+        false,
+        this.dummyUser,
+        []
+      );
+
       list.push(created);
       this.filesBySubcat.set(subcategoryId, list);
 
       success(created);
-    }, 250);
+    }, 150);
   }
+
+  reportFile(
+    fileId: number,
+    reported: boolean,
+    success: (updated: FileVO) => void,
+    error: (status: any) => void
+  ): void {
+    setTimeout(() => {
+      for (const list of this.filesBySubcat.values()) {
+        const f = list.find(x => x.getId() === fileId);
+        if (f) {
+          f.setIsReported(reported);
+          success(f);
+          return;
+        }
+      }
+      error(404);
+    }, 120);
+  }
+
 }
+
 
 export const fileMemService = new FileMemService();
 
