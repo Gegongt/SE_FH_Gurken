@@ -11,9 +11,6 @@ export class MCQuestionEditorView extends QuestionEditorView
         super();
     }
 
-    //TODO: Die Antwortmöglichkeiten sollen in einem selbst erstellten HTML-Element enthalten sein,
-    //      nicht in einer Checkbox. Damit soll sichergestellt werden, dass das Design auch mit einem
-    //      zusätzlichen Delete BUtton schön ist.
     renderAnswers(question:MCQuestion):string
     {
         /*
