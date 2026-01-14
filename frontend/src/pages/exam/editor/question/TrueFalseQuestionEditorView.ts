@@ -1,4 +1,7 @@
 import { TrueFalseQuestion } from "../../../../vo/TrueFalseQuestion.js";
+import { Option } from "../../component/select/Option.js";
+import { SelectView } from "../../component/select/SelectView.js";
+import { SelectViewHandler } from "../../component/select/SelectViewHandler.js";
 import { QuestionEditorView } from "./QuestionEditorView.js";
 
 export class TrueFalseQuestionEditorView extends QuestionEditorView
@@ -16,21 +19,23 @@ export class TrueFalseQuestionEditorView extends QuestionEditorView
         this.questionContainer = document.createElement("div");
         this.questionContainer.id = "question_" + question.getId();
 
-        this.questionContainer.innerHTML = `
-            <p id = "questionText_${question.getId()}">${question.getQuestion()}</p>
-            
-            <div class="form-check">
-                <input class = "form-check-input" type = "radio" name = "answer_${question.getId()}" id = "answer_${question.getId()}_true">
-                <label class = "form-check-label" for = "answer_${question.getId()}_true">True</label>
-            </div>
-
-            <div class = "form-check">
-                <input class = "form-check-input" type = "radio" name = "answer_${question.getId()}" id = "answer_${question.getId()}_false" checked>
-                <label class = "form-check-label" for = "answer_${question.getId()}_false">False</label>
-            </div>`;
+        this.questionContainer.innerHTML = `<p id = "questionText_${question.getId()}">${question.getQuestion()}</p>`;
 
         this.parentElementId = parentElementId;
         let parentElement = document.getElementById(this.parentElementId);
-        parentElement?.appendChild(this.questionContainer);
+        parentElement!.appendChild(this.questionContainer);
+
+        let answerOptions = [
+                                new Option(question.getIsTrue(), "True"),
+                                new Option(!question.getIsTrue(), "False")
+                            ];
+
+        let answerSelectField = new SelectViewHandler(new SelectView(), true, false);
+        answerSelectField.render(answerOptions, "question_" + question.getId());
+    }
+
+    remove()
+    {
+        this.questionContainer!.remove();
     }
 }

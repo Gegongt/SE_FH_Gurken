@@ -16,4 +16,9 @@ export class MCQuestionEditorViewHandler
         this.parentElementId = parentElementId;
         this.mcQuestionEditorView.render(question, this.parentElementId);
     }
+
+    remove()
+    {
+        this.mcQuestionEditorView.remove();
+    }
 }

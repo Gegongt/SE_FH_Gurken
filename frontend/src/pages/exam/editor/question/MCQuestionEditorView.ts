@@ -1,4 +1,8 @@
 import { MCQuestion } from "../../../../vo/MCQuestion.js";
+import { AnaswerOption } from "../../component/select/AnswerOption.js";
+import { Option } from "../../component/select/Option.js";
+import { SelectView } from "../../component/select/SelectView.js";
+import { SelectViewHandler } from "../../component/select/SelectViewHandler.js";
 import { QuestionEditorView } from "./QuestionEditorView.js";
 
 export class MCQuestionEditorView extends QuestionEditorView
@@ -11,7 +15,7 @@ export class MCQuestionEditorView extends QuestionEditorView
         super();
     }
 
-    renderAnswers(question:MCQuestion):string
+    renderAnswers(question:MCQuestion, answerSelectField:SelectViewHandler):string
     {
         /*
             To shuffle the answers, the following algorithm is used:
@@ -31,23 +35,25 @@ export class MCQuestionEditorView extends QuestionEditorView
             intended to prevent potential infinite loops.
         */
 
-        let answers = [...question.getCorrectAnswers()];
+        let answers:string[] = [...question.getCorrectAnswers()];
         answers = answers.concat(question.getWrongAnswers());
+        let options:Option[] = [];
+
+        for(let i = 0; i < answers.length; i++)
+        {
+            let isCorrect:boolean = (i < question.getCorrectAnswers().length) ? true : false;
+            options.push(new AnaswerOption(isCorrect, answers[i] as string, isCorrect));
+        }
+
+        console.table(options);
 
         let answersContainer = "";
         let numberOfAnswers = answers.length;
 
-        for(let i = 0, answerIndex = Math.floor(Math.random() * answers.length); i < numberOfAnswers; i++, answerIndex = Math.floor(Math.random() * answers.length))
+        for(let i = 0, answerIndex = Math.floor(Math.random() * (answers.length - i)); i < numberOfAnswers; i++, answerIndex = Math.floor(Math.random() * (answers.length - i)))
         {
-            answersContainer = answersContainer + `
-                <div class = "form-check">
-                    <input class = "form-check-input" type = "checkbox" name = "answer_${question.getId()}_${i}" />    
-                    <label class = "form-check-label" for = "answer_${question.getId()}_${i}">
-                        ${answers[answerIndex]}
-                    </label>
-                </div>`;
-            
-            answers.splice(answerIndex, 1);
+            answerSelectField.addOption(options[answerIndex] as Option);
+            options.splice(answerIndex, 1);
         }
 
         return answersContainer;
@@ -58,12 +64,19 @@ export class MCQuestionEditorView extends QuestionEditorView
         this.questionContainer = document.createElement("div");
         this.questionContainer.id = "question_" + question.getId();
 
-        this.questionContainer.innerHTML = `<p id = "questionText_${question.getId()}">${question.getQuestion()}</p>` +
-                                      this.renderAnswers(question);
-
-
+        this.questionContainer.innerHTML = `<p id = "questionText_${question.getId()}">${question.getQuestion()}</p>`;
         this.parentElementId = parentElementId;
         let parentElement = document.getElementById(this.parentElementId);
-        parentElement?.appendChild(this.questionContainer);
+        parentElement!.appendChild(this.questionContainer);
+
+        let answerSelectField = new SelectViewHandler(new SelectView(), true, true);        
+        answerSelectField.render([], "question_" + question.getId());
+        
+        this.renderAnswers(question, answerSelectField);
+    }
+
+    remove()
+    {
+        this.questionContainer!.remove();
     }
 }

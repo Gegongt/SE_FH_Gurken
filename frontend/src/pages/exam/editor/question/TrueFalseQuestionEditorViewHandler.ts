@@ -16,4 +16,9 @@ export class TrueFalseQuestionEditorViewHandler
         this.parentElementId = parentElementId;
         this.trueFalseQuestionEditorView.render(question, this.parentElementId);
     }
+
+    remove()
+    {
+        this.trueFalseQuestionEditorView.remove();
+    }
 }

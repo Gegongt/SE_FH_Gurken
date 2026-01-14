@@ -63,6 +63,7 @@ export class SelectView
         {
             let removeButton = document.createElement("input");
             removeButton.type = "button";
+            removeButton.value = "Remove";
 
             removeButton.addEventListener("click", () =>
             {
