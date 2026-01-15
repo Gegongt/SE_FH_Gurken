@@ -8,9 +8,11 @@ import { UserViewHandler } from "./UserViewHandler.js";
 
 const view = new UserView();
 const userService = serviceFactory.getService(ServiceName.USER);
-const handler = new UserViewHandler(view, userService as any);
+const fileService = serviceFactory.getService(ServiceName.FILE);
+const handler = new UserViewHandler(view, userService as any, fileService as any);
 
 handler.init();
+console.log("user.ts loaded");
 
 userService.getCurrentUser((user:User|null) =>
 {

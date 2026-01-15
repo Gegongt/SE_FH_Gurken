@@ -3,23 +3,44 @@ import { File } from "../../vo/File.js";
 
 export class UserView {
   private profileImg = document.getElementById("profileImg") as HTMLImageElement;
+  private roleLabel: HTMLElement;
   private username = document.getElementById("username") as HTMLDivElement;
   private btnChange = document.getElementById("btnChangeProfilePic") as HTMLButtonElement;
   private picker = document.getElementById("profilePicPicker") as HTMLInputElement;
 
-  private adminArea = document.getElementById("adminArea") as HTMLDivElement;
+  private adminPanel= document.getElementById("adminPanel") as HTMLDivElement;
   private reportedFilesList = document.getElementById("reportedFilesList") as HTMLUListElement;
   private blockedUsersList = document.getElementById("blockedUsersList") as HTMLUListElement;
 
+  constructor() {
+    const btn = document.getElementById("btnChangeProfilePic");
+    const picker = document.getElementById("profilePicPicker");
+    this.roleLabel = document.getElementById("roleLabel")!;
+
+    if (!(btn instanceof HTMLButtonElement)) throw new Error("btnChangeProfilePic not found");
+    if (!(picker instanceof HTMLInputElement)) throw new Error("profilePicPicker not found");
+
+    this.btnChange = btn;
+    this.picker = picker;
+  }
+
   renderUser(user: User): void {
-    this.username.textContent = `Logged in as: ${user.getName()}`;
+    this.roleLabel.textContent = user.getIsAdmin() ? "Admin" : "User";
+    this.username.textContent = `Logged in as: ${user.getName()} (${user.getEmail()})`;
 
-    //this.profileImg.src = user.getProfileImageUrl?.() ?? "https://via.placeholder.com/96";
+    const pictureName = user.getProfilePictureName();
+    if (pictureName) {
+      this.profileImg.src = pictureName;
+    } else {
+      this.profileImg.src = "";
+    }
   }
 
-  showAdminArea(show: boolean): void {
-    this.adminArea.style.display = show ? "block" : "none";
-  }
+
+  showAdminPanel(show: boolean): void {
+    this.adminPanel.style.display = show ? "block" : "none";
+ }
+
 
   bindChangeProfilePic(handler: () => void): void {
     this.btnChange.addEventListener("click", handler);
@@ -31,58 +52,119 @@ export class UserView {
   }
 
   bindProfilePicSelected(handler: (file: globalThis.File) => void): void {
-    this.picker.addEventListener("change", () => {
-      const f = this.picker.files?.[0];
+    const input = document.getElementById("profilePicPicker") as HTMLInputElement | null;
+    if (!input) throw new Error("profilePicPicker not found");
+
+    input.onchange = () => {             
+      const f = input.files?.[0];
       if (f) handler(f);
-    });
+    };
   }
 
-  renderReportedFiles(files: File[]): void {
+  bindChangeProfilePicClick(): void {
+    const btn = document.getElementById("btnChangeProfilePic") as HTMLButtonElement | null;
+    const input = document.getElementById("profilePicPicker") as HTMLInputElement | null;
+    if (!btn || !input) return;
+
+    btn.onclick = () => {
+      input.value = "";
+      input.click();
+    };
+  }
+
+  showProfilePicturePreview(file: globalThis.File): void {
+    const img = document.getElementById("profileImg") as HTMLImageElement;
+    if (!img) return;
+
+    const url = URL.createObjectURL(file);
+    img.src = url;
+  }
+
+  setProfilePreviewUrl(url: string): void {
+    this.profileImg.src = url;
+  }
+
+  showError(msg: string): void {
+    console.error(msg);
+    alert(msg);
+  }
+
+  renderReportedFiles(files: any[]): void {
     this.reportedFilesList.innerHTML = "";
-    if (files.length === 0) {
-      this.reportedFilesList.innerHTML = "<li>No reported files</li>";
+
+    if (!files || files.length === 0) {
+      this.reportedFilesList.innerHTML = "<li>No reported files.</li>";
       return;
     }
+
     for (const f of files) {
       const li = document.createElement("li");
       li.setAttribute("data-file-id", String(f.getId()));
+      li.setAttribute("data-uploader-id", String(f.getUploader().getId()));
+
       li.innerHTML = `
-        <b>${f.getName()}</b>
+        <b>${f.getName()}</b> (Uploader: ${f.getUploader().getName()})
         <button data-action="accept">Accept</button>
         <button data-action="delete">Delete</button>
-        <button data-action="block">Block uploader</button>
+        <button data-action="block">Block user</button>
       `;
       this.reportedFilesList.appendChild(li);
     }
   }
 
-  bindReportedFilesActions(handler: (fileId: number, action: "accept"|"delete"|"block") => void): void {
-    this.reportedFilesList.addEventListener("click", (e) => {
-      const btn = (e.target as HTMLElement).closest("button");
+  bindReportedFileActions(
+    handler: (action: "accept" | "delete" | "block", fileId: number, uploaderId: number) => void
+  ): void {
+    const list = document.getElementById("reportedFilesList");
+    if (!list) return;
+
+    list.addEventListener("click", (e) => {
+      const target = e.target as HTMLElement | null;
+      const btn = target?.closest("button");
       if (!btn) return;
 
-      const li = btn.closest("li");
-      const idStr = li?.getAttribute("data-file-id");
-      if (!idStr) return;
-
       const action = btn.getAttribute("data-action") as any;
-      if (action !== "accept" && action !== "delete" && action !== "block") return;
+      const fileId = Number(btn.getAttribute("data-file-id"));
+      const uploaderId = Number(btn.getAttribute("data-uploader-id"));
 
-      handler(Number(idStr), action);
+      if (!action || !Number.isFinite(fileId) || !Number.isFinite(uploaderId)) return;
+
+      handler(action, fileId, uploaderId);
     });
   }
 
-  renderBlockedUsers(users: User[]): void {
+
+  bindBlockedUserActions(
+    handler: (action: "unblock", userId: number) => void
+  ): void {
+    this.blockedUsersList.addEventListener("click", (e) => {
+      const btn = (e.target as HTMLElement).closest("button");
+      if (!btn) return;
+
+      const action = btn.getAttribute("data-action") as any;
+      const li = btn.closest("li");
+      if (!li) return;
+
+      const userId = Number(li.getAttribute("data-user-id"));
+      if (!Number.isFinite(userId)) return;
+
+      handler(action, userId);
+    });
+  }
+
+  renderBlockedUsers(users: any[]): void {
     this.blockedUsersList.innerHTML = "";
-    if (users.length === 0) {
-      this.blockedUsersList.innerHTML = "<li>No blocked users</li>";
+
+    if (!users || users.length === 0) {
+      this.blockedUsersList.innerHTML = "<li>No blocked users.</li>";
       return;
     }
+
     for (const u of users) {
       const li = document.createElement("li");
       li.setAttribute("data-user-id", String(u.getId()));
       li.innerHTML = `
-        <b>${u.getName()}</b>
+        <b>${u.getName()}</b> (${u.getEmail()})
         <button data-action="unblock">Unblock</button>
       `;
       this.blockedUsersList.appendChild(li);
@@ -103,7 +185,4 @@ export class UserView {
     });
   }
 
-  showError(msg: string): void {
-    alert(msg);
-  }
 }

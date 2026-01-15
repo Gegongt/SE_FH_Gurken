@@ -2,6 +2,7 @@ import { Category } from "../../vo/Category.js";
 import { CategoriesView } from "./CategoriesView.js";
 import { File } from "../../vo/File.js";
 import { RatingSummary, RatingValue } from "../../vo/RatingSummary.js";
+import { Subcategory } from "../../vo/Subcategory.js";
 
 export type CategoryService = {
   getCategories(
@@ -15,7 +16,7 @@ export type SubcategoryService = {
   getSubcategories(
     categoryId: number,
     shallow: boolean,
-    success: (subs: any[]) => void,   
+    success: (subs: Subcategory[]) => void,   
     error: (status: any) => void
   ): void;
 };
@@ -132,14 +133,12 @@ export class CategoriesViewHandler {
     );
   }
 
-
   private onSubcategoryClicked(subcategoryId: number): void {
     this.selectedSubcategoryId = subcategoryId;
     this.view.enableActions(true);
 
     this.reloadFiles(subcategoryId);
   }
-
 
   private onUploadClicked(): void {
     if (this.selectedSubcategoryId == null) {
@@ -217,7 +216,6 @@ export class CategoriesViewHandler {
       fileId,
       newValue,
       (updated) => {
-        // simplest: update local object
         f.setIsReported(updated.getIsReported());
         this.view.renderFiles(this.currentFiles);
       },
@@ -228,12 +226,10 @@ export class CategoriesViewHandler {
   }
 
   private onDownloadClicked(fileId: number): void {
-  //BaseURL
-  const url = `/api/files/${fileId}/download`;
-
-  //Browser download
-  window.open(url, "_blank");
-}
-
+    //BaseURL
+    const url = `/api/files/${fileId}/download`;
+    //Browser download
+    window.open(url, "_blank");
+  }
 
 }

@@ -5,22 +5,50 @@ import { UserView } from "./UserView.js";
 export type UserService = {
   getCurrentUser(success: (u: User|null)=>void, error:(s:any)=>void): void;
   logout(success: ()=>void, error:(s:any)=>void): void;
-  updateProfilePic(file: globalThis.File, success: (url: string)=>void, error:(s:any)=>void): void;
+  updateProfilePicture(file: globalThis.File, success: (url: string)=>void, error:(s:any)=>void): void;
 
-  // admin:
   getReportedFiles(success:(files: File[])=>void, error:(s:any)=>void): void;
   acceptFile(fileId:number, success:()=>void, error:(s:any)=>void): void;
   deleteFile(fileId:number, success:()=>void, error:(s:any)=>void): void;
   blockUploaderOfFile(fileId:number, success:()=>void, error:(s:any)=>void): void;
 
   getBlockedUsers(success:(users: User[])=>void, error:(s:any)=>void): void;
+  setBlocked(userId:number, blocked:boolean, success:()=>void, error:(s:any)=>void): void;
   unblockUser(userId:number, success:()=>void, error:(s:any)=>void): void;
 };
+
+export type FileService = {
+  getFiles(
+    subcategoryId: number,
+    shallow: boolean,
+    success: (files: File[]) => void,
+    error: (status: any) => void
+  ): void;
+
+  getReportedFiles(
+    success: (files: File[]) => void,
+    error: (status: any) => void
+  ): void;
+
+  deleteFile(
+    fileId: number,
+    success: () => void,
+    error: (status: any) => void
+  ): void;
+
+  reportFile(
+    fileId: number,
+    reported: boolean,
+    success: (updated: File) => void,
+    error: (status: any) => void
+  ): void;
+};
+
 
 export class UserViewHandler {
   private currentUser: User | null = null;
 
-  constructor(private view: UserView, private userService: UserService) {}
+  constructor(private view: UserView, private userService: UserService, private fileService: FileService) {}
 
   init(): void {
     this.userService.getCurrentUser(
@@ -32,31 +60,48 @@ export class UserViewHandler {
 
         this.currentUser = u;
         this.view.renderUser(u);
+        this.view.showAdminPanel(u.getIsAdmin());
 
-        this.view.bindChangeProfilePic(() => this.view.openProfilePicker());
+        this.view.bindReportedFileActions((action, fileId, uploaderId) => {
+          this.onReportedAction(action, fileId, uploaderId);
+        });
+        this.view.bindBlockedUserActions((action, userId) => {
+          this.onBlockedAction(action, userId);
+        });
+
+        this.view.bindChangeProfilePicClick();
         this.view.bindProfilePicSelected((file) => this.onProfilePicSelected(file));
 
-        const isAdmin = u.getIsAdmin?.() ?? false;
-        this.view.showAdminArea(isAdmin);
 
-        if (isAdmin) this.loadAdminData();
+        const isAdmin = u.getIsAdmin?.() ?? false;
+        this.view.showAdminPanel(isAdmin);
+
+         if (u.getIsAdmin()) {
+        this.loadAdminData();
+         }
       },
       (status) => this.view.showError(`getCurrentUser failed: ${String(status)}`)
     );
   }
 
-  private onProfilePicSelected(file: globalThis.File): void {
-    this.userService.updateProfilePic(
+  onProfilePicSelected(file: globalThis.File): void {
+    this.view.showProfilePicturePreview(file);
+
+    this.userService.updateProfilePicture(
       file,
       (url) => {
-        (document.getElementById("profileImg") as HTMLImageElement).src = url;
+        if (this.currentUser) {
+          this.view.renderUser(this.currentUser);
+        }
       },
-      (status) => this.view.showError(`Profile pic update failed: ${String(status)}`)
+      (err) => this.view.showError(String(err))
     );
   }
 
+
+
   private loadAdminData(): void {
-    this.userService.getReportedFiles(
+    this.fileService.getReportedFiles(
       (files) => this.view.renderReportedFiles(files),
       (status) => this.view.showError(`Failed to load reported files: ${String(status)}`)
     );
@@ -65,25 +110,39 @@ export class UserViewHandler {
       (users) => this.view.renderBlockedUsers(users),
       (status) => this.view.showError(`Failed to load blocked users: ${String(status)}`)
     );
-
-    this.view.bindReportedFilesActions((fileId, action) => this.onReportedFileAction(fileId, action));
-    this.view.bindBlockedUsersActions((userId) => this.onUnblock(userId));
   }
 
-  private onReportedFileAction(fileId: number, action: "accept"|"delete"|"block"): void {
-    const done = () => this.loadAdminData();
-    const fail = (s:any) => this.view.showError(`${action} failed: ${String(s)}`);
 
-    if (action === "accept") this.userService.acceptFile(fileId, done, fail);
-    if (action === "delete") this.userService.deleteFile(fileId, done, fail);
-    if (action === "block") this.userService.blockUploaderOfFile(fileId, done, fail);
+  private onReportedAction(action: "accept" | "delete" | "block", fileId: number, uploaderId: number): void {
+    if (action === "accept") {
+      this.fileService.reportFile(fileId, false,
+        () => this.loadAdminData(),
+        (s) => this.view.showError(`Accept failed: ${String(s)}`)
+      );
+      return;
+    }
+
+    if (action === "delete") {
+      this.fileService.deleteFile(fileId,
+        () => this.loadAdminData(),
+        (s) => this.view.showError(`Delete failed: ${String(s)}`)
+      );
+      return;
+    }
+
+    if (action === "block") {
+      this.userService.setBlocked(uploaderId, true,
+        () => this.loadAdminData(),
+        (s) => this.view.showError(`Block failed: ${String(s)}`)
+      );
+    }
   }
 
-  private onUnblock(userId: number): void {
-    this.userService.unblockUser(
-      userId,
+  private onBlockedAction(action: "unblock", userId: number): void {
+    this.userService.setBlocked(userId, false,
       () => this.loadAdminData(),
       (s) => this.view.showError(`Unblock failed: ${String(s)}`)
     );
   }
+
 }

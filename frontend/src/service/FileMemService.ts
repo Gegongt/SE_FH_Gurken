@@ -10,6 +10,7 @@ export class FileMemService {
       [
         new FileVO(101, "ER-Modell.pdf", false, this.dummyUser, []),
         new FileVO(102, "SQL-Übung.zip", false, this.dummyUser, []),
+        new FileVO(103, "reported-file.txt", true, this.dummyUser, []),
       ],
     ],
     [
@@ -72,6 +73,39 @@ export class FileMemService {
       }
       error(404);
     }, 120);
+  }
+
+  getReportedFiles(
+    success: (files: any[]) => void,
+    error: (status: any) => void
+  ): void {
+    setTimeout(() => {
+      const reported: any[] = [];
+      for (const list of this.filesBySubcat.values()) {
+        for (const f of list) {
+          if (f.getIsReported()) reported.push(f);
+        }
+      }
+      success(reported);
+    }, 150);
+  }
+
+  deleteFile(
+    fileId: number,
+    success: () => void,
+    error: (status: any) => void
+  ): void {
+    setTimeout(() => {
+      for (const list of this.filesBySubcat.values()) {
+        const idx = list.findIndex((x: any) => x.getId() === fileId);
+        if (idx >= 0) {
+          list.splice(idx, 1);
+          success();
+          return;
+        }
+      }
+      error(404);
+    }, 150);
   }
 
 }
