@@ -11,6 +11,21 @@ export class SelectView
     private options:Option[] = [];
     private renderedOptions:HTMLDivElement[] = [];
 
+    selectOrUnselect(index:number):void
+    {
+        let option = this.options[index];
+
+        if(!option!.getSelected())
+        {
+            this.select(index);
+        }
+
+        else
+        {
+            this.unselect(index);
+        }
+    }
+
     select(index:number):void
     {
         this.options[index]!.setSelected(true);
@@ -85,8 +100,7 @@ export class SelectView
                 this.unselectAll();
             }
 
-            renderedOption.classList.toggle("selectedOption");
-            renderedOption.classList.toggle("unselectedOption");
+            this.selectOrUnselect(this.options.indexOf(option));
         });
 
         this.renderedOptions.push(renderedOption);

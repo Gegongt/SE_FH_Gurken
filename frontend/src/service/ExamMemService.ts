@@ -65,13 +65,37 @@ class ExamMem
 export class ExamMemService
 {
     private exams:ExamMem[];
-    private nextExamId:number = 1;
+    private nextExamId:number;
         
     public constructor()
     {
-        this.exams = [];
+        if(localStorage.getItem("exams"))
+        {
+            let storedExams = JSON.parse(localStorage.getItem("exams") as string); //the stored exam objects do not have the methods of a real ExamMem object
 
-        this.exams.push(new ExamMem(this.nextExamId++, "IoT", [1, 2, 3, 4], 1));
+            this.exams = [];
+            
+            for(let storedExam of storedExams)
+            {
+                this.exams.push(new ExamMem(storedExam.id, storedExam.name, storedExam.questions, storedExam.creator));
+            }
+
+            this.nextExamId = this.exams[this.exams.length - 1]!.getId() + 1;
+        }
+
+        else
+        {
+            this.exams = [];
+            this.nextExamId = 1;
+            this.exams.push(new ExamMem(this.nextExamId++, "IoT", [1, 2, 3, 4], 1));
+
+            this.saveData();
+        }
+    }
+
+    private saveData()
+    {
+        localStorage.setItem("exams", JSON.stringify(this.exams));
     }
 
     private getExamIndexSync(id:number):number
@@ -145,6 +169,7 @@ export class ExamMemService
                                                                             (ids:number[]) =>
                                                                             {
                                                                                 this.exams.push(new ExamMem(this.nextExamId++, exam.getName(), ids, exam.getCreator().getId()));
+                                                                                this.saveData();
                                                                                 successCallback(this.nextExamId);
                                                                             },
 
@@ -183,24 +208,51 @@ export class ExamMemService
                 }
             }
 
-            serviceFactory.getService(ServiceName.QUESTION).updateQuestions(existingQuestions,
-                                                                            () =>
-                                                                            {
-                                                                                serviceFactory.getService(ServiceName.QUESTION).createQuestions(newQuestions,
-                                                                                                                                                (ids:number[]) =>
-                                                                                                                                                {
-                                                                                                                                                    examMem.setName(exam.getName());
-                                                                                                                                                    examMem.setQuestions(examMem.getQuestions().concat(ids));
-                                                                                                                                                    examMem.setCreator(exam.getCreator().getId());
+            let deletedQuestions:number[] = [...examMem.getQuestions()];
 
-                                                                                                                                                    successCallback();
-                                                                                                                                                });
-                                                                            },
+            for(let questionId of examMem.getQuestions())
+            {
+                if(questionId > 0)
+                {
+                    deletedQuestions.splice(deletedQuestions.indexOf(questionId), 1);
+                }
+            }
+
+            serviceFactory.getService(ServiceName.QUESTION).deleteQuestions(deletedQuestions, () =>
+            {
+                serviceFactory.getService(ServiceName.QUESTION).updateQuestions(existingQuestions,
+                                                                                () =>
+                                                                                {
+                                                                                    serviceFactory.getService(ServiceName.QUESTION).createQuestions(newQuestions,
+                                                                                                                                                    (ids:number[]) =>
+                                                                                                                                                    {
+                                                                                                                                                        examMem.setName(exam.getName());
+
+                                                                                                                                                        let existingQuestionIds:number[] = [];
+
+                                                                                                                                                        for(let existingQ of existingQuestions)
+                                                                                                                                                        {
+                                                                                                                                                            existingQuestionIds.push(existingQ.getId());
+                                                                                                                                                        }
+
+                                                                                                                                                        examMem.setQuestions(existingQuestionIds.concat(ids));
+                                                                                                                                                        examMem.setCreator(exam.getCreator().getId());
+
+                                                                                                                                                        this.saveData();
+                                                                                                                                                        successCallback();
+                                                                                                                                                    });
+                                                                                },
                                                                         
-                                                                            (error:ServiceError) =>
-                                                                            {
-                                                                                errorCallback(error);
-                                                                            });
+                                                                                (error:ServiceError) =>
+                                                                                {
+                                                                                    errorCallback(error);
+                                                                                });
+            },
+        
+            (error:ServiceError) =>
+            {
+                errorCallback(error);
+            });
         }, 500);
     }
     
@@ -222,7 +274,7 @@ export class ExamMemService
                                                                             () =>
                                                                             {
                                                                                 this.exams.splice(index, 1);
-
+                                                                                this.saveData();
                                                                                 successCallback();
                                                                             },
                                                                         
