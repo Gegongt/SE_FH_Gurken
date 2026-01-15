@@ -18,6 +18,12 @@ export class SelectViewHandler
     render(options:Option[], parentElementId:string):void
     {
         this.parentElementId = parentElementId;
+
+        this.selectView.bindRemoveButton((option:Option) =>
+        {
+            this.selectView.removeOption(option);
+        });
+
         this.selectView.render(options, this.parentElementId, this.removable, this.multipleSelection);
     }
 

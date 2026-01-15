@@ -1,6 +1,9 @@
+import { ServiceError } from "../../../service/error/ServiceError.js";
 import { serviceFactory } from "../../../service/factory/ServiceFactory.js";
 import { ServiceName } from "../../../service/factory/ServiceName.js";
 import { locationUtil } from "../../../util/LocationUtil.js";
+import { urlUtil } from "../../../util/URLUtil.js";
+import { Exam } from "../../../vo/Exam.js";
 import { MCQuestion } from "../../../vo/MCQuestion.js";
 import { TrueFalseQuestion } from "../../../vo/TrueFalseQuestion.js";
 import { User } from "../../../vo/User.js";
@@ -13,18 +16,53 @@ serviceFactory.getService(ServiceName.USER).getCurrentUser((user:User|null) =>
 {
     if(user === null)
     {
-        let mcQuestionEditorViewHandler = new MCQuestionEditorViewHandler(new MCQuestionEditorView());
-        mcQuestionEditorViewHandler.render(new MCQuestion(1, "What day is today?", ["13.01.2026"], ["14.01.2026", "13.01.2025"]), "questions");
-
-        mcQuestionEditorViewHandler = new MCQuestionEditorViewHandler(new MCQuestionEditorView());
-        mcQuestionEditorViewHandler.render(new MCQuestion(2, "What day is today?", ["13.01.2026"], ["14.01.2026", "13.01.2025"]), "questions");
-
-        let trueFalseQuestionEditorViewHandler = new TrueFalseQuestionEditorViewHandler(new TrueFalseQuestionEditorView());
-        trueFalseQuestionEditorViewHandler.render(new TrueFalseQuestion(3, "Today is the 13.01.2026", true), "questions");
+        locationUtil.redirectToLoginPage();
     }
 
-    else
+    const examId = Number(urlUtil.getParam("examId"));
+
+    if(examId === null)
     {
-        locationUtil.redirectToUserPage();
+        locationUtil.redirectToMainPage();
     }
+
+    serviceFactory.getService(ServiceName.EXAM).getExam(examId, (exam:Exam) =>
+    {
+        const nameInputElement:HTMLInputElement = document.getElementById("nameInput") as HTMLInputElement;
+        nameInputElement!.value = exam.getName();
+        nameInputElement!.disabled = false;
+
+        const questionEditorViewHandlers:any[] = [];
+
+        for(let question of exam.getQuestions())
+        {
+            if(question instanceof TrueFalseQuestion)
+            {
+                let trueFalseQuestionEditorViewHandler = new TrueFalseQuestionEditorViewHandler(new TrueFalseQuestionEditorView());
+                trueFalseQuestionEditorViewHandler.render(question as TrueFalseQuestion, "questions");
+
+                questionEditorViewHandlers.push(trueFalseQuestionEditorViewHandler);
+            }
+            
+            else if(question instanceof MCQuestion)
+            {
+                let mcQuestionEditorViewHandler = new MCQuestionEditorViewHandler(new MCQuestionEditorView());
+                mcQuestionEditorViewHandler.render(question as MCQuestion, "questions");
+
+                questionEditorViewHandlers.push(mcQuestionEditorViewHandler);
+            }
+        }
+    },
+
+    (error:ServiceError) =>
+    {
+        console.log("Error: " + error);
+        locationUtil.redirectToMainPage();
+    });
+},
+
+(error:ServiceError) =>
+{
+    console.log("Error: " + error);
+    locationUtil.redirectToMainPage();
 });

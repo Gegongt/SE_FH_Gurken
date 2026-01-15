@@ -6,6 +6,8 @@ export class SelectView
     private selectionElement:HTMLDivElement|null = null;
     private optionContainer:HTMLDivElement|null = null;
 
+    private removeButtonClickHandler:(option:Option) => void = (option:Option) => {};
+
     private options:Option[] = [];
     private renderedOptions:HTMLDivElement[] = [];
 
@@ -89,6 +91,22 @@ export class SelectView
 
         this.renderedOptions.push(renderedOption);
         this.optionContainer!.appendChild(renderedOption);
+    }
+
+    removeOption(option:Option):void
+    {
+        let optionIndex = this.options.indexOf(option);
+
+        this.options.splice(optionIndex, 1);
+
+        let renderedOption = this.renderedOptions[optionIndex];
+        this.renderedOptions.splice(optionIndex, 1);
+        renderedOption!.remove();
+    }
+
+    bindRemoveButton(clickHandler:(option:Option) => void):void
+    {
+        this.removeButtonClickHandler = clickHandler;
     }
 
     renderOptions(options:Option[], removable:boolean = false, multipleSelection = true):void

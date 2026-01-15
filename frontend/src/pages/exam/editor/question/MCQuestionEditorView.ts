@@ -8,55 +8,55 @@ import { QuestionEditorView } from "./QuestionEditorView.js";
 export class MCQuestionEditorView extends QuestionEditorView
 {
     private questionContainer:HTMLDivElement|null = null;
+    private answerSelectField:SelectViewHandler|null = null;
+    private questionInputElement:HTMLInputElement|null = null;
     private parentElementId:string|null = null;
+    private removeQuestionButton:HTMLInputElement|null = null;
+
+    private question:MCQuestion|null = null;
+
+    private addAnswerButtonClickHandler:(addAnswerInputField:HTMLInputElement) => void = (addAnswerInputField:HTMLInputElement) => {};
+    private removeQuestionClickHandler:() => void = () => {};
 
     constructor()
     {
         super();
     }
 
-    renderAnswers(question:MCQuestion, answerSelectField:SelectViewHandler):string
+    renderAnswers(question:MCQuestion, answerSelectField:SelectViewHandler):void
     {
-        /*
-            To shuffle the answers, the following algorithm is used:
-            There is an array containing all answers that are not
-            yet included in the HTML code.
-            
-                answers = ["A", "B", "C", "D", "E"]
-
-            An element from this array is selected - for example the element
-            with the index 3 - using a random number generator. The answer
-            choice with index 3 is then inserted into the HTML code and the
-            corresponding entry in the answers array is removed.
-
-                answers = ["A", "B", "C", "E"]
-
-            This process is repeated until no answers remain. This is
-            intended to prevent potential infinite loops.
-        */
+        this.question = question;
 
         let answers:string[] = [...question.getCorrectAnswers()];
         answers = answers.concat(question.getWrongAnswers());
-        let options:Option[] = [];
 
         for(let i = 0; i < answers.length; i++)
         {
             let isCorrect:boolean = (i < question.getCorrectAnswers().length) ? true : false;
-            options.push(new AnaswerOption(isCorrect, answers[i] as string, isCorrect));
+            answerSelectField.addOption(new AnaswerOption(isCorrect, answers[i] as string, isCorrect));
         }
+    }
 
-        console.table(options);
+    renderAddAnswerArea(answerContainerId:string):void
+    {
+        let answerAreaElement = document.createElement("div");
+        
+        let answerInputElement = document.createElement("input");
+        answerInputElement.type = "text";
+        answerInputElement.placeholder = "<  Add new answer option here  >";
 
-        let answersContainer = "";
-        let numberOfAnswers = answers.length;
+        answerAreaElement.appendChild(answerInputElement);
 
-        for(let i = 0, answerIndex = Math.floor(Math.random() * (answers.length - i)); i < numberOfAnswers; i++, answerIndex = Math.floor(Math.random() * (answers.length - i)))
+        let addAnswerInputButton = document.createElement("input");
+        addAnswerInputButton.type = "button";
+        addAnswerInputButton.value = "+";
+        addAnswerInputButton.addEventListener("click", () =>
         {
-            answerSelectField.addOption(options[answerIndex] as Option);
-            options.splice(answerIndex, 1);
-        }
+            this.addAnswerButtonClickHandler(answerInputElement);
+        });
 
-        return answersContainer;
+        answerAreaElement.appendChild(addAnswerInputButton);
+        document.getElementById(answerContainerId)!.appendChild(answerAreaElement);
     }
 
     render(question:MCQuestion, parentElementId:string):void
@@ -64,19 +64,91 @@ export class MCQuestionEditorView extends QuestionEditorView
         this.questionContainer = document.createElement("div");
         this.questionContainer.id = "question_" + question.getId();
 
-        this.questionContainer.innerHTML = `<p id = "questionText_${question.getId()}">${question.getQuestion()}</p>`;
+        let questionHeaderElement = document.createElement("div");
+
+        this.questionInputElement = document.createElement("input");
+        this.questionInputElement.type = "text";
+        this.questionInputElement.value = question.getQuestion();
+
+        questionHeaderElement.appendChild(this.questionInputElement);
+
+        this.removeQuestionButton = document.createElement("input");
+        this.removeQuestionButton.type = "button";
+        this.removeQuestionButton.value = "Remove";
+
+        this.removeQuestionButton.addEventListener("click", () =>
+        {
+            this.removeQuestionClickHandler();
+        });
+
+        questionHeaderElement.appendChild(this.removeQuestionButton);
+
+        this.questionContainer.appendChild(questionHeaderElement);
+
+        let answerContainer = document.createElement("div");
+        answerContainer.id = this.questionContainer.id + "_answers";
+        this.questionContainer.appendChild(answerContainer);
+        
         this.parentElementId = parentElementId;
         let parentElement = document.getElementById(this.parentElementId);
         parentElement!.appendChild(this.questionContainer);
 
-        let answerSelectField = new SelectViewHandler(new SelectView(), true, true);        
-        answerSelectField.render([], "question_" + question.getId());
+        this.answerSelectField = new SelectViewHandler(new SelectView(), true, true);        
+        this.answerSelectField.render([], answerContainer.id);
         
-        this.renderAnswers(question, answerSelectField);
+        let addAnswerArea = document.createElement("div");
+        addAnswerArea.id = "question_" + question.getId() + "_add";
+        this.questionContainer.appendChild(addAnswerArea);
+
+        this.renderAnswers(question, this.answerSelectField);
+        this.renderAddAnswerArea(addAnswerArea.id);
     }
 
-    remove()
+    remove():void
     {
         this.questionContainer!.remove();
+    }
+
+    addAnswer(text:string):void
+    {
+        this.answerSelectField!.addOption(new Option(false, text));
+    }
+
+    bindAddAnswerButton(clickHandler:(addAnswerInputField:HTMLInputElement) => void):void
+    {
+        this.addAnswerButtonClickHandler = clickHandler;
+    }
+
+    bindRemoveQuestionButton(clickHandler:() => void)
+    {
+        this.removeQuestionClickHandler = clickHandler;
+    }
+
+    getOriginalQuestion():MCQuestion|null
+    {
+        return this.question;
+    }
+
+    getUpdatedQuestion():MCQuestion
+    {
+        let answers = this.answerSelectField!.getOptions();
+
+        let correctAnswers = [];
+        let wrongAnswers = [];
+
+        for(let answer of answers)
+        {
+            if(answer.getSelected())
+            {
+                correctAnswers.push(answer.getContent());
+            }
+
+            else
+            {
+                wrongAnswers.push(answer.getContent());
+            }
+        }
+
+        return new MCQuestion(this.question!.getId(), this.questionInputElement!.value, correctAnswers, wrongAnswers);
     }
 }
