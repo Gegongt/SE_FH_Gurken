@@ -7,6 +7,7 @@ export class UserView {
   private username = document.getElementById("username") as HTMLDivElement;
   private btnChange = document.getElementById("btnChangeProfilePic") as HTMLButtonElement;
   private picker = document.getElementById("profilePicPicker") as HTMLInputElement;
+  private favouritesList: HTMLUListElement;
 
   private adminPanel= document.getElementById("adminPanel") as HTMLDivElement;
   private reportedFilesList = document.getElementById("reportedFilesList") as HTMLUListElement;
@@ -16,12 +17,15 @@ export class UserView {
     const btn = document.getElementById("btnChangeProfilePic");
     const picker = document.getElementById("profilePicPicker");
     this.roleLabel = document.getElementById("roleLabel")!;
+    const favList = document.getElementById("favouritesList");
 
     if (!(btn instanceof HTMLButtonElement)) throw new Error("btnChangeProfilePic not found");
     if (!(picker instanceof HTMLInputElement)) throw new Error("profilePicPicker not found");
+    if (!(favList instanceof HTMLUListElement)) throw new Error("favouritesList not found");
 
     this.btnChange = btn;
     this.picker = picker;
+    this.favouritesList = favList;
   }
 
   renderUser(user: User): void {
@@ -185,4 +189,41 @@ export class UserView {
     });
   }
 
+  renderFavourites(files: import("../../vo/File.js").File[]): void {
+    this.favouritesList.innerHTML = "";
+
+    if (files.length === 0) {
+      this.favouritesList.innerHTML = "<li>No favourites yet</li>";
+      return;
+    }
+
+    for (const f of files) {
+      const li = document.createElement("li");
+      li.setAttribute("data-file-id", String(f.getId()));
+      li.innerHTML = `
+        <span><b>${f.getName()}</b></span>
+        <button data-action="remove">Remove</button>
+        <button data-action="download">Download</button>
+      `;
+      this.favouritesList.appendChild(li);
+    }
+  }
+
+  bindFavouriteAction(handler: (fileId: number, action: "remove" | "download") => void): void {
+    this.favouritesList.addEventListener("click", (e) => {
+      const target = e.target as HTMLElement;
+      const btn = target.closest("button");
+      if (!btn) return;
+
+      const action = btn.getAttribute("data-action");
+      if (action !== "remove" && action !== "download") return;
+
+      const li = btn.closest("li");
+      const idStr = li?.getAttribute("data-file-id");
+      if (!idStr) return;
+
+      handler(Number(idStr), action);
+    });
+  }
+  
 }

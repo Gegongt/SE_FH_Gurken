@@ -45,4 +45,5 @@ export class File extends NamedEntity {
   public setRatingSummary(summary: RatingSummary): void {
     this.ratingSummary = summary;
   }
+
 }

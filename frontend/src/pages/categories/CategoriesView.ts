@@ -99,6 +99,8 @@ export class CategoriesView {
       li.setAttribute("data-file-id", String(f.getId()));
 
       const summary = f.getRatingSummary();
+      const isFav = (f as any).fav === true;
+      const favBtnText = isFav ? "Unfavourite" : "Favourite";
       const reportedText = f.getIsReported() ? "Reported" : "Not reported";
       const reportBtnText = f.getIsReported() ? "Unreport" : "Report";
 
@@ -117,6 +119,7 @@ export class CategoriesView {
           <button data-action="rate" data-value="BAD">Bad</button>
           <button data-action="rate" data-value="MEDIUM">Medium</button>
           <button data-action="rate" data-value="GOOD">Good</button>
+          <button data-action="favourite">${favBtnText}</button>
         </div>
       `;
 
@@ -290,5 +293,22 @@ export class CategoriesView {
       handler(Number(idStr), action);
     });
   }
+
+  bindFavouriteClick(handler: (fileId: number) => void): void {
+    this.fileList.addEventListener("click", (e) => {
+      const target = e.target as HTMLElement;
+      const btn = target.closest("button");
+      if (!btn) return;
+
+      if (btn.getAttribute("data-action") !== "favourite") return;
+
+      const li = btn.closest("li");
+      const idStr = li?.getAttribute("data-file-id");
+      if (!idStr) return;
+
+      handler(Number(idStr));
+    });
+  }
+
 
 }

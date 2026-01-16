@@ -60,13 +60,27 @@ export class UserViewHandler {
 
         this.currentUser = u;
         this.view.renderUser(u);
+        this.view.renderFavourites(u.getFavourites());
         this.view.showAdminPanel(u.getIsAdmin());
 
         this.view.bindReportedFileActions((action, fileId, uploaderId) => {
           this.onReportedAction(action, fileId, uploaderId);
         });
+
         this.view.bindBlockedUserActions((action, userId) => {
           this.onBlockedAction(action, userId);
+        });
+
+        this.view.bindFavouriteAction((fileId, action) => {
+          if (action === "download") window.open(`/api/files/${fileId}/download`, "_blank");
+
+          if (action === "remove") {
+            this.userService.getCurrentUser((u) => {
+              if (!u) return;
+              u.removeFavourite(fileId);
+              this.view.renderFavourites(u.getFavourites());
+            }, () => {});
+          }
         });
 
         this.view.bindChangeProfilePicClick();

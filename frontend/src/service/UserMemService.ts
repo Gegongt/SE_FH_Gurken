@@ -4,6 +4,7 @@ import { LoginError } from "./error/LoginError.js";
 import { ObjectNotFoundError } from "./error/ObjectNotFoundError.js";
 import { ServiceError } from "./error/ServiceError.js";
 import { InvalidValueError } from "./error/InvalidValueError.js";
+import { File } from "../vo/File.js";
 
 class UserMemService
 {

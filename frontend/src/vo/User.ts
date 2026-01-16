@@ -1,3 +1,5 @@
+import { File } from "./File.js";
+
 export class User
 {
   private id:number;
@@ -63,6 +65,24 @@ export class User
   public getFavourites():File[]
   {
     return this.favourites;
+  }
+
+  public isFavourite(fileId: number): boolean {
+    return this.favourites.some(f => f.getId() === fileId);
+  }
+
+  public addFavourite(file: File): void {
+    if (!this.isFavourite(file.getId())) {
+      this.favourites.push(file);
+    }
+  }
+
+  public removeFavourite(fileId: number): void {
+    this.favourites = this.favourites.filter(f => f.getId() !== fileId);
+  }
+
+  public setFavourites(files: File[]): void {
+    this.favourites = files ?? [];
   }
 
   public getProfilePictureName():string|null

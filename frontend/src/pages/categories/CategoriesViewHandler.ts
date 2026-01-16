@@ -71,6 +71,14 @@ export type ExamService = {
   ): void;
 };
 
+export type FavouritesService = {
+  getFavourites(userId: number, success: (files: File[]) => void, error: (e:any)=>void): void;
+  addFavourite(userId: number, file: File, success: ()=>void, error:(e:any)=>void): void;
+  removeFavourite(userId: number, fileId: number, success: ()=>void, error:(e:any)=>void): void;
+};
+
+
+
 console.log("CategoriesViewHandler init()");
 
 export class CategoriesViewHandler {
@@ -87,6 +95,7 @@ export class CategoriesViewHandler {
     private fileService: FileService,
     private ratingService: RatingService,
     private examService: ExamService,
+    private favouritesService: FavouritesService,
     private nav: Navigator = locationUtil
   ) {}
 
@@ -103,6 +112,8 @@ export class CategoriesViewHandler {
     this.view.bindRatingClick((fileId, value) => this.onRateClicked(fileId, value));
     this.view.bindDownloadClick((fileId) => this.onDownloadClicked(fileId));
     this.view.bindCreateExam(() => this.onCreateExamClicked());
+    this.view.bindFavouriteClick((fileId) => this.onFavouriteClicked(fileId));
+
 
     this.view.bindExamAction((examId, action) => {
       if (action === "edit") this.nav.redirectToExamEditorPage(examId);
@@ -204,8 +215,22 @@ export class CategoriesViewHandler {
       true,
       (files) => {
         this.currentFiles = files;
-        this.view.renderFiles(this.currentFiles);
 
+       this.favouritesService.getFavourites(
+       this.currentUserId,
+        (favs) => {
+          const favSet = new Set(favs.map(f => f.getId()));
+          for (const f of this.currentFiles) {
+            (f as any).fav = favSet.has(f.getId());
+          }
+          this.view.renderFiles(this.currentFiles);
+        },
+        (_e) => {
+          this.view.renderFiles(this.currentFiles);
+        }
+       );
+
+        this.view.renderFiles(this.currentFiles);
         for (const f of this.currentFiles) {
           this.ratingService.getSummary(
             f.getId(),
@@ -275,12 +300,30 @@ export class CategoriesViewHandler {
     );
   }
 
- private onCreateExamClicked(): void {
+  private onCreateExamClicked(): void {
     if (this.selectedSubcategoryId == null) {
       this.view.renderError("Please select a subcategory first.");
       return;
     }
     this.nav.redirectToExamEditorPage(); // erstellen (ohne id)
+  }
+
+  private onFavouriteClicked(fileId: number): void {
+    const f = this.currentFiles.find(x => x.getId() === fileId);
+    if (!f) return;
+
+    const isFav = (f as any).fav === true;
+
+    const done = () => {
+      (f as any).fav = !isFav;
+      this.view.renderFiles(this.currentFiles);
+    };
+
+    if (!isFav) {
+      this.favouritesService.addFavourite(this.currentUserId, f, done, (e)=>this.view.renderError(String(e)));
+    } else {
+      this.favouritesService.removeFavourite(this.currentUserId, fileId, done, (e)=>this.view.renderError(String(e)));
+    }
   }
 
 

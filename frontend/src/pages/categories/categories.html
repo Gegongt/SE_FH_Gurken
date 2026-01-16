@@ -4,37 +4,115 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Categories</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="../../../styles.css">
 </head>
 
-<body>
-  <h1>Categories</h1>
+<body class="background-grey">
+  <!-- injected header -->
+  <header id="header"></header>
 
-  <label for="categorySearch">Search</label>
-  <input id="categorySearch" type="text" placeholder="Search categories..." />
+  <main class="container my-4">
+    <!-- Page title centered like Sebastian's example -->
+    <div class="text-center mb-4">
+      <h1 class="examHeader m-0">Categories</h1>
+    </div>
 
-  <h2>Category List</h2>
-  <ul id="categoryList"></ul>
+    <!-- Search -->
+    <div class="row justify-content-center mb-4">
+      <div class="col-12 col-lg-10">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <label for="categorySearch" class="form-label questionText mb-2">Search</label>
+            <div class="input-group">
+              <span class="input-group-text">
+                <i class="bi bi-search"></i>
+              </span>
+              <input id="categorySearch" type="text" class="form-control" placeholder="Search categories..." />
+            </div>
+            <div class="text-muted small mt-2">
+              Select a category and subcategory to view files and exams.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-  <h2>Subcategories</h2>
-  <ul id="subcategoryList"></ul>
+    <!-- 3-column layout -->
+    <div class="row g-4 justify-content-center">
+      <!-- Categories -->
+      <div class="col-12 col-lg-4">
+        <div class="card shadow-sm h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h2 class="h5 questionText m-0">Category List</h2>
+              <span class="badge text-bg-primary nonSelectable">Categories</span>
+            </div>
+            <ul id="categoryList" class="list-group">
+              <!-- JS renders here -->
+            </ul>
+          </div>
+        </div>
+      </div>
 
-  <h2>Files</h2>
-  <ul id="fileList"></ul>
+      <!-- Subcategories -->
+      <div class="col-12 col-lg-4">
+        <div class="card shadow-sm h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h2 class="h5 questionText m-0">Subcategories</h2>
+              <span class="badge text-bg-secondary nonSelectable">Sub</span>
+            </div>
+            <ul id="subcategoryList" class="list-group">
+              <!-- JS renders here -->
+            </ul>
+          </div>
+        </div>
+      </div>
 
-  <div style="margin-top: 12px;">
-    <button id="btnUploadFile" disabled>Upload File</button>
-  </div>
+      <!-- Files + Exams -->
+      <div class="col-12 col-lg-4">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <!-- Files header + Upload -->
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h2 class="h5 questionText m-0">Files</h2>
+              <button id="btnUploadFile" class="btn btn-primary btn-sm" disabled>
+                <i class="bi bi-upload me-1"></i>
+                Upload
+              </button>
+            </div>
 
-  <h2>Exams</h2>
-  <ul id="examList"></ul>
+            <ul id="fileList" class="list-group mb-3">
+              <!-- JS renders here -->
+            </ul>
 
-  <div style="margin-top: 12px;">
-    <button id="btnCreateExam" disabled>Create Exam</button>
-  </div>
+            <hr class="my-3" />
 
-  <input id="filePicker" type="file" style="display:none" />
+            <!-- Exams header + Create -->
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h2 class="h5 questionText m-0">Exams</h2>
+              <button id="btnCreateExam" class="btn btn-secondary btn-sm" disabled>
+                <i class="bi bi-plus-circle me-1"></i>
+                Create
+              </button>
+            </div>
 
-  <script type="module" src="../../../dist/pages/categories/categories.js"></script>
+            <ul id="examList" class="list-group">
+              <!-- JS renders here -->
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
 
+    <!-- hidden file input -->
+    <input id="filePicker" type="file" class="d-none" />
+
+    <script type="module" src="../../../dist/pages/categories/categories.js"></script>
+  </main>
 </body>
 </html>
+

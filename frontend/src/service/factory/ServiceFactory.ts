@@ -7,6 +7,8 @@ import { questionMemService } from "../QuestionMemService.js";
 import { examMemService } from "../ExamMemService.js";
 import { fileMemService } from "../FileMemService.js";
 import { ratingMemService } from "../RatingMemService.js";
+import { FavouritesMemService, favouritesMemService } from "../FavouritesMemService.js";
+
 
 class ServiceFactory
 {
@@ -37,6 +39,7 @@ class ServiceFactory
             case ServiceName.RATING: return ratingMemService;
             case ServiceName.QUESTION: return questionMemService;
             case ServiceName.EXAM: return examMemService;
+            case ServiceName.FAVOURITES: return favouritesMemService;
         }
     }
 }

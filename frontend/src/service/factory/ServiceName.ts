@@ -6,5 +6,6 @@ export enum ServiceName
   FILE, 
   RATING,
   QUESTION,
-  EXAM
+  EXAM,
+  FAVOURITES
 }
