@@ -36,6 +36,19 @@ class UserMemService
         return null;
     }
 
+    private getUserByIdSync(id:number):User|null
+    {
+        for(let user of this.users)
+        {
+            if(user.getId() === id)
+            {
+                return user;
+            }
+        }
+
+        return null;
+    }
+
     getUser(emailOrUserName:string, successCallback:(user:User) => void, errorCallback:(error:ServiceError) => void):void
     {
         setTimeout(() =>
@@ -50,6 +63,25 @@ class UserMemService
             else
             {
                 errorCallback(new ObjectNotFoundError("User<" + emailOrUserName + "> has not been found!"));
+            }
+        }, 500);
+    }
+
+    
+    getUserById(id:number, successCallback:(user:User) => void, errorCallback:(error:ServiceError) => void):void
+    {
+        setTimeout(() =>
+        {
+            let user:User|null = this.getUserByIdSync(id);
+            
+            if(user !== null)
+            {
+                successCallback(user);
+            }
+
+            else
+            {
+                errorCallback(new ObjectNotFoundError("User<" + id + "> has not been found!"));
             }
         }, 500);
     }

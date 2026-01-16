@@ -1,4 +1,8 @@
 export enum ServiceName
 {
-    USER
+  USER,
+  CATEGORY,
+  SUBCATEGORY,
+  QUESTION,
+  EXAM
 }
