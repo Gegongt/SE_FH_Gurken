@@ -2,6 +2,7 @@ import { Category } from "../../vo/Category.js";
 import { Subcategory } from "../../vo/Subcategory.js";
 import { File } from "../../vo/File.js";
 import { RatingValue } from "../../vo/RatingSummary.js";
+import { Exam } from "../../vo/Exam.js";
 
 export class CategoriesView {
   private searchInput: HTMLInputElement;
@@ -10,12 +11,15 @@ export class CategoriesView {
   private btnUploadFile: HTMLButtonElement;
   private filePicker: HTMLInputElement;
   private fileList: HTMLUListElement;
+  private examList: HTMLUListElement;
+  private btnCreateExam: HTMLButtonElement;
 
   constructor() {
     const search = document.getElementById("categorySearch");
     const catList = document.getElementById("categoryList");
     const subList = document.getElementById("subcategoryList");
     const fileList = document.getElementById("fileList");
+    const examList = document.getElementById("examList");
 
     if (!(search instanceof HTMLInputElement)) throw new Error("categorySearch not found");
     if (!(catList instanceof HTMLUListElement)) throw new Error("categoryList not found");
@@ -23,6 +27,8 @@ export class CategoriesView {
     if (!(document.getElementById("btnUploadFile") instanceof HTMLButtonElement)) throw new Error("btnUploadFile not found");
     if (!(document.getElementById("filePicker") instanceof HTMLInputElement)) throw new Error("filePicker not found");
     if (!(fileList instanceof HTMLUListElement)) throw new Error("fileList not found");
+    if (!(examList instanceof HTMLUListElement)) throw new Error("examList not found");
+    if (!(document.getElementById("btnCreateExam") instanceof HTMLButtonElement)) throw new Error("btnCreateExam not found");
 
     this.searchInput = search;
     this.categoryList = catList;
@@ -30,6 +36,8 @@ export class CategoriesView {
     this.btnUploadFile = document.getElementById("btnUploadFile") as HTMLButtonElement;
     this.filePicker = document.getElementById("filePicker") as HTMLInputElement;
     this.fileList = fileList as HTMLUListElement;
+    this.examList = examList;
+    this.btnCreateExam = document.getElementById("btnCreateExam") as HTMLButtonElement; 
 
   }
 
@@ -131,7 +139,9 @@ export class CategoriesView {
   }
 
   enableActions(enable: boolean): void {
-  this.btnUploadFile.disabled = !enable;
+    console.log("enableActions:", enable);
+    this.btnUploadFile.disabled = !enable;
+    this.btnCreateExam.disabled = !enable;
   }
 
   bindUploadClick(handler: () => void): void {
@@ -152,21 +162,26 @@ export class CategoriesView {
 
   bindSubcategoryClick(handler: (subcategoryId: number) => void): void {
     this.subcategoryList.addEventListener("click", (e) => {
-      const target = e.target as HTMLElement;
-      const li = target.closest("li");
+      const target = e.target as HTMLElement | null;
+      const li = target?.closest("li");
       if (!li) return;
 
       const idStr = li.getAttribute("data-id");
       if (!idStr) return;
 
-      handler(Number(idStr));
+      const id = Number(idStr);
+      if (!Number.isFinite(id)) return;
+
+      handler(id);
     });
   }
+
 
   resetDetails(): void {
     this.renderSubcategories([]);
     this.clearFiles();     
     this.enableActions(false);
+    this.renderExams([]);
   }
 
   clearFiles(): void {
@@ -175,6 +190,10 @@ export class CategoriesView {
 
   clearSubcategories(): void {
     this.subcategoryList.innerHTML = "";
+  }
+
+  clearExams(): void {
+    this.examList.innerHTML = "";
   }
 
   bindRatingClick(handler: (fileId: number, value: RatingValue) => void): void {
@@ -225,6 +244,50 @@ export class CategoriesView {
       if (!idStr) return;
 
       handler(Number(idStr));
+    });
+  }
+
+  renderExams(exams: Exam[]): void {
+    this.examList.innerHTML = "";
+
+    if (exams.length === 0) {
+      this.examList.innerHTML = "<li>No exams available</li>";
+      return;
+    }
+
+    for (const ex of exams) {
+      const li = document.createElement("li");
+      li.setAttribute("data-exam-id", String(ex.getId()));
+
+      li.innerHTML = `
+        <span><b>${ex.getName()}</b></span>
+        <div style="margin-top:6px;">
+          <button data-action="execute">Execute</button>
+          <button data-action="edit">Edit</button>
+        </div>
+      `;
+      this.examList.appendChild(li);
+    }
+  }
+
+  bindCreateExam(handler: () => void): void {
+    this.btnCreateExam.addEventListener("click", handler);
+  }
+
+  bindExamAction(handler: (examId: number, action: "execute" | "edit") => void): void {
+    this.examList.addEventListener("click", (e) => {
+      const target = e.target as HTMLElement;
+      const btn = target.closest("button");
+      if (!btn) return;
+
+      const action = btn.getAttribute("data-action");
+      if (action !== "execute" && action !== "edit") return;
+
+      const li = btn.closest("li");
+      const idStr = li?.getAttribute("data-exam-id");
+      if (!idStr) return;
+
+      handler(Number(idStr), action);
     });
   }
 

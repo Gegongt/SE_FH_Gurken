@@ -3,6 +3,16 @@ import { CategoriesView } from "./CategoriesView.js";
 import { File } from "../../vo/File.js";
 import { RatingSummary, RatingValue } from "../../vo/RatingSummary.js";
 import { Subcategory } from "../../vo/Subcategory.js";
+import { Exam } from "../../vo/Exam.js";
+import { locationUtil } from "../../util/LocationUtil.js";
+
+type Navigator = {
+  redirectToExamExecutorPage(id: number): void;
+  redirectToExamEditorPage(id?: number | null): void;
+  redirectToLoginPage(): void;
+  redirectToUserPage(): void;
+  redirectToMainPage(): void;
+};
 
 export type CategoryService = {
   getCategories(
@@ -52,6 +62,15 @@ export type RatingService = {
   ): void;
 };
 
+export type ExamService = {
+  getExams(
+    subcategoryId: number,
+    shallow: boolean,
+    success: (exams: Exam[]) => void,
+    error: (status: any) => void
+  ): void;
+};
+
 console.log("CategoriesViewHandler init()");
 
 export class CategoriesViewHandler {
@@ -59,14 +78,16 @@ export class CategoriesViewHandler {
   private allCategories: Category[] = [];
   private selectedSubcategoryId: number | null = null;
   private currentFiles: File[] = [];
+  private currentExams: Exam[] = [];
 
   constructor(
     private view: CategoriesView,
     private categoryService: CategoryService,
     private subcategoryService: SubcategoryService,
     private fileService: FileService,
-    private ratingService: RatingService
-
+    private ratingService: RatingService,
+    private examService: ExamService,
+    private nav: Navigator = locationUtil
   ) {}
 
   init(): void {
@@ -81,7 +102,12 @@ export class CategoriesViewHandler {
     this.view.bindSubcategoryClick((subcategoryId) => this.onSubcategoryClicked(subcategoryId));
     this.view.bindRatingClick((fileId, value) => this.onRateClicked(fileId, value));
     this.view.bindDownloadClick((fileId) => this.onDownloadClicked(fileId));
+    this.view.bindCreateExam(() => this.onCreateExamClicked());
 
+    this.view.bindExamAction((examId, action) => {
+      if (action === "edit") this.nav.redirectToExamEditorPage(examId);
+      if (action === "execute") this.nav.redirectToExamExecutorPage(examId);
+    });
 
     this.categoryService.getCategories(
       true,
@@ -100,6 +126,8 @@ export class CategoriesViewHandler {
     this.selectedSubcategoryId = null;
     this.currentFiles = [];
     this.view.resetDetails();
+    this.currentExams = [];
+    this.view.clearExams();
 
     const q = text.trim().toLowerCase();
 
@@ -119,6 +147,8 @@ export class CategoriesViewHandler {
     this.selectedSubcategoryId = null;
     this.view.enableActions(false);
     this.currentFiles = [];
+    this.view.clearExams();
+    this.currentExams = [];
 
     this.view.clearSubcategories();
     this.view.clearFiles();
@@ -138,6 +168,7 @@ export class CategoriesViewHandler {
     this.view.enableActions(true);
 
     this.reloadFiles(subcategoryId);
+    this.reloadExams(subcategoryId);
   }
 
   private onUploadClicked(): void {
@@ -231,5 +262,26 @@ export class CategoriesViewHandler {
     //Browser download
     window.open(url, "_blank");
   }
+
+  private reloadExams(subcategoryId: number): void {
+    this.examService.getExams(
+      subcategoryId,
+      true,
+      (exams) => {
+        this.currentExams = exams;
+        this.view.renderExams(this.currentExams);
+      },
+      (status) => this.view.renderError(`Failed to load exams: ${String(status)}`)
+    );
+  }
+
+ private onCreateExamClicked(): void {
+    if (this.selectedSubcategoryId == null) {
+      this.view.renderError("Please select a subcategory first.");
+      return;
+    }
+    this.nav.redirectToExamEditorPage(); // erstellen (ohne id)
+  }
+
 
 }
