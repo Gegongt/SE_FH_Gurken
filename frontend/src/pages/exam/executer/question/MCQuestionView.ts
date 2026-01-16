@@ -3,12 +3,15 @@ import { AnaswerOption } from "../../component/select/AnswerOption.js";
 import { Option } from "../../component/select/Option.js";
 import { SelectView } from "../../component/select/SelectView.js";
 import { SelectViewHandler } from "../../component/select/SelectViewHandler.js";
+import { QuestionState } from "./QuestionState.js";
 import { QuestionView } from "./QuestionView.js";
 
 export class MCQuestionView extends QuestionView
 {
     private questionContainer:HTMLDivElement|null = null;
     private parentElementId:string|null = null;
+
+    private answerSelectField:SelectViewHandler|null = null;
 
     constructor()
     {
@@ -67,14 +70,44 @@ export class MCQuestionView extends QuestionView
         let parentElement = document.getElementById(this.parentElementId);
         parentElement!.appendChild(this.questionContainer);
 
-        let answerSelectField = new SelectViewHandler(new SelectView(), false, true);        
-        answerSelectField.render([], "question_" + question.getId());
+        this.answerSelectField = new SelectViewHandler(new SelectView(), false, true);        
+        this.answerSelectField.render([], "question_" + question.getId());
         
-        this.renderAnswers(question, answerSelectField);
+        this.renderAnswers(question, this.answerSelectField);
     }
 
-    remove()
+    remove():void
     {
         this.questionContainer!.remove();
+    }
+
+    markQuestion(state:QuestionState):void
+    {
+        switch(state)
+        {
+            case QuestionState.HIDDEN:
+                this.questionContainer!.classList.remove("incorrectQuestion", "correctQuestion");
+                break;
+
+            case QuestionState.CORRECT:
+                this.questionContainer!.classList.remove("incorrectQuestion");
+                this.questionContainer!.classList.add("correctQuestion");
+                break;
+
+            case QuestionState.INCORRECT:
+                this.questionContainer!.classList.remove("correctQuestion");
+                this.questionContainer!.classList.add("incorrectQuestion");
+                break;
+        }
+    }
+
+    getSelection():Option[]
+    {
+        return this.answerSelectField!.getSelection();
+    }
+
+    getOptions():Option[]
+    {
+        return this.answerSelectField!.getOptions();
     }
 }

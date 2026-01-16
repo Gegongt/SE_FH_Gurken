@@ -27,6 +27,11 @@ export class SelectViewHandler
         this.selectView.render(options, this.parentElementId, this.removable, this.multipleSelection);
     }
 
+    getSelection():Option[]
+    {
+        return this.selectView.getSelection();
+    }
+
     getSelectionIndexes():number[]
     {
         return this.selectView.getSelectionIndexes();

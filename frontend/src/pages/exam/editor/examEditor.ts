@@ -143,7 +143,7 @@ serviceFactory.getService(ServiceName.USER).getCurrentUser((user:User|null) =>
 
     const examId = Number(urlUtil.getParam("examId"));
 
-    if(examId === null) //a new exam is being created
+    if(!examId) //a new exam is being created
     {
         loadPage(new Exam(-1, "", [], user as User));
     }

@@ -33,7 +33,7 @@ export class Exam
 
     setName(name:string):void
     {
-        this.name = this.name;
+        this.name = name;
     }
 
     getQuestions():Question[]

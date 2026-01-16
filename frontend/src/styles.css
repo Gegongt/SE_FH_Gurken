@@ -9,3 +9,13 @@
     border: 1px solid gray;
     background-color: gray;
 }
+
+.correctQuestion
+{
+    border: 1px solid green;
+}
+
+.incorrectQuestion
+{
+    border: 1px solid red;
+}

@@ -60,11 +60,14 @@ export class SelectView
         }
     }
 
-    unselectAll():void
+    unselectAll(skipIndexes:number[] = []):void
     {
         for(let i = 0; i < this.options.length; i++)
         {
-            this.unselect(i);
+            if(!skipIndexes.includes(i))
+            {
+                this.unselect(i);
+            }
         }
     }
 
@@ -95,12 +98,14 @@ export class SelectView
 
         renderedOption.addEventListener("click", () =>
         {
+            let optionIndex = this.options.indexOf(option);
+
             if(!multipleSelection)
             {
-                this.unselectAll();
+                this.unselectAll([optionIndex]);
             }
 
-            this.selectOrUnselect(this.options.indexOf(option));
+            this.selectOrUnselect(optionIndex);
         });
 
         this.renderedOptions.push(renderedOption);
@@ -155,6 +160,19 @@ export class SelectView
         parentElement!.appendChild(this.selectionElement);
     }
 
+    getSelection():Option[]
+    {
+        let indexes = this.getSelectionIndexes();
+        let selectedOptions:Option[] = [];
+
+        for(let i of indexes)
+        {
+            selectedOptions.push(this.options[i] as Option);
+        }
+
+        return selectedOptions;
+    }
+
     getSelectionIndexes():number[]
     {
         let indexes:number[] = [];
@@ -165,7 +183,7 @@ export class SelectView
             {
                 if(this.options[i]!.getSelected())
                 {
-                    indexes.push();
+                    indexes.push(i);
                 }
             }
         }
