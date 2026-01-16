@@ -1,25 +1,118 @@
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>FHGurken</title>
-    </head>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FHGurken</title>
 
-    <body>
-        <div id = "content">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    />
+    <link rel="stylesheet" href="../../styles.css" />
+  </head>
 
+  <body class="background-grey">
+    <header id="header"></header>
+
+    <main class="container my-4">
+      <div class="text-center mb-4">
+        <h1 id="roleLabel" class="examHeader m-0">User</h1>
+      </div>
+
+      <div class="row g-4 justify-content-center">
+        <div class="col-12 col-lg-8">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <div class="d-flex align-items-center gap-3">
+                <img
+                  id="profileImg"
+                  alt="profile"
+                  width="96"
+                  height="96"
+                  class="rounded-circle border"
+                />
+
+                <div class="flex-grow-1">
+                  <div id="username" class="h5 mb-1"></div>
+                  <div class="text-muted small">Manage your profile and favourites</div>
+                </div>
+
+                <div class="d-flex align-items-center gap-2">
+                  <button id="btnChangeProfilePic" class="btn btn-primary btn-sm">
+                    <i class="bi bi-image me-1"></i>
+                    Change picture
+                  </button>
+                  <input
+                    id="profilePicPicker"
+                    type="file"
+                    accept="image/*"
+                    class="d-none"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <!--
-            Reported Files:
-                * delete file
-                * block user
-                * accept file
+        <div class="col-12 col-lg-8">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h3 class="questionText m-0">Favourites</h3>
+                <span class="badge text-bg-secondary nonSelectable">Files</span>
+              </div>
 
-            Blocked users:
-                * Unblock
-        -->
+              <ul id="favouritesList" class="list-group">
 
-        <script type = "module" src = "../../../dist/pages/user/user.js"></script>
-    </body>
+              </ul>
+
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-lg-8">
+          <div id="adminPanel" style="display: none;">
+            <div class="card shadow-sm border-0">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h2 class="questionText m-0">Admin Panel</h2>
+                  <span class="badge text-bg-primary nonSelectable">Admin</span>
+                </div>
+
+                <div class="row g-3">
+                  <div class="col-12">
+                    <div class="p-3 rounded background-grey border">
+                      <h4 class="h6 mb-2 questionText">Reported Files</h4>
+                      <ul id="reportedFilesList" class="list-group">
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div class="col-12">
+                    <div class="p-3 rounded background-grey border">
+                      <h4 class="h6 mb-2 questionText">Blocked Users</h4>
+                      <ul id="blockedUsersList" class="list-group">
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="text-muted small mt-3">
+                  Admin actions: review reported files, manage blocked users.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script type="module" src="../../../dist/pages/user/user.js"></script>
+  </body>
 </html>

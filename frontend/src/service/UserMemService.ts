@@ -4,6 +4,7 @@ import { LoginError } from "./error/LoginError.js";
 import { ObjectNotFoundError } from "./error/ObjectNotFoundError.js";
 import { ServiceError } from "./error/ServiceError.js";
 import { InvalidValueError } from "./error/InvalidValueError.js";
+import { File } from "../vo/File.js";
 
 class UserMemService
 {
@@ -15,6 +16,7 @@ class UserMemService
     {
         this.users = [new User(this.nextUserId++, true, "admin@stud.hcw.ac.at", "Admin", false, null, []),
                       new User(this.nextUserId++, false, "fred.mueller@stud.hcw.ac.at", "fred", false, null, []),
+                      new User(this.nextUserId++, false, "blocki.mueller@stud.hcw.ac.at", "blocki", true, null, []),
                       new User(this.nextUserId++, false, "susi.schmidt@stud.hcw.ac.at", "susi", true, null, [])];
         
         this.userPasswords = new Map<string, string>();
@@ -158,6 +160,52 @@ class UserMemService
             }
         }, 500);
     }
+
+    updateProfilePicture(
+        file: globalThis.File,
+        success: (updatedUser: User) => void,
+        error: (status: any) => void
+        ): void {
+        setTimeout(() => {
+            const currentUserName = localStorage.getItem("currentUser");
+            const loggedInUser = currentUserName ? this.getUserSync(currentUserName) : null;
+
+            if (!loggedInUser) {
+            error(401);
+            return;
+            }
+
+            const url = URL.createObjectURL(file); 
+            loggedInUser.setProfilePictureName(url);
+
+            success(loggedInUser);
+        }, 150);
+    }
+
+
+    getBlockedUsers(
+        success: (users: User[]) => void,
+        error: (status: any) => void
+        ): void {
+        setTimeout(() => {
+            success(this.users.filter(u => u.getIsBlocked()));
+        }, 150);
+    }
+
+    setBlocked(
+        userId: number,
+        blocked: boolean,
+        success: (u: User) => void,
+        error: (status: any) => void
+        ): void {
+        setTimeout(() => {
+            const u = this.users.find(x => x.getId() === userId);
+            if (!u) { error(404); return; }
+            u.setIsBlocked(blocked);
+            success(u);
+        }, 150);
+    }
+
 }
 
 export let userMemService = new UserMemService();

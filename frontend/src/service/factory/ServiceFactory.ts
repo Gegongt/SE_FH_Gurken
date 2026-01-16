@@ -5,6 +5,10 @@ import { categoryMemService } from "../CategoryMemService.js";
 import { subcategoryMemService } from "../SubcategoryMemService.js";
 import { questionMemService } from "../QuestionMemService.js";
 import { examMemService } from "../ExamMemService.js";
+import { fileMemService } from "../FileMemService.js";
+import { ratingMemService } from "../RatingMemService.js";
+import { FavouritesMemService, favouritesMemService } from "../FavouritesMemService.js";
+
 
 class ServiceFactory
 {
@@ -31,8 +35,11 @@ class ServiceFactory
             case ServiceName.USER: return userMemService;
             case ServiceName.CATEGORY: return categoryMemService;
             case ServiceName.SUBCATEGORY: return subcategoryMemService;
+            case ServiceName.FILE: return fileMemService;
+            case ServiceName.RATING: return ratingMemService;
             case ServiceName.QUESTION: return questionMemService;
             case ServiceName.EXAM: return examMemService;
+            case ServiceName.FAVOURITES: return favouritesMemService;
         }
     }
 }

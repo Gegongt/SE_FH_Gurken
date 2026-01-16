@@ -284,6 +284,40 @@ export class ExamMemService
                                                                             });
         }, 500);
     }
+
+    getExams(
+        _subcategoryId: number, // aktuell noch nicht im Model -> ignorieren
+        _shallow: boolean,
+        successCallback: (exams: Exam[]) => void,
+        errorCallback: (error: ServiceError) => void
+        ): void {
+        setTimeout(() => {
+            // Wenn keine Exams existieren
+            if (this.exams.length === 0) {
+            successCallback([]);
+            return;
+            }
+
+            const result: Exam[] = [];
+            let remaining = this.exams.length;
+
+            for (const em of this.exams) {
+            // Creator laden (Questions lassen wir leer -> reicht für Listendarstellung)
+            serviceFactory.getService(ServiceName.USER).getUserById(
+                em.getCreator(),
+                (u: User) => {
+                result.push(new Exam(em.getId(), em.getName(), [], u));
+                remaining--;
+                if (remaining === 0) successCallback(result);
+                },
+                (err: ServiceError) => {
+                errorCallback(err);
+                }
+            );
+            }
+        }, 200);
+    }
+
 }
 
 export let examMemService = new ExamMemService();
