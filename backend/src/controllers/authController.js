@@ -9,6 +9,10 @@ async function register(req, res) {
     return res.status(400).json({ error: "Missing email/password/name" });
   }
 
+  if (!String(email).endsWith("@stud.hcw.ac.at")) {
+    return res.status(400).json({ error: "Only @stud.hcw.ac.at emails are allowed" });
+  }
+
   let firebaseResult = null;
 
   try {
