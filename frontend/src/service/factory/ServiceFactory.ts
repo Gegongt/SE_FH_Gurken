@@ -8,7 +8,6 @@ import { examMemService } from "../ExamMemService.js";
 import { fileMemService } from "../FileMemService.js";
 import { ratingMemService } from "../RatingMemService.js";
 
-
 class ServiceFactory
 {
     private serviceType:ServiceType;
