@@ -67,4 +67,15 @@ async function deleteById(id) {
   return rowCount > 0;
 }
 
-module.exports = { findById, createIfNotExists, updateById, deleteById };
+async function findByBlocked(isBlocked) {
+  const { rows } = await pool.query(
+    `SELECT *
+     FROM public."User"
+     WHERE isblocked = $1`,
+    [isBlocked]
+  );
+
+  return rows;
+};
+
+module.exports = { findById, createIfNotExists, updateById, deleteById, findByBlocked };

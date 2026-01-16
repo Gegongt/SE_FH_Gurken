@@ -101,4 +101,37 @@ async function remove(req, res) {
   }
 }
 
-module.exports = { create, whoami, update, remove };
+async function list(req, res) {
+  try {
+    const dbUser = req.dbUser;
+
+    if (!dbUser) {
+      return res.status(500).json({ message: "User missing" });
+    }
+
+    if (!dbUser.isadmin) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
+    const query = req.query?.isBlocked;
+
+    if (query === undefined) {
+      return res.status(400).json({ message: "Query param isBlocked is required (true|false)" });
+    }
+
+    const blockedBool = String(query).toLowerCase();
+    if (blockedBool !== "true" && blockedBool !== "false") {
+      return res.status(400).json({ message: "isBlocked must be 'true' or 'false'" });
+    }
+
+    const isBlocked = blockedBool === "true";
+    const users = await userService.listUsersByBlocked(isBlocked);
+
+    return res.status(200).json(users);
+  } catch (err) {
+    console.error("list users error:", err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+module.exports = { create, whoami, update, remove, list };

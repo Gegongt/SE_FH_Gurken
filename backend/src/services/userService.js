@@ -34,4 +34,8 @@ async function deleteUser(userId) {
   return userRepository.deleteById(userId);
 }
 
-module.exports = { createUser, getUserById, updateUser, deleteUser };
+async function listUsersByBlocked(isBlocked) {
+  return userRepository.findByBlocked(isBlocked);
+}
+
+module.exports = { createUser, getUserById, updateUser, deleteUser, listUsersByBlocked };

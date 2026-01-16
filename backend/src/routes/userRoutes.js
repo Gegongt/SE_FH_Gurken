@@ -252,6 +252,6 @@ router.delete("/", requireAuth, userController.remove);
  */
 router.delete("/:userId", requireAuth, userController.remove);
 
-//router.get("/user", requireAuth, checkBlocked, userController.list);
+router.get("/", requireAuth, checkBlocked, userController.list);
 
 module.exports = router;
