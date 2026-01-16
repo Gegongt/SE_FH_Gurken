@@ -6,7 +6,6 @@ import { subcategoryMemService } from "../SubcategoryMemService.js";
 import { questionMemService } from "../QuestionMemService.js";
 import { examMemService } from "../ExamMemService.js";
 
-
 class ServiceFactory
 {
     private serviceType:ServiceType;

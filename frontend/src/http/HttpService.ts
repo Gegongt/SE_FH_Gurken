@@ -58,24 +58,10 @@ class HttpService
         }
     }
 
-    get<T>(
-        url: string,
-        params: any,
-        withCredentials: boolean,
-        success: (data: T) => void,
-        error: (status: any) => void
-    ): void {
-    this.sendRequest(
-        HttpMethod.METHOD_GET,
-        url,
-        params ?? null,
-        null,
-        HttpContentType.CONTENT_TYPE_JSON,
-        "json",
-        withCredentials ?? true,
-        (data: any) => success(data as T),
-        (status: any) => error(status)
-    );
+    get(url:string, params:any, withCredentials:boolean, success:(data:any) => void, error:(status: any) => void):void
+    {
+        this.sendRequest(HttpMethod.METHOD_GET, url, params ?? null, null, HttpContentType.CONTENT_TYPE_JSON,
+                         "json", withCredentials ?? true, (data: any) => success(data), (status: any) => error(status));
     }
 }
 

@@ -64,8 +64,9 @@ export class MCQuestionView extends QuestionView
     {
         this.questionContainer = document.createElement("div");
         this.questionContainer.id = "question_" + question.getId();
+        this.questionContainer.classList.add("mt-3");
 
-        this.questionContainer.innerHTML = `<p id = "questionText_${question.getId()}">${question.getQuestion()}</p>`;
+        this.questionContainer.innerHTML = `<p class = "m-0 questionText" id = "questionText_${question.getId()}">${question.getQuestion()}</p>`;
         this.parentElementId = parentElementId;
         let parentElement = document.getElementById(this.parentElementId);
         parentElement!.appendChild(this.questionContainer);

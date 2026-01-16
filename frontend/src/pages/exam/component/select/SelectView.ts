@@ -77,6 +77,7 @@ export class SelectView
 
         let renderedOption = document.createElement("div");
         renderedOption.classList.add(option.getSelected() ? "selectedOption" : "unselectedOption");
+        renderedOption.classList.add("mt-2", "p-1");
         renderedOption.innerHTML = option.getContent();
 
         if(removable)
@@ -155,6 +156,7 @@ export class SelectView
         let parentElement = document.getElementById(this.parentElementId);
 
         this.selectionElement = document.createElement("div");
+        this.selectionElement.classList.add("nonSelectable");
         this.renderOptions(options, removable, multipleSelection);
 
         parentElement!.appendChild(this.selectionElement);

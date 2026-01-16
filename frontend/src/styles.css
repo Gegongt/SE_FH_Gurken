@@ -1,21 +1,121 @@
+:root
+{
+  --bs-primary: #005D59;
+  --bs-intermediate: #0A7A69;
+  --bs-secondary: #139779;
+
+  --bs-warning: #583E23;
+}
+
+.btn-primary
+{
+    --bs-btn-color: #FFFFFF;
+
+    --bs-btn-bg: #005D59;
+    --bs-btn-border-color: #005D59;
+    
+    --bs-btn-hover-color: #FFFFFF;
+    --bs-btn-hover-bg: #0A7A69;
+    --bs-btn-hover-border-color: #0A7A69;
+    
+    --bs-btn-focus-shadow-rgb: #0A7A69;
+    
+    --bs-btn-active-color: #FFFFF;
+    --bs-btn-active-bg: #139779;
+    --bs-btn-active-border-color: #139779;
+}
+
+.btn-secondary
+{
+    --bs-btn-color: #FFFFFF;
+
+    --bs-btn-bg: #139779;
+    --bs-btn-border-color: #139779;
+    
+    --bs-btn-hover-color: #FFFFFF;
+    --bs-btn-hover-bg: #0A7A69;
+    --bs-btn-hover-border-color: #0A7A69;
+    
+    --bs-btn-focus-shadow-rgb: #0A7A69;
+    
+    --bs-btn-active-color: #FFFFF;
+    --bs-btn-active-bg: #005D59;
+    --bs-btn-active-border-color: #005D59;
+}
+
 .selectedOption
 {
-    border: 1px solid green;
-    background-color: green;
+    border: 1px solid var(--bs-primary);
+    background-color: var(--bs-primary);
+    border-radius: 4px;
+    color: white;
 }
 
 .unselectedOption
 {
-    border: 1px solid gray;
-    background-color: gray;
+    border-left: 2px solid var(--bs-primary);
 }
 
 .correctQuestion
 {
-    border: 1px solid green;
+    padding: 1em;
+    border: 2px solid var(--bs-primary);
+    border-radius: 6px;
 }
 
 .incorrectQuestion
 {
-    border: 1px solid red;
+    padding: 1em;
+    border: 2px solid var(--bs-warning);
+    border-radius: 6px;
+}
+
+.headerElement
+{
+    background-color: var(--bs-primary);
+    user-select: none;
+}
+
+.nonSelectable
+{
+    user-select:none;
+}
+
+.background-grey
+{
+    background-color: #FAFAFA;
+}
+
+.border-primary
+{
+    border: 1em solid var(--bs-primary);
+}
+
+.questionText
+{
+    font-weight: bold;
+    color: var(--bs-primary);
+}
+
+.resultsSection
+{
+    background-color: var(--bs-primary);
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 6px;
+}
+
+.examHeader
+{
+    color: var(--bs-primary);
+    font-weight: bold;
+    text-align: center;
+}
+
+header a
+{
+    color: white;
+    font-weight: bold;
+    text-decoration: none;
 }

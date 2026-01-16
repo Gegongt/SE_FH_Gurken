@@ -1,6 +1,17 @@
-import { httpService } from "./HttpService.js";
-import { EVENT_TYPES, URL_USER_API_ADD_EVENT_POSTFIX, URL_USER_API_ADD_EVENT_PREFIX, URL_USER_API_ADD_FRIEND_POSTFIX, URL_USER_API_ADD_FRIEND_PREFIX, URL_USER_API_ADD_MOVIE_REVIEW_POSTFIX, URL_USER_API_ADD_MOVIE_REVIEW_PREFIX, URL_USER_API_ADD_TO_WATCHLIST_POSTFIX, URL_USER_API_ADD_TO_WATCHLIST_PREFIX, URL_USER_API_CHANGE_PASSWORD, URL_USER_API_DELETE, URL_USER_API_DELETE_MOVIE_REVIEW_POSTFIX, URL_USER_API_DELETE_MOVIE_REVIEW_PREFIX, URL_USER_API_GET_CURRENT_USER, URL_USER_API_GET_USER, URL_USER_API_LOGIN, URL_USER_API_LOGOUT, URL_USER_API_REGISTER, URL_USER_API_REMOVE_FRIEND_POSTFIX, URL_USER_API_REMOVE_FRIEND_PREFIX, URL_USER_API_REMOVE_FROM_WATCHLIST_POSTFIX, URL_USER_API_REMOVE_FROM_WATCHLIST_PREFIX, URL_USER_API_UPDATE_MOVIE_REVIEW_POSTFIX, URL_USER_API_UPDATE_MOVIE_REVIEW_PREFIX } from "../constants.js";
+import { ServiceError } from "../service/error/ServiceError.js";
+import { User } from "../vo/User.js";
 
+export class UserHttpService
+{
+    login(emailOrUserName:string, password:string, successCallback:(user:User) => void, errorCallback:(error:ServiceError) => void):void
+    {
+        
+
+
+    }
+}
+
+/*
 class UserHttpService
 {
     login(userName, password, successCallback, errorCallback)
@@ -196,3 +207,4 @@ class UserHttpService
 }
 
 export let userHttpService = new UserHttpService();
+*/
