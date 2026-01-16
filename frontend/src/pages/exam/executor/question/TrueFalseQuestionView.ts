@@ -29,8 +29,8 @@ export class TrueFalseQuestionView extends QuestionView
         parentElement!.appendChild(this.questionContainer);
 
         let answerOptions = [
-                                new Option(question.getIsTrue(), "True"),
-                                new Option(!question.getIsTrue(), "False")
+                                new Option(false, "True"),
+                                new Option(false, "False")
                             ];
 
         this.answerSelectField = new SelectViewHandler(new SelectView(), false, false);
