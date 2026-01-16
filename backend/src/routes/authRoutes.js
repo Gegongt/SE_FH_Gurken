@@ -1,11 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const authController = require("../controllers/authController");
-const requireAuth = require("../middlewares/requireAuth");
 
 /**
  * @swagger
- * /api/auth/register:
+ * /auth/register:
  *   post:
  *     summary: Register a new user (Firebase + DB)
  *     tags: [Auth]
@@ -86,7 +85,7 @@ router.post("/register", authController.register);
 
 /**
  * @swagger
- * /api/auth/login:
+ * /auth/login:
  *   post:
  *     summary: Login an existing user (Firebase)
  *     tags: [Auth]

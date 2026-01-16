@@ -129,7 +129,6 @@ async function list(req, res) {
 
     return res.status(200).json(users);
   } catch (err) {
-    console.error("list users error:", err);
     return res.status(500).json({ message: "Internal server error" });
   }
 }

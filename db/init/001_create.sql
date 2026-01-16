@@ -14,3 +14,19 @@ CREATE TABLE public."User" (
 	CONSTRAINT user_pk PRIMARY KEY (id),
 	CONSTRAINT user_unique UNIQUE (email)
 );
+
+DROP TABLE IF EXISTS public.category;
+
+CREATE TABLE public.category (
+	id serial NOT NULL,
+	"name" text NOT NULL,
+	CONSTRAINT category_pk PRIMARY KEY (id)
+);
+
+DROP TABLE IF EXISTS public.subcategory;
+
+CREATE TABLE public.subcategory (
+	id serial NOT NULL,
+	"name" text NOT NULL,
+	CONSTRAINT subcategory_pk PRIMARY KEY (id)
+);

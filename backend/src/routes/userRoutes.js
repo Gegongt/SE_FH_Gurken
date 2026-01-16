@@ -7,7 +7,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /api/user/whoami:
+ * /users/whoami:
  *   get:
  *     summary: Returns the currently authenticated user (from DB)
  *     tags: [User]
@@ -53,7 +53,7 @@ router.get("/whoami", requireAuth, checkBlocked, userController.whoami);
 
 /**
  * @swagger
- * /api/user:
+ * /users:
  *   put:
  *     tags: [User]
  *     summary: Update own user
@@ -123,7 +123,7 @@ router.put("/", requireAuth, checkBlocked, userController.update)
 
 /**
  * @swagger
- * /user/{userId}:
+ * /users/{userId}:
  *   put:
  *     tags: [User]
  *     summary: Update user by id (self or admin)
@@ -200,7 +200,7 @@ router.put("/:userId", requireAuth, checkBlocked, userController.update)
 
 /**
  * @swagger
- * /user:
+ * /users:
  *   delete:
  *     tags: [User]
  *     summary: Delete own user
@@ -223,7 +223,7 @@ router.delete("/", requireAuth, userController.remove);
 
 /**
  * @swagger
- * /user/{userId}:
+ * /users/{userId}:
  *   delete:
  *     tags: [User]
  *     summary: Delete user by id (admin only for other users)
@@ -252,6 +252,61 @@ router.delete("/", requireAuth, userController.remove);
  */
 router.delete("/:userId", requireAuth, userController.remove);
 
+/**
+ * @swagger
+ * /users:
+ *   get:
+ *     tags: [User]
+ *     summary: List users filtered by blocked status (admin only)
+ *     description: Returns all users filtered by the `isBlocked` query parameter. Admin only.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: isBlocked
+ *         required: true
+ *         schema:
+ *           type: boolean
+ *         description: Filter users by blocked status
+ *         example: true
+ *     responses:
+ *       200:
+ *         description: List of users
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                     example: "firebaseUid123"
+ *                   email:
+ *                     type: string
+ *                     example: "max@example.com"
+ *                   name:
+ *                     type: string
+ *                     example: "Max Mustermann"
+ *                   isadmin:
+ *                     type: boolean
+ *                     example: false
+ *                   isblocked:
+ *                     type: boolean
+ *                     example: true
+ *                   profilepicturename:
+ *                     type: string
+ *                     nullable: true
+ *                     example: "avatar.png"
+ *       400:
+ *         description: Missing or invalid query parameter (isBlocked must be true/false)
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden (admin only)
+ *       500:
+ *         description: Internal server error
+ */
 router.get("/", requireAuth, checkBlocked, userController.list);
 
 module.exports = router;
