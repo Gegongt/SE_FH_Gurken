@@ -7,6 +7,8 @@ import { Exam } from "../../../vo/Exam.js";
 import { MCQuestion } from "../../../vo/MCQuestion.js";
 import { TrueFalseQuestion } from "../../../vo/TrueFalseQuestion.js";
 import { User } from "../../../vo/User.js";
+import { HeaderView } from "../../components/header/HeaderView.js";
+import { HeaderViewHandler } from "../../components/header/HeaderViewHandler.js";
 import { MCQuestionView } from "./question/MCQuestionView.js";
 import { MCQuestionViewHandler } from "./question/MCQuestionViewHandler.js";
 import { TrueFalseQuestionView } from "./question/TrueFalseQuestionView.js";
@@ -93,8 +95,8 @@ function loadPage(exam:Exam):void
         locationUtil.redirectToMainPage();
     });
 
-    const hideResultsButton:HTMLInputElement = document.getElementById("hideResultsButton") as HTMLInputElement;
-    const showResultsButton:HTMLInputElement = document.getElementById("showResultsButton") as HTMLInputElement;
+    const hideResultsButton:HTMLButtonElement = document.getElementById("hideResultsButton") as HTMLButtonElement;
+    const showResultsButton:HTMLButtonElement = document.getElementById("showResultsButton") as HTMLButtonElement;
 
     const resultsArea:HTMLElement = document.getElementById("results") as HTMLElement;
 
@@ -115,6 +117,9 @@ serviceFactory.getService(ServiceName.USER).getCurrentUser((user:User|null) =>
     {
         locationUtil.redirectToLoginPage();
     }
+
+    let headerViewHandler = new HeaderViewHandler(new HeaderView());
+    headerViewHandler.render("header");
 
     const examId = Number(urlUtil.getParam("examId"));
 
