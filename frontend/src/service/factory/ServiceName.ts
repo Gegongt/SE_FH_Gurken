@@ -1,7 +1,10 @@
-export enum ServiceName {
+export enum ServiceName
+{
   USER,
   CATEGORY,
   SUBCATEGORY,
   FILE, 
-  RATING
+  RATING,
+  QUESTION,
+  EXAM
 }
