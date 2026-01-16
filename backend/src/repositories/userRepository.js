@@ -42,4 +42,40 @@ async function createIfNotExists({ id, email, name, profilepicturename }) {
   throw err;
 }
 
-module.exports = { findById, createIfNotExists };
+async function updateById(id, name, profilepicturename, isblocked) {
+  const sql = `
+    UPDATE public."User"
+    SET
+      name = $2,
+      profilepicturename = $3,
+      isblocked = COALESCE($4, isblocked)
+    WHERE id = $1
+    RETURNING *
+  `;
+
+  const params = [id, name, profilepicturename, isblocked];
+  const { rows } = await pool.query(sql, params);
+  return rows[0] ?? null;
+}
+
+async function deleteById(id) {
+  const { rowCount } = await pool.query(
+    `DELETE FROM public."User" WHERE id = $1`,
+    [id]
+  );
+
+  return rowCount > 0;
+}
+
+async function findByBlocked(isBlocked) {
+  const { rows } = await pool.query(
+    `SELECT *
+     FROM public."User"
+     WHERE isblocked = $1`,
+    [isBlocked]
+  );
+
+  return rows;
+};
+
+module.exports = { findById, createIfNotExists, updateById, deleteById, findByBlocked };
