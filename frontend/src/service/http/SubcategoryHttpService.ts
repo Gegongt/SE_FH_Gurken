@@ -1,4 +1,5 @@
-import { SubcategoryEntity } from "../../http/entity/SubcategoryEntity";
+import { SubcategoryEntity } from "../../http/entity/SubcategoryEntity.js";
+import { converter } from "../../http/entity/util/Converter.js";
 import { HttpMethod } from "../../http/HttpMethod.js";
 import { httpService } from "../../http/HttpService.js";
 import { Subcategory } from "../../vo/Subcategory.js";
@@ -8,7 +9,7 @@ import { accessTokenUtil } from "./AccessTokenUtil.js";
 class SubcategoryHttpService
 {
     private URL_SUBCATEGORY_API_BASE = "http://localhost:3000/api/subcategories";
-    private URL_SUBCATEGORY_API_GET_CATEGORIES = this.URL_SUBCATEGORY_API_BASE;
+    private URL_SUBCATEGORY_API_GET_SUBCATEGORIES = this.URL_SUBCATEGORY_API_BASE;
 
     getSubcategories(categoryId:number|string|null, successCallback:(subcategories:Subcategory[]) => void, errorCallback:(status: any) => void):void
     {
@@ -19,7 +20,7 @@ class SubcategoryHttpService
             params = { categoryId };
         }
 
-        httpService.sendRequest(HttpMethod.METHOD_GET, this.URL_SUBCATEGORY_API_GET_CATEGORIES, params, null,
+        httpService.sendRequest(HttpMethod.METHOD_GET, this.URL_SUBCATEGORY_API_GET_SUBCATEGORIES, params, null,
                                 null, "json", false, accessTokenUtil.getAccessToken(),
                                 (response:SubcategoryEntity[]) =>
                                 {
@@ -27,7 +28,7 @@ class SubcategoryHttpService
 
                                     for(let subcategorieEntity of response)
                                     {
-                                        subcategories.push(new Subcategory(subcategorieEntity.id, subcategorieEntity.name, []));
+                                        subcategories.push(converter.convertSubcategoryEntityToSubcategory(subcategorieEntity));
                                     }
 
                                     successCallback(subcategories);

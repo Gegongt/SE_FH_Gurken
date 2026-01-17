@@ -10,7 +10,7 @@ export class TrueFalseQuestionEditorView extends QuestionEditorView
     private parentElementId:string|null = null;
     private questionInputElement:HTMLInputElement|null = null;
     private answerSelectField:SelectViewHandler|null = null;
-    private removeQuestionButton:HTMLInputElement|null = null;
+    private removeQuestionButton:HTMLButtonElement|null = null;
 
     private question:TrueFalseQuestion|null = null;
 
@@ -27,18 +27,26 @@ export class TrueFalseQuestionEditorView extends QuestionEditorView
 
         this.questionContainer = document.createElement("div");
         this.questionContainer.id = "question_" + question.getId();
+        this.questionContainer.classList.add("mt-3", "editorQuestionContainer");
 
         let questionHeaderElement = document.createElement("div");
+        questionHeaderElement.classList.add("d-flex", "justify-content-between", "align-items-center", "pe-1", "mt-2");
+
+        let questionInputElementContainer = document.createElement("div");
+        questionInputElementContainer.classList.add("col-9", "col-lg-10");
 
         this.questionInputElement = document.createElement("input");
+        this.questionInputElement.classList.add("form-control");
         this.questionInputElement.type = "text";
         this.questionInputElement.value = question.getQuestion();
 
-        questionHeaderElement.appendChild(this.questionInputElement);
+        questionInputElementContainer.appendChild(this.questionInputElement);
+        questionHeaderElement.appendChild(questionInputElementContainer);
 
-        this.removeQuestionButton = document.createElement("input");
+        this.removeQuestionButton = document.createElement("button");
         this.removeQuestionButton.type = "button";
-        this.removeQuestionButton.value = "Remove";
+        this.removeQuestionButton.innerHTML = `<i class = "bi bi-trash-fill"></i></button>`;
+        this.removeQuestionButton.classList.add("btn", "btn-secondary", "p-2");
 
         this.removeQuestionButton.addEventListener("click", () =>
         {

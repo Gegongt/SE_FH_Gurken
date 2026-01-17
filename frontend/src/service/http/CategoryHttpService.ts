@@ -1,8 +1,9 @@
-import { CategoryEntity } from "../../http/entity/CategoryEntity";
+import { CategoryEntity } from "../../http/entity/CategoryEntity.js";
+import { converter } from "../../http/entity/util/Converter.js";
 import { HttpMethod } from "../../http/HttpMethod.js";
 import { httpService } from "../../http/HttpService.js";
 import { Category } from "../../vo/Category.js";
-import { ServiceError } from "../error/ServiceError";
+import { ServiceError } from "../error/ServiceError.js";
 import { accessTokenUtil } from "./AccessTokenUtil.js";
 
 class CategoryHttpService
@@ -21,7 +22,7 @@ class CategoryHttpService
 
                                     for(let categorieEntity of response)
                                     {
-                                        categories.push(new Category(categorieEntity.id, categorieEntity.name, []));
+                                        categories.push(converter.convertCategoryEntityToCategory(categorieEntity));
                                     }
 
                                     if(shallow)

@@ -62,4 +62,4 @@ class ServiceFactory
     }
 }
 
-export let serviceFactory = new ServiceFactory(ServiceType.HTTP);
+export let serviceFactory = new ServiceFactory(ServiceType.MEM);

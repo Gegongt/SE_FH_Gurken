@@ -8,6 +8,8 @@ import { MCQuestion } from "../../../vo/MCQuestion.js";
 import { Question } from "../../../vo/Question.js";
 import { TrueFalseQuestion } from "../../../vo/TrueFalseQuestion.js";
 import { User } from "../../../vo/User.js";
+import { HeaderView } from "../../components/header/HeaderView.js";
+import { HeaderViewHandler } from "../../components/header/HeaderViewHandler.js";
 import { MCQuestionEditorView } from "./question/MCQuestionEditorView.js";
 import { MCQuestionEditorViewHandler } from "./question/MCQuestionEditorViewHandler.js";
 import { TrueFalseQuestionEditorView } from "./question/TrueFalseQuestionEditorView.js";
@@ -82,6 +84,11 @@ function addMCQuestion(question:MCQuestion|null, questionEditorViewHandlers:any[
 
 function loadPage(exam:Exam):void
 {
+    document.getElementById("mainArea")!.hidden = false;
+
+    let headerViewHandler = new HeaderViewHandler(new HeaderView());
+    headerViewHandler.render("header");
+
     const nameInputElement:HTMLInputElement = document.getElementById("nameInput") as HTMLInputElement;
     nameInputElement!.value = exam.getName();
     nameInputElement!.disabled = false;
@@ -125,7 +132,7 @@ function loadPage(exam:Exam):void
         locationUtil.redirectToMainPage();
     });
 
-    const saveButton:HTMLInputElement = document.getElementById("saveButton") as HTMLInputElement;
+    const saveButton:HTMLButtonElement = document.getElementById("saveButton") as HTMLButtonElement;
 
     saveButton!.addEventListener("click", () =>
     {

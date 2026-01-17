@@ -1,17 +1,19 @@
+import { UserEntity } from "./UserEntity";
+
 export class FileEntity
 {
     public id:number;
     public subcategoryid:number;
     public name:string;
-    public uploaderid:number;
+    public uploader:UserEntity;
     public isreported:boolean;
 
-    constructor(id:number, subcategoryid:number, name:string, uploaderid:number, isreported:boolean)
+    constructor(id:number, subcategoryid:number, name:string, uploader:UserEntity, isreported:boolean)
     {
         this.id = id;
         this.subcategoryid = subcategoryid;
         this.name = name;
-        this.uploaderid = uploaderid;
+        this.uploader = uploader;
         this.isreported = isreported;
     }
 }

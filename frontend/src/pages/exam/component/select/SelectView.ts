@@ -77,14 +77,15 @@ export class SelectView
 
         let renderedOption = document.createElement("div");
         renderedOption.classList.add(option.getSelected() ? "selectedOption" : "unselectedOption");
-        renderedOption.classList.add("mt-2", "p-1");
-        renderedOption.innerHTML = option.getContent();
+        renderedOption.classList.add("mt-2", "p-1", "d-flex", "justify-content-between", "align-items-center");
+        renderedOption.innerHTML = `<div>` + option.getContent() + "</div>";
 
         if(removable)
         {
-            let removeButton = document.createElement("input");
+            let removeButton = document.createElement("button");
             removeButton.type = "button";
-            removeButton.value = "Remove";
+            removeButton.innerHTML = `<i class = "bi bi-trash-fill"></i></button>`;
+            removeButton.classList.add("btn", "btn-secondary", "p-2");
 
             removeButton.addEventListener("click", () =>
             {

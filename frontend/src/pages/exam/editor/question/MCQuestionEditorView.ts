@@ -11,7 +11,7 @@ export class MCQuestionEditorView extends QuestionEditorView
     private answerSelectField:SelectViewHandler|null = null;
     private questionInputElement:HTMLInputElement|null = null;
     private parentElementId:string|null = null;
-    private removeQuestionButton:HTMLInputElement|null = null;
+    private removeQuestionButton:HTMLButtonElement|null = null;
 
     private question:MCQuestion|null = null;
 
@@ -40,16 +40,24 @@ export class MCQuestionEditorView extends QuestionEditorView
     renderAddAnswerArea(answerContainerId:string):void
     {
         let answerAreaElement = document.createElement("div");
+        answerAreaElement.classList.add("d-flex", "justify-content-between", "align-items-center", "pe-1", "mt-2")
         
+        let answerInputElementContainer = document.createElement("div");
+        answerInputElementContainer.classList.add("col-9", "col-lg-10");
+
         let answerInputElement = document.createElement("input");
+        answerInputElement.classList.add("form-control");
         answerInputElement.type = "text";
-        answerInputElement.placeholder = "<  Add new answer option here  >";
+        answerInputElement.placeholder = "New answer ...";
 
-        answerAreaElement.appendChild(answerInputElement);
+        answerInputElementContainer.appendChild(answerInputElement);
+        answerAreaElement.appendChild(answerInputElementContainer);
 
-        let addAnswerInputButton = document.createElement("input");
+        let addAnswerInputButton = document.createElement("button");
         addAnswerInputButton.type = "button";
-        addAnswerInputButton.value = "+";
+        addAnswerInputButton.innerHTML = `<i class="bi bi-plus-lg"></i>`;
+        addAnswerInputButton.classList.add("btn", "btn-secondary", "p-2");
+
         addAnswerInputButton.addEventListener("click", () =>
         {
             this.addAnswerButtonClickHandler(answerInputElement);
@@ -63,18 +71,26 @@ export class MCQuestionEditorView extends QuestionEditorView
     {
         this.questionContainer = document.createElement("div");
         this.questionContainer.id = "question_" + question.getId();
+        this.questionContainer.classList.add("mt-3", "editorQuestionContainer");
 
         let questionHeaderElement = document.createElement("div");
+        questionHeaderElement.classList.add("d-flex", "justify-content-between", "align-items-center", "pe-1");
+
+        let questionInputElementContainer = document.createElement("div");
+        questionInputElementContainer.classList.add("col-9", "col-lg-10");
 
         this.questionInputElement = document.createElement("input");
+        this.questionInputElement.classList.add("form-control");
         this.questionInputElement.type = "text";
         this.questionInputElement.value = question.getQuestion();
 
-        questionHeaderElement.appendChild(this.questionInputElement);
+        questionInputElementContainer.appendChild(this.questionInputElement);
+        questionHeaderElement.appendChild(questionInputElementContainer);
 
-        this.removeQuestionButton = document.createElement("input");
+        this.removeQuestionButton = document.createElement("button");
         this.removeQuestionButton.type = "button";
-        this.removeQuestionButton.value = "Remove";
+        this.removeQuestionButton.innerHTML = `<i class = "bi bi-trash-fill"></i></button>`;
+        this.removeQuestionButton.classList.add("btn", "btn-secondary", "p-2");
 
         this.removeQuestionButton.addEventListener("click", () =>
         {
