@@ -35,7 +35,7 @@ class HttpService
 
         xhr.onload = () =>
         {
-            if(xhr.status != 200 && xhr.status != 201)
+            if(xhr.status < 200 || xhr.status > 299)
             {
                 errorCallback(xhr.status);
             }

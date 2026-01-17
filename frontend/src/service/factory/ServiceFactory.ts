@@ -11,6 +11,7 @@ import { FavouritesMemService, favouritesMemService } from "../FavouritesMemServ
 import { userHttpService } from "../http/UserHttpService.js";
 import { categoryHttpService } from "../http/CategoryHttpService.js";
 import { subcategoryHttpService } from "../http/SubcategoryHttpService.js";
+import { examHttpService } from "../http/ExamHttpService.js";
 
 
 class ServiceFactory
@@ -56,10 +57,10 @@ class ServiceFactory
             case ServiceName.FILE: return fileMemService;
             case ServiceName.RATING: return ratingMemService;
             case ServiceName.QUESTION: return questionMemService;
-            case ServiceName.EXAM: return examMemService;
+            case ServiceName.EXAM: return examHttpService;
             case ServiceName.FAVOURITES: return favouritesMemService;
         }
     }
 }
 
-export let serviceFactory = new ServiceFactory(ServiceType.MEM);
+export let serviceFactory = new ServiceFactory(ServiceType.HTTP);

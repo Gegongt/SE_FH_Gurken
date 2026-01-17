@@ -42,9 +42,13 @@ class LocationUtil
         this.redirect(this.URL_REDIRECT_EXAM_EXECUTOR_PAGE, { examId: id });
     }
 
-    redirectToExamEditorPage(id:number|null = null)
+    redirectToExamEditorPage(id:number|null = null, subcategoryId:number|null = null)
     {
-        this.redirect(this.URL_REDIRECT_EXAM_EDITOR_PAGE, (id ? { examId: id } : undefined));
+        let params:any = {};
+        if(id) params.examId = id;
+        if(subcategoryId) params.subcategoryId = subcategoryId;
+
+        this.redirect(this.URL_REDIRECT_EXAM_EDITOR_PAGE, params);
     }
 
     getLoginPageAddress():string

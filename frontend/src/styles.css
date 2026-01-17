@@ -1,10 +1,11 @@
 :root
 {
-  --bs-primary: #005D59;
-  --bs-intermediate: #0A7A69;
-  --bs-secondary: #139779;
+    --bs-primary: #005D59;
+    --bs-primary-rgb: 0, 93, 89;
+    --bs-intermediate: #0A7A69;
+    --bs-secondary: #139779;
 
-  --bs-warning: #583E23;
+    --bs-warning: #583E23;
 }
 
 .btn-primary
@@ -41,6 +42,18 @@
     --bs-btn-active-color: #FFFFF;
     --bs-btn-active-bg: #005D59;
     --bs-btn-active-border-color: #005D59;
+}
+
+.form-control
+{
+    --bs-form-control-focus-border-color: #005D59;
+    --bs-focus-ring-color: rgba(0, 93, 89, 0.3);
+}
+
+.form-control:focus
+{
+    border-color: #005D59;
+    box-shadow: 0 0 0 .25rem var(--bs-focus-ring-color);
 }
 
 .selectedOption
@@ -118,4 +131,11 @@ header a
     color: white;
     font-weight: bold;
     text-decoration: none;
+}
+
+.editorQuestionContainer
+{
+    padding: 1em;
+    border: 2px solid var(--bs-primary);
+    border-radius: 6px;
 }

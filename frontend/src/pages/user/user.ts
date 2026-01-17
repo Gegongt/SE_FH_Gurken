@@ -9,6 +9,7 @@ import { HeaderView } from "../components/header/HeaderView.js";
 import { HeaderViewHandler } from "../components/header/HeaderViewHandler.js";
 import { Category } from "../../vo/Category.js";
 import { Subcategory } from "../../vo/Subcategory.js";
+import { Exam } from "../../vo/Exam.js";
 
 const view = new UserView();
 const userService = serviceFactory.getService(ServiceName.USER);
@@ -29,7 +30,7 @@ userService.getCurrentUser((user:User|null) =>
 
     else
     {
-        serviceFactory.getService(ServiceName.CATEGORY).getCategories(true,
+        /*serviceFactory.getService(ServiceName.CATEGORY).getCategories(true,
         (categories:Category[]) =>
         {
             console.log(categories);
@@ -58,6 +59,30 @@ userService.getCurrentUser((user:User|null) =>
             });
         },
     
+        (error:ServiceError) => console.log(error));*/
+
+        serviceFactory.getService(ServiceName.EXAM).createExam(new Exam(-1, "My exam", [], user), 5,
+        (id:number) =>
+        {
+            console.log("Created: " + id);
+
+            serviceFactory.getService(ServiceName.EXAM).getExams(5,
+            (e:Exam[]) =>
+            {
+                console.log(e);
+
+                for(let eeee of e)
+                {
+                    serviceFactory.getService(ServiceName.EXAM).deleteExam(eeee.getId(), () => {console.log("Exam deleted")}, (error:ServiceError) => {console.log("Exam not deleted")});
+                }
+
+            },
+        
+            (error:ServiceError) =>
+            {
+                console.log(error);
+            });
+        },
         (error:ServiceError) => console.log(error));
     }
 });
