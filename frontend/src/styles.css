@@ -21,9 +21,13 @@
     
     --bs-btn-focus-shadow-rgb: #0A7A69;
     
-    --bs-btn-active-color: #FFFFF;
+    --bs-btn-active-color: #FFFFFF;
     --bs-btn-active-bg: #139779;
     --bs-btn-active-border-color: #139779;
+
+    --bs-btn-disabled-color: #FFFFFF;
+    --bs-btn-disabled-bg: #005D59;
+    --bs-btn-disabled-border-color: #005D59;
 }
 
 .btn-secondary
@@ -39,9 +43,13 @@
     
     --bs-btn-focus-shadow-rgb: #0A7A69;
     
-    --bs-btn-active-color: #FFFFF;
+    --bs-btn-active-color: #FFFFFF;
     --bs-btn-active-bg: #005D59;
     --bs-btn-active-border-color: #005D59;
+
+    --bs-btn-disabled-color: #FFFFFF;
+    --bs-btn-disabled-bg: #139779;
+    --bs-btn-disabled-border-color: #139779;
 }
 
 .form-control

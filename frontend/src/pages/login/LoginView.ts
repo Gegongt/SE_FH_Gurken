@@ -34,8 +34,8 @@ export class LoginView
                 </div>
             </div>
 
-            <input id = "${this.registerButtonId}" type = "button" class = "btn btn-secondary p-2" value = "Register" />
-            <input id = "${this.loginButtonId}" type = "button" class = "btn btn-primary p-2" value = "Login" />`;
+            <input id = "${this.registerButtonId}" type = "button" class = "btn btn-secondary p-2" value = "Register"/>
+            <input id = "${this.loginButtonId}" type = "button" class = "btn btn-primary p-2" value = "Login"/>`;
 
         this.parentElementId = parentElementId;
         let parentElement = document.getElementById(this.parentElementId);
