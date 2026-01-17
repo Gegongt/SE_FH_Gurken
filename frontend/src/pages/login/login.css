@@ -8,3 +8,20 @@ main
     background-color: rgba(0, 93, 89, 0.3);
     border-radius: 4px;
 }
+
+.errorArea
+{
+    background-color: rgba(88, 62, 35, 0.7);
+    color: white;
+    border-radius: 4px;
+}
+
+*
+{
+    user-select: none;
+}
+
+input
+{
+    user-select: auto;
+}

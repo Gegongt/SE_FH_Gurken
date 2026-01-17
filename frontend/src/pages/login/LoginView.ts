@@ -63,6 +63,17 @@ export class LoginView
         });
     }
 
+    showError(errorMessage:string, parentElementId:string)
+    {
+        let errorArea:HTMLDivElement = document.createElement("div") as HTMLDivElement;
+        errorArea.classList.add("p-2", "mt-2", "mb-4", "d-flex", "justify-content-center", "align-items-center", "errorArea");
+        
+        errorArea.innerHTML = `<p class = "p-2">${errorMessage}</p>`;
+        errorArea.hidden = false;
+        
+        document.getElementById(parentElementId)!.appendChild(errorArea);
+    }
+
     remove()
     {
         if(this.parentElementId !== null)

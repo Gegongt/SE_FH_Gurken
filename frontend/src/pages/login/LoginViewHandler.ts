@@ -31,8 +31,8 @@ export class LoginViewHandler
         
             (error:ServiceError) =>
             {
-                console.log(error);
-            })
+                this.loginView.showError("Login failed!", this.parentElementId as string);
+            });
         });
 
         this.loginView.bindRegisterButton(() =>

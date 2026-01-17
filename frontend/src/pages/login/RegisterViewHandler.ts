@@ -36,7 +36,7 @@ export class RegisterViewHandler
                                                             
                                                                (error:ServiceError) =>
                                                                {
-                                                                   console.log(error);
+                                                                   this.registerView.showError("Failed to register!", this.parentElementId as string);
                                                                })
         });
 
