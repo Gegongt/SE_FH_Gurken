@@ -10,3 +10,14 @@ exports.findAll = async () => {
   );
   return rows;
 };
+
+exports.findByCategoryId = async (categoryId) => {
+  const { rows } = await pool.query(
+    `SELECT id, categoryid AS "categoryId", name
+     FROM ${TABLE}
+     WHERE categoryid = $1
+     ORDER BY name ASC`,
+    [categoryId]
+  );
+  return rows;
+};

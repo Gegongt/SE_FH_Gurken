@@ -26,7 +26,9 @@ CREATE TABLE public.category (
 DROP TABLE IF EXISTS public.subcategory;
 
 CREATE TABLE public.subcategory (
-	id serial NOT NULL,
+	id serial4 NOT NULL,
 	"name" text NOT NULL,
-	CONSTRAINT subcategory_pk PRIMARY KEY (id)
+	categoryid int4 NOT NULL,
+	CONSTRAINT subcategory_pk PRIMARY KEY (id),
+	CONSTRAINT subcategory_category_fk FOREIGN KEY (categoryid) REFERENCES public.category(id) ON DELETE CASCADE
 );
