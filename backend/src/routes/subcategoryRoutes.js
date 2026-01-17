@@ -9,8 +9,16 @@ const subcategoryController = require("../controllers/subcategoryController");
  * /subcategories:
  *   get:
  *     tags: [Subcategory]
- *     summary: Get all subcategories
- *     description: Returns a list of all subcategories.
+ *     summary: Get subcategories (optionally filtered by category)
+ *     description: Returns a list of all subcategories. If `categoryId` is provided, only subcategories of that category are returned.
+ *     parameters:
+ *       - in: query
+ *         name: categoryId
+ *         required: false
+ *         schema:
+ *           type: integer
+ *         description: Filter subcategories by category id
+ *         example: 3
  *     responses:
  *       200:
  *         description: List of subcategories
@@ -24,9 +32,14 @@ const subcategoryController = require("../controllers/subcategoryController");
  *                   id:
  *                     type: integer
  *                     example: 1
+ *                   categoryId:
+ *                     type: integer
+ *                     example: 3
  *                   name:
  *                     type: string
  *                     example: "Sports"
+ *       400:
+ *         description: Invalid categoryId (must be a positive integer)
  *       500:
  *         description: Internal server error
  */
