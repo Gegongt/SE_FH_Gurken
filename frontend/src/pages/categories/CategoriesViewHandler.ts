@@ -25,7 +25,6 @@ export type CategoryService = {
 export type SubcategoryService = {
   getSubcategories(
     categoryId: number,
-    shallow: boolean,
     success: (subs: Subcategory[]) => void,   
     error: (status: any) => void
   ): void;
@@ -168,10 +167,10 @@ export class CategoriesViewHandler {
 
     this.subcategoryService.getSubcategories(
       categoryId,
-      true,
       (subs: any[]) => this.view.renderSubcategories(subs as any),
-      (status) => this.view.renderError(`Failed to load subcategories: ${String(status)}`)
+      (status: any) => this.view.renderError(`Failed to load subcategories: ${String(status)}`)
     );
+
   }
 
   private onSubcategoryClicked(subcategoryId: number): void {
