@@ -43,7 +43,8 @@ async function create(req, res) {
 
 async function list(req, res) {
   try {
-    const { subcategoryId, reported } = req.query ?? {};
+    const { subcategoryId, subcategoryid, reported } = req.query ?? {};
+    const subIdRaw = subcategoryId ?? subcategoryid;
 
     if (reported !== undefined) {
       const s = String(reported).toLowerCase();
@@ -54,8 +55,8 @@ async function list(req, res) {
       return res.status(200).json(files);
     }
 
-    if (subcategoryId !== undefined) {
-      const sid = Number(subcategoryId);
+    if (subIdRaw !== undefined) {
+      const sid = Number(subIdRaw);
       if (!Number.isInteger(sid) || sid <= 0) {
         return res.status(400).json({ message: "subcategoryId must be a positive number" });
       }

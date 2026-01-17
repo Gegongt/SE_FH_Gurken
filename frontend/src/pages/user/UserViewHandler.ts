@@ -6,6 +6,7 @@ export type UserService = {
   getCurrentUser(success: (u: User|null)=>void, error:(s:any)=>void): void;
   logout(success: ()=>void, error:(s:any)=>void): void;
   updateProfilePicture(file: globalThis.File, success: (url: string)=>void, error:(s:any)=>void): void;
+  deleteOwnUser(success: () => void, error: (e: any) => void): void;
 
   getReportedFiles(success:(files: File[])=>void, error:(s:any)=>void): void;
   acceptFile(fileId:number, success:()=>void, error:(s:any)=>void): void;
@@ -95,7 +96,7 @@ export class UserViewHandler {
 
         this.view.bindChangeProfilePicClick();
         this.view.bindProfilePicSelected((file) => this.onProfilePicSelected(file));
-
+        this.view.bindDeleteAccountClick(() => this.onDeleteAccountClicked());
 
         const isAdmin = u.getIsAdmin?.() ?? false;
         this.view.showAdminPanel(isAdmin);
@@ -165,5 +166,18 @@ export class UserViewHandler {
       (s) => this.view.showError(`Unblock failed: ${String(s)}`)
     );
   }
+
+  private onDeleteAccountClicked(): void {
+    const ok = confirm("Really delete your account? This cannot be undone.");
+    if (!ok) return;
+
+    this.userService.deleteOwnUser(
+      () => {
+        window.location.href = "../login/login.html";
+      },
+      (err) => this.view.showError(`Delete failed: ${String(err)}`)
+    );
+  }
+
 
 }

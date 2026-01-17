@@ -91,10 +91,33 @@ class Converter
         return new UserEntity(user.getId(), user.getIsAdmin(), user.getEmail(), user.getName(), user.getIsBlocked(), user.getProfilePictureName());
     }
 
-    convertFileEntityToFile(fileEntity:FileEntity):File
-    {
-        return new File(fileEntity.id, fileEntity.name, fileEntity.isreported, this.convertUserEntityToUser(fileEntity.uploader));
+    convertFileEntityToFile(fileEntity: any): File {
+    let uploaderUser: User;
+
+    if (fileEntity.uploader) {
+        uploaderUser = this.convertUserEntityToUser(fileEntity.uploader);
+    } else {
+        const uid = fileEntity.uploaderid ?? fileEntity.uploaderId ?? null;
+
+        uploaderUser = new User(
+        uid ?? "unknown",
+        false,
+        "",
+        "unknown",
+        false,
+        null,
+        []
+        );
     }
+
+    return new File(
+        fileEntity.id,
+        fileEntity.name,
+        fileEntity.isreported ?? fileEntity.isReported ?? false,
+        uploaderUser
+    );
+    }
+
 
     convertFileToFileEntity(file:File, subcategoryId:number = -1):FileEntity
     {

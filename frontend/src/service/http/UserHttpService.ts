@@ -157,6 +157,27 @@ class UserHttpService
         );
     }
 
+    deleteOwnUser(successCallback: () => void, errorCallback: (error: ServiceError) => void): void {
+        httpService.sendRequest(
+            HttpMethod.METHOD_DELETE,
+            this.URL_USERS_API_BASE,   
+            null,
+            null,
+            null,
+            null,
+            false,
+            accessTokenUtil.getAccessToken(),
+            () => {
+            accessTokenUtil.deleteAccessToken();
+            successCallback();
+            },
+            (error: any) => {
+            errorCallback(new ServiceError("Error! Delete user failed!"));
+            }
+        );
+    }
+
+
 }
 
 export let userHttpService = new UserHttpService();

@@ -60,7 +60,7 @@ class ServiceFactory
             case ServiceName.RATING: return ratingMemService;
             case ServiceName.QUESTION: return questionMemService;
             case ServiceName.EXAM: return examHttpService;
-            case ServiceName.FAVOURITES: return favouritesMemService;
+            case ServiceName.FAVOURITES: return favouritesHttpService;
         }
     }
 }
