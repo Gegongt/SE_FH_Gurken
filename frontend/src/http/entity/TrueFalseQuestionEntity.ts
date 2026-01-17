@@ -3,22 +3,12 @@ import { QuestionEntityType } from "./QuestionEntityType.js";
 
 export class TrueFalseQuestionEntity extends QuestionEntity
 {
-    private isTrue:boolean;
+    public istrue:boolean;
 
-    constructor(id:number, examId:number, question:string, questionType:QuestionEntityType, isTrue:boolean)
+    constructor(id:number, examid:number, question:string, questiontype:QuestionEntityType, istrue:boolean)
     {
-        super(id, examId, question, questionType);
+        super(id, examid, question, questiontype);
 
-        this.isTrue = isTrue;
-    }
-
-    getIsTrue():boolean
-    {
-        return this.isTrue;
-    }
-
-    setIsTrue(isTrue:boolean):void
-    {
-        this.isTrue = isTrue;
+        this.istrue = istrue;
     }
 }

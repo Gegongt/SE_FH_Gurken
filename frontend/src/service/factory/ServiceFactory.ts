@@ -8,6 +8,9 @@ import { examMemService } from "../ExamMemService.js";
 import { fileMemService } from "../FileMemService.js";
 import { ratingMemService } from "../RatingMemService.js";
 import { FavouritesMemService, favouritesMemService } from "../FavouritesMemService.js";
+import { userHttpService } from "../http/UserHttpService.js";
+import { categoryHttpService } from "../http/CategoryHttpService.js";
+import { subcategoryHttpService } from "../http/SubcategoryHttpService.js";
 
 
 class ServiceFactory
@@ -24,7 +27,7 @@ class ServiceFactory
         switch(this.serviceType)
         {
             case ServiceType.MEM: return this.getMemService(serviceName);
-            case ServiceType.HTTP: return null;
+            case ServiceType.HTTP: return this.getHttpService(serviceName);
         }
     }
 
@@ -42,6 +45,21 @@ class ServiceFactory
             case ServiceName.FAVOURITES: return favouritesMemService;
         }
     }
+
+    public getHttpService(serviceName:ServiceName):any
+    {
+        switch(serviceName)
+        {
+            case ServiceName.USER: return userHttpService;
+            case ServiceName.CATEGORY: return categoryHttpService;
+            case ServiceName.SUBCATEGORY: return subcategoryHttpService;
+            case ServiceName.FILE: return fileMemService;
+            case ServiceName.RATING: return ratingMemService;
+            case ServiceName.QUESTION: return questionMemService;
+            case ServiceName.EXAM: return examMemService;
+            case ServiceName.FAVOURITES: return favouritesMemService;
+        }
+    }
 }
 
-export let serviceFactory = new ServiceFactory(ServiceType.MEM);
+export let serviceFactory = new ServiceFactory(ServiceType.HTTP);

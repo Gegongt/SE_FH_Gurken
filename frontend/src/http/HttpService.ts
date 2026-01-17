@@ -3,8 +3,8 @@ import { HttpMethod } from "./HttpMethod.js";
 
 class HttpService
 {
-    sendRequest(method:HttpMethod, url:string, params:any, body:any, bodyContentType:HttpContentType,
-                responseType:any, withCredentials:boolean, successCallback:any, errorCallback:any)
+    sendRequest(method:HttpMethod, url:string, params:any, body:any, bodyContentType:HttpContentType|null,
+                responseType:any, withCredentials:boolean, accessToken:string|null, successCallback:any, errorCallback:any)
     {
         let xhr = new XMLHttpRequest();
 
@@ -28,6 +28,11 @@ class HttpService
     
         xhr.open(method, urlObject.toString());
 
+        if(accessToken)
+        {
+            xhr.setRequestHeader("Authorization", "Bearer " + accessToken);
+        }
+
         xhr.onload = () =>
         {
             if(xhr.status != 200 && xhr.status != 201)
@@ -46,7 +51,7 @@ class HttpService
             errorCallback(xhr.status);
         }
 
-        if(body)
+        if(body && bodyContentType)
         {
             xhr.setRequestHeader("Content-Type", bodyContentType);
             xhr.send(JSON.stringify(body));
@@ -61,7 +66,7 @@ class HttpService
     get(url:string, params:any, withCredentials:boolean, success:(data:any) => void, error:(status: any) => void):void
     {
         this.sendRequest(HttpMethod.METHOD_GET, url, params ?? null, null, HttpContentType.CONTENT_TYPE_JSON,
-                         "json", withCredentials ?? true, (data: any) => success(data), (status: any) => error(status));
+                         "json", withCredentials ?? true, null, (data: any) => success(data), (status: any) => error(status));
     }
 }
 

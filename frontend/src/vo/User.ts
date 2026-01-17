@@ -2,7 +2,7 @@ import { File } from "./File.js";
 
 export class User
 {
-  private id:number;
+  private id:number|string;
   private isAdmin:boolean;
   private email:string;
   private name:string;
@@ -10,7 +10,7 @@ export class User
   private profilePictureName:string|null;
   private favourites:File[];
 
-  constructor(id:number, isAdmin:boolean, email:string, name:string, isBlocked:boolean,
+  constructor(id:number|string, isAdmin:boolean, email:string, name:string, isBlocked:boolean,
               profilePictureName:string|null, favourites:File[] = [])
   {
     this.id = id;
@@ -22,7 +22,7 @@ export class User
     this.favourites = favourites;
   }
 
-  public getId():number
+  public getId():number|string
   {
     return this.id;
   }

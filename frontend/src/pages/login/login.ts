@@ -1,3 +1,4 @@
+import { ServiceError } from "../../service/error/ServiceError.js";
 import { serviceFactory } from "../../service/factory/ServiceFactory.js";
 import { ServiceName } from "../../service/factory/ServiceName.js";
 import { locationUtil } from "../../util/LocationUtil.js";
@@ -17,4 +18,9 @@ serviceFactory.getService(ServiceName.USER).getCurrentUser((user:User|null) =>
     {
         locationUtil.redirectToUserPage();
     }
+},
+
+(error:ServiceError) =>
+{
+    console.error("Error!");
 });

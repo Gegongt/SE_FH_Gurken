@@ -1,3 +1,6 @@
+import { ServiceError } from "../../../service/error/ServiceError.js";
+import { serviceFactory } from "../../../service/factory/ServiceFactory.js";
+import { ServiceName } from "../../../service/factory/ServiceName.js";
 import { locationUtil } from "../../../util/LocationUtil.js";
 import { HeaderView } from "./HeaderView.js";
 
@@ -16,6 +19,10 @@ export class HeaderViewHandler
 
         this.headerView.bindLogoLink(locationUtil.getMainPageAddress());
         this.headerView.bindHomeLink(locationUtil.getMainPageAddress());
-        this.headerView.bindLogoutLink("#");
+        this.headerView.bindLogoutLink(() =>
+                                       {
+                                        serviceFactory.getService(ServiceName.USER).logout(() => locationUtil.redirectToLoginPage(),
+                                                                                           (error:ServiceError) => console.log("Error! Logout failed!"));
+                                       });
     }
 }

@@ -7,6 +7,8 @@ import { UserView } from "./UserView.js";
 import { UserViewHandler } from "./UserViewHandler.js";
 import { HeaderView } from "../components/header/HeaderView.js";
 import { HeaderViewHandler } from "../components/header/HeaderViewHandler.js";
+import { Category } from "../../vo/Category.js";
+import { Subcategory } from "../../vo/Subcategory.js";
 
 const view = new UserView();
 const userService = serviceFactory.getService(ServiceName.USER);
@@ -27,14 +29,35 @@ userService.getCurrentUser((user:User|null) =>
 
     else
     {
-        document.getElementById("content")!.innerHTML = `
-            <p>Already logged in as ${user.getName()}</p>
-            <input type = "button" value = "Logout" id = "logoutButton" />`;
-
-        document.getElementById("logoutButton")?.addEventListener("click", () =>
+        serviceFactory.getService(ServiceName.CATEGORY).getCategories(true,
+        (categories:Category[]) =>
         {
-            userService.logout(() => { locationUtil.redirectToLoginPage() },
-                               (error:ServiceError) => { console.log("Something went wrong!"); });
-        })
+            console.log(categories);
+
+            serviceFactory.getService(ServiceName.SUBCATEGORY).getSubcategories(null,
+            (subcategories:Subcategory[]) =>
+            {
+                console.log(subcategories);
+            },
+        
+            (error:ServiceError) =>
+            {
+                console.log(error);
+            });
+
+            serviceFactory.getService(ServiceName.SUBCATEGORY).getSubcategories(categories[0]?.getId(),
+            (subcategories:Subcategory[]) =>
+            {
+                console.log("Subcategories of " + categories[0]?.getId());
+                console.log(subcategories);
+            },
+            
+            (error:ServiceError) =>
+            {
+                console.log(error);
+            });
+        },
+    
+        (error:ServiceError) => console.log(error));
     }
 });

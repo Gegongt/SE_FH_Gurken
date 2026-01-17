@@ -21,10 +21,22 @@ export class HeaderView
             </nav>`;
     }
 
-    private bindLink(id:string, address:string):void
+    private bindLink(id:string, address:string|null, callback:() => void = () => {}):void
     {
         let linkElement:HTMLLinkElement = document.getElementById(id) as HTMLLinkElement;
-        linkElement.href = address;
+        
+        if(address)
+        {
+            linkElement.href = address;
+        }
+
+        else
+        {
+            linkElement.addEventListener("click", () =>
+            {
+                callback();
+            });
+        }
     }
 
     bindLogoLink(address:string):void
@@ -37,8 +49,8 @@ export class HeaderView
         this.bindLink("homeLink", address);
     }
 
-    bindLogoutLink(address:string):void
+    bindLogoutLink(callback:() => void):void
     {
-        this.bindLink("logoutLink", address);
+        this.bindLink("logoutLink", null, () => callback());
     }
 }
