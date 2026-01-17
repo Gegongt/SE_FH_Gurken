@@ -3,34 +3,14 @@ import { QuestionEntityType } from "./QuestionEntityType.js";
 
 export class MCQuestionEntity extends QuestionEntity
 {
-    private correctAnswers:string[];
-    private wrongAnswers:string[];
+    public correctanswers:string[];
+    public wronganswers:string[];
     
-    constructor(id:number, examId:number, question:string, questionType:QuestionEntityType, correctAnswers:string[], wrongAnswers:string[])
+    constructor(id:number, examid:number, question:string, questiontype:QuestionEntityType, correctanswers:string[], wronganswers:string[])
     {
-        super(id, examId, question, questionType);
+        super(id, examid, question, questiontype);
 
-        this.correctAnswers = correctAnswers;
-        this.wrongAnswers = wrongAnswers;
-    }
-
-    getCorrectAnswers():string[]
-    {
-        return this.correctAnswers;
-    }
-
-    setCorrectAnswers(correctAnswers:string[]):void
-    {
-        this.correctAnswers = correctAnswers;
-    }
-
-    getWrongAnswers():string[]
-    {
-        return this.wrongAnswers;
-    }
-
-    setWrongAnswers(wrongAnswers:string[]):void
-    {
-        this.wrongAnswers = wrongAnswers;
+        this.correctanswers = correctanswers;
+        this.wronganswers = wronganswers;
     }
 }

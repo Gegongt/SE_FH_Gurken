@@ -11,9 +11,9 @@ class ExamMem
     private id:number;
     private name:string;
     private questions:number[];
-    private creator:number;
+    private creator:number|string;
 
-    constructor(id:number, name:string, questions:number[], creator:number)
+    constructor(id:number, name:string, questions:number[], creator:number|string)
     {
         this.id = id;
         this.name = name;
@@ -36,7 +36,7 @@ class ExamMem
         return this.questions;
     }
 
-    getCreator():number
+    getCreator():number|string
     {
         return this.creator;
     }
@@ -56,7 +56,7 @@ class ExamMem
         this.questions = questions;
     }
 
-    setCreator(creator:number):void
+    setCreator(creator:number|string):void
     {
         this.creator = creator;
     }
