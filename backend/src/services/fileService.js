@@ -1,5 +1,8 @@
 const fileRepository = require("../repositories/fileRepository");
 
+const path = require("path");
+const fs = require("fs/promises");
+
 function mapRow(row) {
   return {
     id: row.id,
@@ -34,4 +37,29 @@ exports.getFilesBySubcategoryId = async (subcategoryId) => {
 exports.getFilesByReported = async (reported) => {
   const rows = await fileRepository.findByReported(reported);
   return rows.map(mapRow);
+};
+
+exports.getFileById = async (fileId) => {
+  return fileRepository.findById(fileId);
+};
+
+exports.updateFile = async (fileId, name, isReported) => {
+  return fileRepository.updateById(fileId, name, isReported);
+};
+
+exports.deleteFileEverywhere = async (fileId) => {
+  const deleted = await fileRepository.deleteById(fileId);
+
+  if (deleted) {
+    const filePath = path.join(process.cwd(), "uploads", "files", String(fileId));
+    try {
+      await fs.unlink(filePath);
+    } catch (e) {
+      if (e && e.code !== "ENOENT") {
+        console.warn("Failed to delete uploaded file:", e);
+      }
+    }
+  }
+
+  return deleted;
 };

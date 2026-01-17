@@ -75,3 +75,36 @@ exports.findByReported = async (reported) => {
   );
   return rows;
 };
+
+exports.findById = async (fileId) => {
+  const { rows } = await pool.query(
+    `SELECT * FROM ${TABLE} WHERE id = $1`,
+    [fileId]
+  );
+  return rows[0] ?? null;
+};
+
+exports.updateById = async (fileId, name, isReported) => {
+  const { rowCount } = await pool.query(
+    `
+    UPDATE ${TABLE}
+    SET
+      "name" = COALESCE($2, "name"),
+      isreported = COALESCE($3, isreported)
+    WHERE id = $1
+    `,
+    [fileId, name, isReported]
+  );
+
+  if (rowCount === 0) return null;
+
+  return exports.findById(fileId);
+};
+
+exports.deleteById = async (fileId) => {
+  const { rowCount } = await pool.query(
+    `DELETE FROM ${TABLE} WHERE id = $1`,
+    [fileId]
+  );
+  return rowCount > 0;
+};

@@ -148,4 +148,127 @@ router.post("/", requireAuth, checkBlocked, upload.single("file"), fileControlle
  */
 router.get("/", requireAuth, checkBlocked, fileController.list);
 
+/**
+ * @swagger
+ * /files/{fileId}:
+ *   put:
+ *     tags: [File]
+ *     summary: Update a file (uploader or admin)
+ *     description: >
+ *       Updates a file. Only the uploader or an admin can update it.
+ *       Both `name` and `isreported` must be provided.
+ *       Everyone (uploader/admin) can set `isreported` to true, but only an admin can set it to false.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: fileId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: File id
+ *         example: 2
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - isreported
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: "Script.sql"
+ *               isreported:
+ *                 type: boolean
+ *                 example: true
+ *     responses:
+ *       200:
+ *         description: File updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                   example: 2
+ *                 subcategoryid:
+ *                   type: integer
+ *                   example: 3
+ *                 name:
+ *                   type: string
+ *                   example: "Script.sql"
+ *                 isreported:
+ *                   type: boolean
+ *                   example: true
+ *                 uploader:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       example: "1WEAjHYMHOYeMegeMKZlhMwMgEm2"
+ *                     email:
+ *                       type: string
+ *                       example: "filiplukic9@gmail.com"
+ *                     name:
+ *                       type: string
+ *                       example: "lelek"
+ *                     isadmin:
+ *                       type: boolean
+ *                       example: true
+ *                     isblocked:
+ *                       type: boolean
+ *                       example: false
+ *                     profilepicturename:
+ *                       type: string
+ *                       nullable: true
+ *                       example: "s"
+ *       400:
+ *         description: Missing/invalid body fields or invalid fileId
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden (not uploader/admin or non-admin trying to set isreported=false)
+ *       404:
+ *         description: File not found
+ *       500:
+ *         description: Internal server error
+ *
+ *   delete:
+ *     tags: [File]
+ *     summary: Delete a file (uploader or admin)
+ *     description: >
+ *       Deletes a file. The uploader can delete their own files, an admin can delete any file.
+ *       The uploaded file on the server (uploads/files/{fileId}) is also deleted.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: fileId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: File id
+ *         example: 2
+ *     responses:
+ *       204:
+ *         description: File deleted
+ *       400:
+ *         description: Invalid fileId
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden (not uploader/admin)
+ *       404:
+ *         description: File not found
+ *       500:
+ *         description: Internal server error
+ */
+
+router.put("/:fileId", requireAuth, checkBlocked, fileController.update);
+router.delete("/:fileId", requireAuth, checkBlocked, fileController.remove);
+
 module.exports = router;

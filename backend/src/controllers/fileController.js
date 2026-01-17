@@ -71,4 +71,99 @@ async function list(req, res) {
   }
 }
 
-module.exports = { create, list };
+async function update(req, res) {
+  try {
+    const dbUser = req.dbUser;
+    if (!dbUser) {
+        return res.status(500).json({ message: "dbUser missing" });
+    }
+
+    const fileId = Number(req.params.fileId);
+    if (!Number.isInteger(fileId) || fileId <= 0) {
+      return res.status(400).json({ message: "fileId must be a positive number" });
+    }
+
+    const file = await fileService.getFileById(fileId);
+    if (!file) {
+        return res.status(404).json({ message: "File not found" });
+    }
+
+    const isAdmin = dbUser.isadmin;
+    const isUploader = file.uploaderid === dbUser.id;
+
+    if (!isUploader && !isAdmin) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
+    const { name, isreported } = req.body ?? {};
+
+    if (name === undefined || isreported === undefined) {
+      return res.status(400).json({ message: "Missing  name / isreported" });
+    }
+
+    if (typeof name !== "string" || name.trim().length === 0) {
+      return res.status(400).json({ message: "name must be a non-empty string" });
+    }
+
+    let parsedReported;
+    if (typeof isreported === "boolean") {
+      parsedReported = isreported;
+    } else {
+      const s = String(isreported).toLowerCase();
+      if (s !== "true" && s !== "false") {
+        return res.status(400).json({ message: "isreported must be true/false" });
+      }
+      parsedReported = s === "true";
+    }
+
+    if (parsedReported === false && !isAdmin) {
+      return res.status(403).json({ message: "Only admin can set isreported to false" });
+    }
+
+    const updated = await fileService.updateFile(fileId, name.trim(), parsedReported);
+    if (!updated) return res.status(404).json({ message: "File not found" });
+
+    return res.status(200).json(updated);
+  } catch (err) {
+    console.error("update file error:", err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+async function remove(req, res) {
+  try {
+    const dbUser = req.dbUser;
+    if (!dbUser) {
+        return res.status(500).json({ message: "dbUser missing" });
+    }
+
+    const fileId = Number(req.params.fileId);
+    if (!Number.isInteger(fileId) || fileId <= 0) {
+      return res.status(400).json({ message: "fileId must be a positive number" });
+    }
+
+    const file = await fileService.getFileById(fileId);
+    if (!file) {
+        return res.status(404).json({ message: "File not found" });
+    }
+
+    const isAdmin = dbUser.isadmin;
+    const isUploader = file.uploaderid === dbUser.id;
+
+    if (!isUploader && !isAdmin) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
+    const deleted = await fileService.deleteFileEverywhere(fileId);
+    if (!deleted) {
+        return res.status(404).json({ message: "File not found" });
+    }
+
+    return res.status(204).send();
+  } catch (err) {
+    console.error("delete file error:", err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+module.exports = { create, list, update, remove };
