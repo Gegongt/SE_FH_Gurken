@@ -32,14 +32,14 @@ const subcategoryController = require("../controllers/subcategoryController");
  *                   id:
  *                     type: integer
  *                     example: 1
- *                   categoryId:
+ *                   categoryid:
  *                     type: integer
  *                     example: 3
  *                   name:
  *                     type: string
  *                     example: "Sports"
  *       400:
- *         description: Invalid categoryId (must be a positive integer)
+ *         description: Invalid categoryid (must be a positive integer)
  *       500:
  *         description: Internal server error
  */

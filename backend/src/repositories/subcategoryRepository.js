@@ -4,7 +4,7 @@ const TABLE = 'public.subcategory';
 
 exports.findAll = async () => {
   const { rows } = await pool.query(
-    `SELECT id, name
+    `SELECT *
      FROM ${TABLE}
      ORDER BY name ASC`
   );
@@ -13,7 +13,7 @@ exports.findAll = async () => {
 
 exports.findByCategoryId = async (categoryId) => {
   const { rows } = await pool.query(
-    `SELECT id, categoryid AS "categoryId", name
+    `SELECT *
      FROM ${TABLE}
      WHERE categoryid = $1
      ORDER BY name ASC`,
