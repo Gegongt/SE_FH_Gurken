@@ -57,16 +57,15 @@ exports.findBySubcategoryId = async (subcategoryId) => {
   return rows;
 };
 
-exports.updateById = async (examId, subcategoryId, name) => {
+exports.updateById = async (examId, name) => {
   const { rows } = await pool.query(
     `
     UPDATE ${TABLE}
-    SET subcategoryid = $2,
-        "name" = $3
+    SET "name" = $2
     WHERE id = $1
     RETURNING *
     `,
-    [examId, subcategoryId, name]
+    [examId, name]
   );
 
   return rows[0] ?? null;

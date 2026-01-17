@@ -30,8 +30,8 @@ exports.getExamsBySubcategoryId = async (subcategoryId) => {
   return rows.map(mapRow);
 };
 
-exports.updateExam = async (examId, subcategoryId, name) => {
-  return examRepository.updateById(examId, subcategoryId, name);
+exports.updateExam = async (examId, name) => {
+  return examRepository.updateById(examId, name);
 };
 
 exports.deleteExam = async (examId) => {
