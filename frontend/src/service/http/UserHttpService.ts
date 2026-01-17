@@ -14,6 +14,7 @@ class UserHttpService
     private URL_USER_API_BASE = "http://localhost:3000/api";
     private URL_USERS_API_BASE = this.URL_USER_API_BASE + "/users";
     private URL_USER_API_LOGIN = this.URL_USER_API_BASE + "/auth/login";
+    private URL_USER_API_REGISTER = this.URL_USER_API_BASE + "/auth/register";
     private URL_USER_API_GET_CURRENT_USER = this.URL_USERS_API_BASE + "/whoami";
     private URL_USER_API_UPDATE_OWN_USER = this.URL_USERS_API_BASE;
 
@@ -54,6 +55,26 @@ class UserHttpService
         accessTokenUtil.deleteAccessToken();
 
         successCallback();
+    }
+
+    create(email:string, userName:string, password:string, successCallback:() => void,
+            errorCallback:(error:ServiceError) => void):void
+    {
+        let body:any = new UserEntity(-1, false, email, userName, false, null);
+        body.password = password;
+
+        httpService.sendRequest(HttpMethod.METHOD_POST, this.URL_USER_API_REGISTER, null,
+                                body, HttpContentType.CONTENT_TYPE_JSON, "json", false, null,
+                                (userCredentials:any) =>
+                                {
+                                    successCallback();
+                                },
+
+                                (error:any) =>
+                                {
+                                    errorCallback(new ServiceError("Error! Creation failed!"));
+                                }
+        )
     }
 
     getCurrentUser(successCallback:(user:User|null) => void, errorCallback:(error:ServiceError) => void):void

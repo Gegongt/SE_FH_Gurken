@@ -15,16 +15,27 @@ export class LoginView
     render(parentElementId:string)
     {
         let formElement = document.createElement("form");
+        formElement.classList.add("p-4", "mb-0");
 
         formElement.innerHTML = `
-            <label for = "${this.emailOrUserNameInputFieldId}">Email or Username</label>
-            <input id = "${this.emailOrUserNameInputFieldId}" type = "text" />
+            <div class = "mb-3 row">
+                <label for = "${this.emailOrUserNameInputFieldId}" class = "col-sm-2 col-form-label">Email</label>
+                
+                <div class = "col-sm-10">
+                    <input id = "${this.emailOrUserNameInputFieldId}" class = "form-control" type = "text" />
+                </div>
+            </div>
 
-            <label for = "${this.passwordInputFieldId}">Password</label>
-            <input id = "${this.passwordInputFieldId}" type = "password" />
+            <div class = "mb-3 row">
+                <label for = "${this.passwordInputFieldId}" class = "col-sm-2 col-form-label">Password</label>
+                
+                <div class = "col-sm-10">
+                    <input id = "${this.passwordInputFieldId}" class = "form-control" type = "password" />
+                </div>
+            </div>
 
-            <input id = "${this.loginButtonId}" type = "button" value = "Login" />
-            <input id = "${this.registerButtonId}" type = "button" value = "Register" />`;
+            <input id = "${this.registerButtonId}" type = "button" class = "btn btn-secondary p-2" value = "Register" />
+            <input id = "${this.loginButtonId}" type = "button" class = "btn btn-primary p-2" value = "Login" />`;
 
         this.parentElementId = parentElementId;
         let parentElement = document.getElementById(this.parentElementId);

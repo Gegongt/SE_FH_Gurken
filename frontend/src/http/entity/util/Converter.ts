@@ -1,10 +1,17 @@
 import { Category } from "../../../vo/Category.js";
 import { Exam } from "../../../vo/Exam.js";
+import { MCQuestion } from "../../../vo/MCQuestion.js";
+import { Question } from "../../../vo/Question.js";
 import { Subcategory } from "../../../vo/Subcategory.js";
+import { TrueFalseQuestion } from "../../../vo/TrueFalseQuestion.js";
 import { User } from "../../../vo/User.js";
 import { CategoryEntity } from "../CategoryEntity.js";
 import { ExamEntity } from "../ExamEntity.js";
+import { MCQuestionEntity } from "../MCQuestionEntity.js";
+import { QuestionEntity } from "../QuestionEntity.js";
+import { QuestionEntityType } from "../QuestionEntityType.js";
 import { SubcategoryEntity } from "../SubcategoryEntity.js";
+import { TrueFalseQuestionEntity } from "../TrueFalseQuestionEntity.js";
 import { UserEntity } from "../UserEntity.js";
 
 class Converter
@@ -27,6 +34,39 @@ class Converter
     convertExamToExamEntity(exam:Exam, subcategoryId:number = -1):ExamEntity
     {
         return new ExamEntity(exam.getId(), subcategoryId, exam.getName(), this.convertUserToUserEntity(exam.getCreator()));
+    }
+
+    convertQuestionEntityToQuestion(questionEntity:QuestionEntity):Question
+    {
+        if(questionEntity.questiontype === QuestionEntityType.MC_QUESTION)
+        {
+            let mcQuestionEntity = questionEntity as MCQuestionEntity;
+            return new MCQuestion(mcQuestionEntity.id, mcQuestionEntity.question, mcQuestionEntity.correctanswers, mcQuestionEntity.wronganswers);
+        }
+
+        else
+        {
+            let trueFalseQuestionEntity = questionEntity as TrueFalseQuestionEntity;
+            return new TrueFalseQuestion(trueFalseQuestionEntity.id, trueFalseQuestionEntity.question, trueFalseQuestionEntity.istrue);
+        }
+    }
+
+    convertQuestionToQuestionEntity(question:Question, examId:number = -1):QuestionEntity
+    {
+        if(question instanceof MCQuestion)
+        {
+            let mcQuestion = question as MCQuestion;
+            return new MCQuestionEntity(mcQuestion.getId(), examId, mcQuestion.getQuestion(),
+                                        QuestionEntityType.MC_QUESTION, mcQuestion.getCorrectAnswers(),
+                                        mcQuestion.getWrongAnswers());
+        }
+
+        else
+        {
+            let trueFalseQuestion = question as TrueFalseQuestion;
+            return new TrueFalseQuestionEntity(trueFalseQuestion.getId(), examId, trueFalseQuestion.getQuestion(),
+                                               QuestionEntityType.TRUE_FALSE_QUESTION, trueFalseQuestion.getIsTrue());
+        }
     }
 
     convertSubcategoryEntityToSubcategory(subcategorieEntity:SubcategoryEntity):Subcategory

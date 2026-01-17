@@ -20,14 +20,19 @@ export class RegisterViewHandler
     {
         this.parentElementId = parentElementId;
         this.registerView.render(this.parentElementId);
-        
+
+        let switchToLoginView = () =>
+        {
+            let loginViewHandler = new LoginViewHandler(new LoginView());
+
+            this.registerView.remove();
+            loginViewHandler.render(this.parentElementId as string);
+        };
+
         this.registerView.bindRegisterButton((email:string, userName:string, password:string) =>
         {
             serviceFactory.getService(ServiceName.USER).create(email, userName, password,
-                                                               (user:User) =>
-                                                               {
-                                                                   console.dir(user);
-                                                               },
+                                                               switchToLoginView,
                                                             
                                                                (error:ServiceError) =>
                                                                {
@@ -35,12 +40,6 @@ export class RegisterViewHandler
                                                                })
         });
 
-        this.registerView.bindLoginButton(() =>
-        {
-            let loginViewHandler = new LoginViewHandler(new LoginView());
-
-            this.registerView.remove();
-            loginViewHandler.render(this.parentElementId as string);
-        });
+        this.registerView.bindLoginButton(switchToLoginView);
     }
 }

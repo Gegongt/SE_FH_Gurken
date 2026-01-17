@@ -17,19 +17,35 @@ export class RegisterView
     render(parentElementId:string)
     {
         let formElement = document.createElement("form");
+        formElement.classList.add("p-4", "mb-0");
 
         formElement.innerHTML = `
-            <label for = "${this.emailInputFieldId}">Email</label>
-            <input id = "${this.emailInputFieldId}" type = "email" />
-
-            <label for = "${this.userNameInputFieldId}">User name</label>
-            <input id = "${this.userNameInputFieldId}" type = "text" />
+            <div class = "mb-3 row">
+                <label for = "${this.emailInputFieldId}" class = "col-sm-2 col-form-label">Email</label>
             
-            <label for = "${this.passwordInputFieldId}">Password</label>
-            <input id = "${this.passwordInputFieldId}" type = "password" />
+                <div class = "col-sm-10">
+                    <input id = "${this.emailInputFieldId}" class = "form-control" type = "email" />
+                </div>
+            </div>
 
-            <input id = "${this.registerButtonId}" type = "button" value = "Register" />
-            <input id = "${this.loginButtonId}" type = "button" value = "Login" />`;
+            <div class = "mb-3 row">
+                <label for = "${this.userNameInputFieldId}" class = "col-sm-2 col-form-label">User name</label>
+
+                <div class = "col-sm-10">
+                    <input id = "${this.userNameInputFieldId}" class = "form-control" type = "text" />
+                </div>
+            </div>
+
+            <div class = "mb-3 row">
+                <label for = "${this.passwordInputFieldId}" class = "col-sm-2 col-form-label">Password</label>
+                
+                <div class = "col-sm-10">
+                    <input id = "${this.passwordInputFieldId}" class = "form-control" type = "password" />
+                </div>
+            </div>
+
+            <input id = "${this.loginButtonId}" type = "button" value = "Login" class = "btn btn-secondary p-2" />
+            <input id = "${this.registerButtonId}" type = "button" value = "Register" class = "btn btn-primary p-2" />`;
 
         this.parentElementId = parentElementId;
         let parentElement = document.getElementById(this.parentElementId);
