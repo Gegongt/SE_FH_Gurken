@@ -68,7 +68,7 @@ export class LoginView
         let errorArea:HTMLDivElement = document.createElement("div") as HTMLDivElement;
         errorArea.classList.add("p-2", "mt-2", "mb-4", "d-flex", "justify-content-center", "align-items-center", "errorArea");
         
-        errorArea.innerHTML = `<p class = "p-2">${errorMessage}</p>`;
+        errorArea.innerHTML = `<p class = "p-2 m-0">${errorMessage}</p>`;
         errorArea.hidden = false;
         
         document.getElementById(parentElementId)!.appendChild(errorArea);

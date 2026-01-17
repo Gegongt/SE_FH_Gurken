@@ -40,7 +40,11 @@ export class RegisterView
                 <label for = "${this.passwordInputFieldId}" class = "col-sm-2 col-form-label">Password</label>
                 
                 <div class = "col-sm-10">
-                    <input id = "${this.passwordInputFieldId}" class = "form-control" type = "password" />
+                    <input id = "${this.passwordInputFieldId}" aria-describedby = "passwordRules" class = "form-control" type = "password" />
+                    
+                    <div id = "passwordRules" class = "form-text">
+                        Your password must be at least 6 characters long.
+                    </div>
                 </div>
             </div>
 
@@ -79,7 +83,7 @@ export class RegisterView
         let errorArea:HTMLDivElement = document.createElement("div") as HTMLDivElement;
         errorArea.classList.add("p-2", "mt-2", "mb-4", "d-flex", "justify-content-center", "align-items-center", "errorArea");
         
-        errorArea.innerHTML = `<p class = "p-2">${errorMessage}</p>`;
+        errorArea.innerHTML = `<p class = "p-2 m-0">${errorMessage}</p>`;
         errorArea.hidden = false;
         
         document.getElementById(parentElementId)!.appendChild(errorArea);
