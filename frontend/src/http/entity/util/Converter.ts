@@ -83,7 +83,7 @@ class Converter
 
     convertUserEntityToUser(userEntity:UserEntity):User
     {
-        return new User(userEntity.id, userEntity.isadmin, userEntity.email, UserEntity.name, userEntity.isblocked, userEntity.profilepicturename, []);
+        return new User(userEntity.id, userEntity.isadmin, userEntity.email, userEntity.name, userEntity.isblocked, userEntity.profilepicturename, []);
     }
 
     convertUserToUserEntity(user:User):UserEntity

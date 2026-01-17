@@ -105,6 +105,58 @@ class UserHttpService
                                 () => { successCallback(); },
                                 (error:any) => { errorCallback(new ServiceError("Error! Something went wrong!")); });
     }
+
+  getBlockedUsers(
+    isBlocked: boolean,
+    successCallback: (users: User[]) => void,
+    errorCallback: (error: ServiceError) => void
+    ): void {
+    const params = { isBlocked: String(isBlocked) }; // Swagger: isBlocked query param
+
+    httpService.sendRequest(
+        HttpMethod.METHOD_GET,
+        this.URL_USERS_API_BASE,   
+        params,
+        null,
+        null,
+        "json",
+        false,
+        accessTokenUtil.getAccessToken(),
+        (response: any) => {
+        const arr: any[] = Array.isArray(response) ? response : (response.users ?? []);
+        const users = arr.map((ue) => converter.convertUserEntityToUser(ue));
+        successCallback(users);
+        },
+        (error: any) => errorCallback(new ServiceError("Error: could not load blocked users"))
+    );
+    }
+
+    setBlocked(
+        userId: string,
+        blocked: boolean,
+        successCallback: () => void,
+        errorCallback: (error: ServiceError) => void
+        ): void {
+        const body = {
+            name: "",
+            profilepicturename: null,
+            isblocked: blocked,
+        };
+
+        httpService.sendRequest(
+            HttpMethod.METHOD_PUT,
+            `${this.URL_USERS_API_BASE}/${userId}`,
+            null,
+            body,
+            HttpContentType.CONTENT_TYPE_JSON,
+            "json",
+            false,
+            accessTokenUtil.getAccessToken(),
+            () => successCallback(),
+            (error: any) => errorCallback(new ServiceError("Error: could not update user blocked status"))
+        );
+    }
+
 }
 
 export let userHttpService = new UserHttpService();
