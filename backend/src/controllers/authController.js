@@ -13,6 +13,10 @@ async function register(req, res) {
     return res.status(400).json({ error: "Only @stud.hcw.ac.at emails are allowed" });
   }
 
+  if (String(password).length < 6) {
+    return res.status(400).json({ error: "Password length must be > 5" });
+  }
+
   let firebaseResult = null;
 
   try {
