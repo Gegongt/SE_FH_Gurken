@@ -117,7 +117,7 @@ export class UserView {
   }
 
   bindReportedFileActions(
-    handler: (action: "accept" | "delete" | "block", fileId: number, uploaderId: number) => void
+    handler: (action: "accept" | "delete" | "block", fileId: number, uploaderId: string) => void
   ): void {
     const list = document.getElementById("reportedFilesList");
     if (!list) return;
@@ -129,17 +129,16 @@ export class UserView {
 
       const action = btn.getAttribute("data-action") as any;
       const fileId = Number(btn.getAttribute("data-file-id"));
-      const uploaderId = Number(btn.getAttribute("data-uploader-id"));
+      const uploaderId = btn.getAttribute("data-uploader-id");
 
-      if (!action || !Number.isFinite(fileId) || !Number.isFinite(uploaderId)) return;
-
+      if (!action || !Number.isFinite(fileId) || !uploaderId) return;
       handler(action, fileId, uploaderId);
     });
   }
 
 
   bindBlockedUserActions(
-    handler: (action: "unblock", userId: number) => void
+    handler: (action: "unblock", userId: string) => void
   ): void {
     this.blockedUsersList.addEventListener("click", (e) => {
       const btn = (e.target as HTMLElement).closest("button");
@@ -149,8 +148,8 @@ export class UserView {
       const li = btn.closest("li");
       if (!li) return;
 
-      const userId = Number(li.getAttribute("data-user-id"));
-      if (!Number.isFinite(userId)) return;
+      const userId = li.getAttribute("data-user-id");
+      if (!userId) return;
 
       handler(action, userId);
     });

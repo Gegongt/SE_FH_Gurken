@@ -12,6 +12,8 @@ import { userHttpService } from "../http/UserHttpService.js";
 import { categoryHttpService } from "../http/CategoryHttpService.js";
 import { subcategoryHttpService } from "../http/SubcategoryHttpService.js";
 import { examHttpService } from "../http/ExamHttpService.js";
+import { fileHttpService } from "../http/FileHttpService.js";
+import { favouritesHttpService } from "../http/FavouritesHttpService.js";
 
 
 class ServiceFactory
@@ -54,7 +56,7 @@ class ServiceFactory
             case ServiceName.USER: return userHttpService;
             case ServiceName.CATEGORY: return categoryHttpService;
             case ServiceName.SUBCATEGORY: return subcategoryHttpService;
-            case ServiceName.FILE: return fileMemService;
+            case ServiceName.FILE: return fileHttpService;
             case ServiceName.RATING: return ratingMemService;
             case ServiceName.QUESTION: return questionMemService;
             case ServiceName.EXAM: return examHttpService;

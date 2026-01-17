@@ -12,9 +12,20 @@ export type UserService = {
   deleteFile(fileId:number, success:()=>void, error:(s:any)=>void): void;
   blockUploaderOfFile(fileId:number, success:()=>void, error:(s:any)=>void): void;
 
-  getBlockedUsers(success:(users: User[])=>void, error:(s:any)=>void): void;
-  setBlocked(userId:number, blocked:boolean, success:()=>void, error:(s:any)=>void): void;
-  unblockUser(userId:number, success:()=>void, error:(s:any)=>void): void;
+  getBlockedUsers(
+    isBlocked: boolean,
+    success: (users: User[]) => void,
+    error: (e: any) => void
+  ): void;
+
+  setBlocked(
+    userId: string,
+    blocked: boolean,
+    success: () => void,
+    error: (e: any) => void
+  ): void;
+
+  unblockUser(userId: string, success:()=>void, error:(s:any)=>void): void;
 };
 
 export type FileService = {
@@ -61,7 +72,6 @@ export class UserViewHandler {
         this.currentUser = u;
         this.view.renderUser(u);
         this.view.renderFavourites(u.getFavourites());
-        this.view.showAdminPanel(u.getIsAdmin());
 
         this.view.bindReportedFileActions((action, fileId, uploaderId) => {
           this.onReportedAction(action, fileId, uploaderId);
@@ -115,19 +125,16 @@ export class UserViewHandler {
 
 
   private loadAdminData(): void {
-    this.fileService.getReportedFiles(
-      (files) => this.view.renderReportedFiles(files),
-      (status) => this.view.showError(`Failed to load reported files: ${String(status)}`)
-    );
 
     this.userService.getBlockedUsers(
+      true, 
       (users) => this.view.renderBlockedUsers(users),
-      (status) => this.view.showError(`Failed to load blocked users: ${String(status)}`)
+      (err) => this.view.showError(`Failed to load blocked users`)
     );
   }
 
 
-  private onReportedAction(action: "accept" | "delete" | "block", fileId: number, uploaderId: number): void {
+  private onReportedAction(action: "accept" | "delete" | "block", fileId: number, uploaderId: string): void {
     if (action === "accept") {
       this.fileService.reportFile(fileId, false,
         () => this.loadAdminData(),
@@ -152,7 +159,7 @@ export class UserViewHandler {
     }
   }
 
-  private onBlockedAction(action: "unblock", userId: number): void {
+  private onBlockedAction(action: "unblock", userId: string): void {
     this.userService.setBlocked(userId, false,
       () => this.loadAdminData(),
       (s) => this.view.showError(`Unblock failed: ${String(s)}`)

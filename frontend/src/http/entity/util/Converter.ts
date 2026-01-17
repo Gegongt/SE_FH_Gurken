@@ -13,6 +13,8 @@ import { QuestionEntityType } from "../QuestionEntityType.js";
 import { SubcategoryEntity } from "../SubcategoryEntity.js";
 import { TrueFalseQuestionEntity } from "../TrueFalseQuestionEntity.js";
 import { UserEntity } from "../UserEntity.js";
+import { File } from "../../../vo/File.js";
+import { FileEntity } from "../FileEntity.js";
 
 class Converter
 {
@@ -87,6 +89,16 @@ class Converter
     convertUserToUserEntity(user:User):UserEntity
     {
         return new UserEntity(user.getId(), user.getIsAdmin(), user.getEmail(), user.getName(), user.getIsBlocked(), user.getProfilePictureName());
+    }
+
+    convertFileEntityToFile(fileEntity:FileEntity):File
+    {
+        return new File(fileEntity.id, fileEntity.name, fileEntity.isreported, this.convertUserEntityToUser(fileEntity.uploader));
+    }
+
+    convertFileToFileEntity(file:File, subcategoryId:number = -1):FileEntity
+    {
+        return new FileEntity(file.getId(), subcategoryId, file.getName(), this.convertUserToUserEntity(file.getUploader()),  file.getIsReported());
     }
 }
 
