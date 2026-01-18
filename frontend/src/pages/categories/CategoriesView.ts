@@ -101,7 +101,6 @@ export class CategoriesView {
       const li = document.createElement("li");
       li.setAttribute("data-file-id", String(f.getId()));
 
-      const summary = f.getRatingSummary?.();
       const isFav = (f as any).fav === true;
       const favBtnText = isFav ? "Unfavourite" : "Favourite";
 
@@ -110,6 +109,7 @@ export class CategoriesView {
 
       const canDelete = (f as any).canDelete === true;
 
+      const summary = (f as any).ratingSummary;
       const scoreText = summary
         ? `Score: ${summary.score} (${summary.overall}) | 👍 ${summary.good} 😐 ${summary.medium} 👎 ${summary.bad}`
         : "Score: -";
@@ -123,9 +123,10 @@ export class CategoriesView {
           <button data-action="download">Download</button>
           <button data-action="report">${reportBtnText}</button>
 
-          <button data-action="rate" data-value="BAD">Bad</button>
-          <button data-action="rate" data-value="MEDIUM">Medium</button>
           <button data-action="rate" data-value="GOOD">Good</button>
+          <button data-action="rate" data-value="MEDIUM">Medium</button>
+          <button data-action="rate" data-value="BAD">Bad</button>
+          
 
           <button data-action="favourite">${favBtnText}</button>
 
