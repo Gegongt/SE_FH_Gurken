@@ -49,6 +49,8 @@ class QuestionHttpService
                                 });
     }
 
+    /*
+    Old version:
     createQuestion(question:Question, examId:number, successCallback:(id:number) => void, errorCallback:(error:ServiceError) => void):void
     {
         httpService.sendRequest(HttpMethod.METHOD_POST, this.URL_QUESTION_API_CREATE_QUESTION, null,
@@ -56,7 +58,7 @@ class QuestionHttpService
                                 "json", false, accessTokenUtil.getAccessToken(),
                                 (response:any) => { successCallback(-1); },
                                 (error:any) => { errorCallback(new ServiceError("Error! Create failed!")); });
-    }
+    }*/
     
     createQuestions(questions:Question[], examId:number, successCallback:(ids:number[]) => void, errorCallback:(error:ServiceError) => void):void
     {
@@ -73,6 +75,8 @@ class QuestionHttpService
                                 (error:any) => { errorCallback(new ServiceError("Error! Create failed!")); });
     }
     
+    /*
+    Old version:
     updateQuestion(question:Question, examId:number, successCallback:() => void, errorCallback:(error:ServiceError) => void):void
     {
         httpService.sendRequest(HttpMethod.METHOD_PUT, this.URL_QUESTION_API_UPDATE_QUESTION + "/" + question.getId(), null,
@@ -95,23 +99,25 @@ class QuestionHttpService
                                 body, HttpContentType.CONTENT_TYPE_JSON, "json", false, accessTokenUtil.getAccessToken(),
                                 (response:any) => { successCallback(); },
                                 (error:any) => { errorCallback(new ServiceError("Error! Update failed!")); });
-        }
-    
-        deleteQuestion(id:number, successCallback:() => void, errorCallback:(error:ServiceError) => void):void
-        {
-            httpService.sendRequest(HttpMethod.METHOD_DELETE, this.URL_QUESTION_API_DELETE_QUESTION + "/" + id, null,
-                                    null, null, null, false, accessTokenUtil.getAccessToken(),
-                                    (response:any) => { successCallback(); },
-                                    (error:any) => { errorCallback(new ServiceError("Error! Delete failed!")); });
-        }
-    
-        deleteQuestions(examId:number, successCallback:() => void, errorCallback:(error:ServiceError) => void):void
-        {
-            httpService.sendRequest(HttpMethod.METHOD_DELETE, this.URL_QUESTION_API_DELETE_QUESTIONS, { examId },
-                                    null, null, null, false, accessTokenUtil.getAccessToken(),
-                                    (response:any) => { successCallback(); },
-                                    (error:any) => { errorCallback(new ServiceError("Error! Delete failed!")); });
-        }
+    }
+    */
+    /*
+    Old version:
+    deleteQuestion(id:number, successCallback:() => void, errorCallback:(error:ServiceError) => void):void
+    {
+        httpService.sendRequest(HttpMethod.METHOD_DELETE, this.URL_QUESTION_API_DELETE_QUESTION + "/" + id, null,
+                                null, null, null, false, accessTokenUtil.getAccessToken(),
+                                (response:any) => { successCallback(); },
+                                (error:any) => { errorCallback(new ServiceError("Error! Delete failed!")); });
+    }*/
+
+    deleteQuestions(examId:number, successCallback:() => void, errorCallback:(error:ServiceError) => void):void
+    {
+        httpService.sendRequest(HttpMethod.METHOD_DELETE, this.URL_QUESTION_API_DELETE_QUESTIONS, { examId },
+                                null, null, null, false, accessTokenUtil.getAccessToken(),
+                                (response:any) => { successCallback(); },
+                                (error:any) => { errorCallback(new ServiceError("Error! Delete failed!")); });
+    }
 }
 
 export let questionHttpService = new QuestionHttpService();

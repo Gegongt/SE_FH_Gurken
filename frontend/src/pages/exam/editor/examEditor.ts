@@ -37,8 +37,11 @@ function saveExam(exam:Exam, nameInputElement:HTMLInputElement, questionEditorVi
 
     if(exam.getId() < 0)
     {
-        serviceFactory.getService(ServiceName.EXAM).createExam(exam, (id:number) =>
+        let subcategoryId:number = Number(urlUtil.getParam("subcategoryId"));
+
+        serviceFactory.getService(ServiceName.EXAM).createExam(exam, subcategoryId, (id:number) =>
         {
+            console.log(id);
             locationUtil.redirectToMainPage();
         },
     
