@@ -65,7 +65,13 @@ const fileController = require("../controllers/fileController");
  *         description: Internal server error
  */
 
-router.post("/", requireAuth, checkBlocked, upload.single("file"), fileController.create);
+router.post(
+  "/",
+  requireAuth,
+  checkBlocked,
+  upload.single("file"),
+  fileController.create,
+);
 
 /**
  * @swagger
@@ -307,6 +313,13 @@ router.delete("/:fileId", requireAuth, checkBlocked, fileController.remove);
  *       500:
  *         description: Internal server error
  */
-router.get("/:fileId/download", requireAuth, checkBlocked, fileController.download);
+router.get(
+  "/:fileId/download",
+  requireAuth,
+  checkBlocked,
+  fileController.download,
+);
+
+router.put("/:fileId/report", requireAuth, checkBlocked, fileController.report);
 
 module.exports = router;

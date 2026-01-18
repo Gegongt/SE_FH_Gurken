@@ -51,7 +51,12 @@ exports.deleteFileEverywhere = async (fileId) => {
   const deleted = await fileRepository.deleteById(fileId);
 
   if (deleted) {
-    const filePath = path.join(process.cwd(), "uploads", "files", String(fileId));
+    const filePath = path.join(
+      process.cwd(),
+      "uploads",
+      "files",
+      String(fileId),
+    );
     try {
       await fs.unlink(filePath);
     } catch (e) {
@@ -62,4 +67,8 @@ exports.deleteFileEverywhere = async (fileId) => {
   }
 
   return deleted;
+};
+
+exports.reportFile = async (fileId) => {
+  return fileRepository.setReportedTrue(fileId);
 };

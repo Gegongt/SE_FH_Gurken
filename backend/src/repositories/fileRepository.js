@@ -9,7 +9,7 @@ exports.insert = async (subcategoryId, name, uploaderId) => {
     VALUES ($1, $2, $3, false)
     RETURNING *
     `,
-    [subcategoryId, name, uploaderId]
+    [subcategoryId, name, uploaderId],
   );
 
   return rows[0] ?? null;
@@ -50,7 +50,7 @@ exports.findBySubcategoryId = async (subcategoryId) => {
     FROM ${TABLE} f
     JOIN public."User" u ON u.id = f.uploaderid
     WHERE f.subcategoryid = $1 ORDER BY f.id DESC`,
-    [subcategoryId]
+    [subcategoryId],
   );
   return rows;
 };
@@ -71,16 +71,15 @@ exports.findByReported = async (reported) => {
     FROM ${TABLE} f
     JOIN public."User" u ON u.id = f.uploaderid
     WHERE f.isreported = $1 ORDER BY f.id DESC`,
-    [reported]
+    [reported],
   );
   return rows;
 };
 
 exports.findById = async (fileId) => {
-  const { rows } = await pool.query(
-    `SELECT * FROM ${TABLE} WHERE id = $1`,
-    [fileId]
-  );
+  const { rows } = await pool.query(`SELECT * FROM ${TABLE} WHERE id = $1`, [
+    fileId,
+  ]);
   return rows[0] ?? null;
 };
 
@@ -93,7 +92,7 @@ exports.updateById = async (fileId, name, isReported) => {
       isreported = COALESCE($3, isreported)
     WHERE id = $1
     `,
-    [fileId, name, isReported]
+    [fileId, name, isReported],
   );
 
   if (rowCount === 0) return null;
@@ -102,9 +101,17 @@ exports.updateById = async (fileId, name, isReported) => {
 };
 
 exports.deleteById = async (fileId) => {
-  const { rowCount } = await pool.query(
-    `DELETE FROM ${TABLE} WHERE id = $1`,
-    [fileId]
-  );
+  const { rowCount } = await pool.query(`DELETE FROM ${TABLE} WHERE id = $1`, [
+    fileId,
+  ]);
   return rowCount > 0;
+};
+
+exports.setReportedTrue = async (fileId) => {
+  const { rowCount } = await pool.query(
+    `UPDATE ${TABLE} SET isreported = true WHERE id = $1`,
+    [fileId],
+  );
+  if (rowCount === 0) return null;
+  return exports.findById(fileId);
 };
