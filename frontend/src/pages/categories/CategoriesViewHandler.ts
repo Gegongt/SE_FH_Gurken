@@ -8,7 +8,7 @@ import { locationUtil } from "../../util/LocationUtil.js";
 
 type Navigator = {
   redirectToExamExecutorPage(id: number): void;
-  redirectToExamEditorPage(id?: number | null): void;
+  redirectToExamEditorPage(id?: number | null, subcategoryId?:number|null): void;
   redirectToLoginPage(): void;
   redirectToUserPage(): void;
   redirectToMainPage(): void;
@@ -64,7 +64,6 @@ export type RatingService = {
 export type ExamService = {
   getExams(
     subcategoryId: number,
-    shallow: boolean,
     success: (exams: Exam[]) => void,
     error: (status: any) => void
   ): void;
@@ -267,7 +266,6 @@ private reloadFiles(subcategoryId: number): void {
   private reloadExams(subcategoryId: number): void {
     this.examService.getExams(
       subcategoryId,
-      true,
       (exams) => {
         this.currentExams = exams;
         this.view.renderExams(this.currentExams);
@@ -281,7 +279,7 @@ private reloadFiles(subcategoryId: number): void {
       this.view.renderError("Please select a subcategory first.");
       return;
     }
-    this.nav.redirectToExamEditorPage(); // erstellen (ohne id)
+    this.nav.redirectToExamEditorPage(null, this.selectedSubcategoryId); // erstellen (ohne id)
   }
 
   private onFavouriteClicked(fileId: number): void {
