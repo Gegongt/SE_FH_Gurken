@@ -33,7 +33,7 @@ async function createIfNotExists({ id, email, name, profilepicturename }) {
   if (inserted.rowCount > 0) {
     return { created: true, user: inserted.rows[0] };
   }
-  
+
   const existing = await findById(id);
   if (existing) return { created: false, user: existing };
 
@@ -59,10 +59,9 @@ async function updateById(id, name, profilepicturename, isblocked) {
 }
 
 async function deleteById(id) {
-  const { rowCount } = await pool.query(
-    `DELETE FROM ${TABLE} WHERE id = $1`,
-    [id]
-  );
+  const { rowCount } = await pool.query(`DELETE FROM ${TABLE} WHERE id = $1`, [
+    id,
+  ]);
 
   return rowCount > 0;
 }
@@ -72,11 +71,11 @@ async function findByBlocked(isBlocked) {
     `SELECT *
      FROM ${TABLE}
      WHERE isblocked = $1`,
-    [isBlocked]
+    [isBlocked],
   );
 
   return rows;
-};
+}
 
 async function updateProfilePictureName(userId, profilepicturename) {
   const { rows } = await pool.query(
@@ -86,9 +85,27 @@ async function updateProfilePictureName(userId, profilepicturename) {
     WHERE id = $1
     RETURNING *
     `,
-    [userId, profilepicturename]
+    [userId, profilepicturename],
+  );
+  return rows[0] ?? null;
+}
+
+exports.findByName = async (name) => {
+  const { rows } = await pool.query(
+    `SELECT *
+     FROM ${TABLE}
+     WHERE name = $1
+     LIMIT 1`,
+    [name],
   );
   return rows[0] ?? null;
 };
 
-module.exports = { findById, createIfNotExists, updateById, deleteById, findByBlocked, updateProfilePictureName };
+module.exports = {
+  findById,
+  createIfNotExists,
+  updateById,
+  deleteById,
+  findByBlocked,
+  updateProfilePictureName,
+};

@@ -21,15 +21,18 @@ async function getUserById(id) {
 }
 
 async function updateUser(userId, name, profilepicturename, isblockedOrNull) {
-  return userRepository.updateById(userId, name, profilepicturename, isblockedOrNull);
-};
+  return userRepository.updateById(
+    userId,
+    name,
+    profilepicturename,
+    isblockedOrNull,
+  );
+}
 
 async function deleteUser(userId) {
-  try{
+  try {
     await admin.auth().deleteUser(userId);
-  } catch (e) {
-
-  }
+  } catch (e) {}
 
   return userRepository.deleteById(userId);
 }
@@ -40,6 +43,17 @@ async function listUsersByBlocked(isBlocked) {
 
 async function updateProfilePictureName(userId, profilepicturename) {
   return userRepository.updateProfilePictureName(userId, profilepicturename);
+}
+
+exports.getUserByName = async (name) => {
+  return userRepository.findByName(name);
 };
 
-module.exports = { createUser, getUserById, updateUser, deleteUser, listUsersByBlocked, updateProfilePictureName };
+module.exports = {
+  createUser,
+  getUserById,
+  updateUser,
+  deleteUser,
+  listUsersByBlocked,
+  updateProfilePictureName,
+};

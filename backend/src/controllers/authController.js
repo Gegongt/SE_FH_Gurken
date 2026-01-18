@@ -10,7 +10,9 @@ async function register(req, res) {
   }
 
   if (!String(email).endsWith("@stud.hcw.ac.at")) {
-    return res.status(400).json({ error: "Only @stud.hcw.ac.at emails are allowed" });
+    return res
+      .status(400)
+      .json({ error: "Only @stud.hcw.ac.at emails are allowed" });
   }
 
   if (String(password).length < 6) {
@@ -34,7 +36,7 @@ async function register(req, res) {
       userId: uid,
       accessToken: firebaseResult.idToken,
       refreshToken: firebaseResult.refreshToken,
-      expiresIn: Number(firebaseResult.expiresIn)
+      expiresIn: Number(firebaseResult.expiresIn),
     });
   } catch (err) {
     if (firebaseResult?.localId) {
@@ -46,7 +48,9 @@ async function register(req, res) {
     }
 
     const status = err.status || 500;
-    return res.status(status).json({ error: err.message || "Internal server error" });
+    return res
+      .status(status)
+      .json({ error: err.message || "Internal server error" });
   }
 }
 
@@ -57,12 +61,22 @@ async function login(req, res) {
   }
 
   try {
+    if (!email.includes("@")) {
+      const userByName = await userService.getUserByName(email);
+      if (!userByName) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      email = userByName.email;
+    }
+
     const firebaseResult = await authService.login(email, password);
     const uid = firebaseResult.localId;
 
     const dbUser = await userService.getUserById(uid);
     if (!dbUser) {
-      return res.status(404).json({ error: "User not found in database. Please register first." });
+      return res
+        .status(404)
+        .json({ error: "User not found in database. Please register first." });
     }
 
     if (dbUser.isblocked) {
@@ -73,7 +87,7 @@ async function login(req, res) {
       userId: uid,
       accessToken: firebaseResult.idToken,
       refreshToken: firebaseResult.refreshToken,
-      expiresIn: Number(firebaseResult.expiresIn)
+      expiresIn: Number(firebaseResult.expiresIn),
     });
   } catch (err) {
     const status = err.status || 401;
