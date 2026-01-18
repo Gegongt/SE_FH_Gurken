@@ -5,7 +5,7 @@ main
 
 #content
 {
-    background-color: rgba(0, 93, 89, 0.3);
+    background-color: rgba(0, 93, 89, 0.9);
     border-radius: 4px;
 }
 
@@ -24,4 +24,14 @@ main
 input
 {
     user-select: auto;
+}
+
+label
+{
+    color: white;
+}
+
+#passwordRules
+{
+    color: white;
 }

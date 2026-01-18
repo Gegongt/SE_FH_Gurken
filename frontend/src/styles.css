@@ -147,3 +147,27 @@ header a
     border: 2px solid var(--bs-primary);
     border-radius: 6px;
 }
+
+.background-picture
+{
+    background-image: url("../images/background.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+.background-picture-modern
+{
+    background-image: url("../images/background_modern.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+.background-neutral
+{
+    background-color: white;
+    border-radius: 4px;
+}
