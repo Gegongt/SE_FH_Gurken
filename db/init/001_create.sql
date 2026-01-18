@@ -12,7 +12,8 @@ CREATE TABLE public."User" (
 	isblocked bool DEFAULT false NOT NULL,
 	profilepicturename text DEFAULT NULL,
 	CONSTRAINT user_pk PRIMARY KEY (id),
-	CONSTRAINT user_unique UNIQUE (email)
+	CONSTRAINT user_unique UNIQUE (email),
+	CONSTRAINT user_name_unique UNIQUE ("name")
 );
 
 DROP TABLE IF EXISTS public.category;
