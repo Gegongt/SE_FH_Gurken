@@ -8,6 +8,7 @@ import { ObjectNotFoundError } from "../error/ObjectNotFoundError.js";
 import { UserEntity } from "../../http/entity/UserEntity.js";
 import { accessTokenUtil } from "./AccessTokenUtil.js";
 import { converter } from "../../http/entity/util/Converter.js";
+import { errorUtil } from "./ErrorUtil.js";
 
 class UserHttpService
 {
@@ -44,9 +45,9 @@ class UserHttpService
                                                         (error:ServiceError) => errorCallback(error));
                                 },
 
-                                (error:any) =>
+                                (error:number) =>
                                 {
-                                    errorCallback(new LoginError("Login failed!"));
+                                    errorCallback(errorUtil.getServiceError(error));
                                 });
     }
 
@@ -70,9 +71,9 @@ class UserHttpService
                                     successCallback();
                                 },
 
-                                (error:any) =>
+                                (error:number) =>
                                 {
-                                    errorCallback(new ServiceError("Error! Creation failed!"));
+                                    errorCallback(errorUtil.getServiceError(error));
                                 }
         )
     }
@@ -87,14 +88,14 @@ class UserHttpService
                                     successCallback(converter.convertUserEntityToUser(userEntity));
                                 },
 
-                                (error:any) =>
+                                (error:number) =>
                                 {
                                     if(error === 401)
                                     {
                                         successCallback(null); //the user is not logged in
                                     }
 
-                                    errorCallback(new ServiceError("Error: User could not be loaded!"));
+                                    errorCallback(errorUtil.getServiceError(error));
                                 });
     }
 
@@ -103,7 +104,7 @@ class UserHttpService
         httpService.sendRequest(HttpMethod.METHOD_PUT, this.URL_USER_API_UPDATE_OWN_USER, null, converter.convertUserToUserEntity(updatedUser),
                                 HttpContentType.CONTENT_TYPE_JSON, null, false, accessTokenUtil.getAccessToken(),
                                 () => { successCallback(); },
-                                (error:any) => { errorCallback(new ServiceError("Error! Something went wrong!")); });
+                                (error:number) => { errorCallback(errorUtil.getServiceError(error)); });
     }
 
   getBlockedUsers(

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FHGurken 🥒🥒🥒</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="../../styles.css">
+
+  <link rel = "icon" type = "image/png" href = "../../../images/favicon.png">
+</head>
+
+<body class="background-picture-modern">
+  <header id="header"></header>
+
+  <main class="container my-4">
+    <div class="text-center mb-4">
+      <h1 class="examHeader m-0">Categories</h1>
+    </div>
+
+    <div class="row justify-content-center mb-4">
+      <div class="col-12 col-lg-10">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <label for="categorySearch" class="form-label questionText mb-2">Search</label>
+            <div class="input-group">
+              <span class="input-group-text">
+                <i class="bi bi-search"></i>
+              </span>
+              <input id="categorySearch" type="text" class="form-control" placeholder="Search categories..." />
+            </div>
+            <div class="text-muted small mt-2">
+              Select a category and subcategory to view files and exams.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4 justify-content-center">
+      <div class="col-12 col-lg-4">
+        <div class="card shadow-sm h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h2 class="h5 questionText m-0">Category List</h2>
+              <span class="badge text-bg-primary nonSelectable">Categories</span>
+            </div>
+            <ul id="categoryList" class="list-group">
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-4">
+        <div class="card shadow-sm h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h2 class="h5 questionText m-0">Subcategories</h2>
+              <span class="badge text-bg-secondary nonSelectable">Sub</span>
+            </div>
+            <ul id="subcategoryList" class="list-group">
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-4">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h2 class="h5 questionText m-0">Files</h2>
+              <button id="btnUploadFile" class="btn btn-primary btn-sm" disabled>
+                <i class="bi bi-upload me-1"></i>
+                Upload
+              </button>
+            </div>
+
+            <ul id="fileList" class="list-group mb-3">
+            </ul>
+
+            <hr class="my-3" />
+
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h2 class="h5 questionText m-0">Exams</h2>
+              <button id="btnCreateExam" class="btn btn-secondary btn-sm" disabled>
+                <i class="bi bi-plus-circle me-1"></i>
+                Create
+              </button>
+            </div>
+
+            <ul id="examList" class="list-group">
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <input id="filePicker" type="file" class="d-none" />
+
+    <script type="module" src="../../../dist/pages/categories/categories.js"></script>
+  </main>
+</body>
+</html>
+

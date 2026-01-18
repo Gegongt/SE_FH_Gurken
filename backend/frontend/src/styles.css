@@ -1,0 +1,195 @@
+:root
+{
+    --bs-primary: #005D59;
+    --bs-primary-rgb: 0, 93, 89;
+    --bs-intermediate: #0A7A69;
+    --bs-secondary: #139779;
+
+    --bs-warning: #583E23;
+}
+
+.btn-primary
+{
+    --bs-btn-color: #FFFFFF;
+
+    --bs-btn-bg: #005D59;
+    --bs-btn-border-color: #005D59;
+    
+    --bs-btn-hover-color: #FFFFFF;
+    --bs-btn-hover-bg: #0A7A69;
+    --bs-btn-hover-border-color: #0A7A69;
+    
+    --bs-btn-focus-shadow-rgb: #0A7A69;
+    
+    --bs-btn-active-color: #FFFFFF;
+    --bs-btn-active-bg: #139779;
+    --bs-btn-active-border-color: #139779;
+
+    --bs-btn-disabled-color: #FFFFFF;
+    --bs-btn-disabled-bg: #005D59;
+    --bs-btn-disabled-border-color: #005D59;
+}
+
+.btn-secondary
+{
+    --bs-btn-color: #FFFFFF;
+
+    --bs-btn-bg: #139779;
+    --bs-btn-border-color: #139779;
+    
+    --bs-btn-hover-color: #FFFFFF;
+    --bs-btn-hover-bg: #0A7A69;
+    --bs-btn-hover-border-color: #0A7A69;
+    
+    --bs-btn-focus-shadow-rgb: #0A7A69;
+    
+    --bs-btn-active-color: #FFFFFF;
+    --bs-btn-active-bg: #005D59;
+    --bs-btn-active-border-color: #005D59;
+
+    --bs-btn-disabled-color: #FFFFFF;
+    --bs-btn-disabled-bg: #139779;
+    --bs-btn-disabled-border-color: #139779;
+}
+
+.btn-danger
+{
+    --bs-btn-color: #FFFFFF;
+
+    --bs-btn-bg: #583E23;
+    --bs-btn-border-color: #583E23;
+    
+    --bs-btn-hover-color: #FFFFFF;
+    --bs-btn-hover-bg: #81582D;
+    --bs-btn-hover-border-color: #81582D;
+    
+    --bs-btn-focus-shadow-rgb: #81582D;
+    
+    --bs-btn-active-color: #FFFFFF;
+    --bs-btn-active-bg: #A97237;
+    --bs-btn-active-border-color: #A97237;
+
+    --bs-btn-disabled-color: #FFFFFF;
+    --bs-btn-disabled-bg: #583E23;
+    --bs-btn-disabled-border-color: #583E23;
+}
+
+.form-control
+{
+    --bs-form-control-focus-border-color: #005D59;
+    --bs-focus-ring-color: rgba(0, 93, 89, 0.3);
+}
+
+.form-control:focus
+{
+    border-color: #005D59;
+    box-shadow: 0 0 0 .25rem var(--bs-focus-ring-color);
+}
+
+.selectedOption
+{
+    border: 1px solid var(--bs-primary);
+    background-color: var(--bs-primary);
+    border-radius: 4px;
+    color: white;
+}
+
+.unselectedOption
+{
+    border-left: 2px solid var(--bs-primary);
+}
+
+.correctQuestion
+{
+    padding: 1em;
+    border: 2px solid var(--bs-primary);
+    border-radius: 6px;
+}
+
+.incorrectQuestion
+{
+    padding: 1em;
+    border: 2px solid var(--bs-warning);
+    border-radius: 6px;
+}
+
+.headerElement
+{
+    background-color: var(--bs-primary);
+    user-select: none;
+}
+
+.nonSelectable
+{
+    user-select:none;
+}
+
+.background-grey
+{
+    background-color: #FAFAFA;
+}
+
+.border-primary
+{
+    border: 1em solid var(--bs-primary);
+}
+
+.questionText
+{
+    font-weight: bold;
+    color: var(--bs-primary);
+}
+
+.resultsSection
+{
+    background-color: var(--bs-primary);
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 6px;
+}
+
+.examHeader
+{
+    color: var(--bs-primary);
+    font-weight: bold;
+    text-align: center;
+}
+
+header a
+{
+    color: white;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.editorQuestionContainer
+{
+    padding: 1em;
+    border: 2px solid var(--bs-primary);
+    border-radius: 6px;
+}
+
+.background-picture
+{
+    background-image: url("../images/background.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+.background-picture-modern
+{
+    background-image: url("../images/background_modern.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+.background-neutral
+{
+    background-color: white;
+    border-radius: 4px;
+}

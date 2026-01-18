@@ -6,6 +6,7 @@ import { httpService } from "../../http/HttpService.js";
 import { Question } from "../../vo/Question.js";
 import { ServiceError } from "../error/ServiceError.js";
 import { accessTokenUtil } from "./AccessTokenUtil.js";
+import { errorUtil } from "./ErrorUtil.js";
 
 class QuestionHttpService
 {
@@ -24,7 +25,7 @@ class QuestionHttpService
         httpService.sendRequest(HttpMethod.METHOD_GET, this.URL_QUESTION_API_GET_QUESTION + "/" + id, null,
                                 null, null, "json", false, accessTokenUtil.getAccessToken(),
                                 (response:QuestionEntity) => { successCallback(converter.convertQuestionEntityToQuestion(response)); },
-                                (error:any) => { errorCallback(new ServiceError("Error! Get failed!")); });
+                                (error:any) => { errorCallback(errorUtil.getServiceError(error)); });
     }
 
     getQuestions(examId:number, successCallback:(questions:Question[]) => void, errorCallback:(error:ServiceError) => void):void
@@ -45,7 +46,7 @@ class QuestionHttpService
 
                                 (error:any) =>
                                 {
-                                    errorCallback(new ServiceError("Error! Get failed!"));
+                                    errorCallback(errorUtil.getServiceError(error));
                                 });
     }
 
@@ -72,7 +73,7 @@ class QuestionHttpService
         httpService.sendRequest(HttpMethod.METHOD_POST, this.URL_QUESTION_API_CREATE_QUESTIONS, null,
                                 body, HttpContentType.CONTENT_TYPE_JSON, "json", false, accessTokenUtil.getAccessToken(),
                                 (response:any) => { successCallback([]); },
-                                (error:any) => { errorCallback(new ServiceError("Error! Create failed!")); });
+                                (error:any) => { errorCallback(errorUtil.getServiceError(error)); });
     }
     
     /*
@@ -116,7 +117,7 @@ class QuestionHttpService
         httpService.sendRequest(HttpMethod.METHOD_DELETE, this.URL_QUESTION_API_DELETE_QUESTIONS, { examId },
                                 null, null, null, false, accessTokenUtil.getAccessToken(),
                                 (response:any) => { successCallback(); },
-                                (error:any) => { errorCallback(new ServiceError("Error! Delete failed!")); });
+                                (error:any) => { errorCallback(errorUtil.getServiceError(error)); });
     }
 }
 
