@@ -135,12 +135,15 @@ class UserHttpService
     setBlocked(
         userId: string,
         blocked: boolean,
+        name: string,
+        profilePictureName: string | null,
         successCallback: () => void,
         errorCallback: (error: ServiceError) => void
         ): void {
+
         const body = {
-            name: "",
-            profilepicturename: null,
+            name: name,                      
+            profilepicturename: profilePictureName, 
             isblocked: blocked,
         };
 
@@ -154,9 +157,10 @@ class UserHttpService
             false,
             accessTokenUtil.getAccessToken(),
             () => successCallback(),
-            (error: any) => errorCallback(new ServiceError("Error: could not update user blocked status"))
+            (error: any) => errorCallback(errorUtil.getServiceError?.(error) ?? new ServiceError(String(error)))
         );
     }
+
 
     deleteOwnUser(successCallback: () => void, errorCallback: (error: ServiceError) => void): void {
         httpService.sendRequest(
