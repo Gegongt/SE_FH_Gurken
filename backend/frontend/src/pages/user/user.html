@@ -15,6 +15,7 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
     />
     <link rel="stylesheet" href="../../styles.css" />
+    <link rel="stylesheet" href = "user.css">
 
     <link rel = "icon" type = "image/png" href = "../../../images/favicon.png">
   </head>
@@ -22,7 +23,7 @@
   <body class = "background-picture-modern">
     <header id="header"></header>
 
-    <main class="container my-4">
+    <main class="container my-4 user-page">
       <div class="text-center mb-4">
         <h1 id="roleLabel" class="examHeader m-0">User</h1>
       </div>
@@ -45,7 +46,7 @@
                   <div class="text-muted small">Manage your profile and favourites</div>
                 </div>
 
-                <div class="d-flex align-items-center gap-2">
+                <div class="d-flex align-items-center gap-2 user-profile-actions">
                   <button id="btnChangeProfilePic" class="btn btn-primary btn-sm">
                     <i class="bi bi-image me-1"></i>
                     Change picture
@@ -70,15 +71,18 @@
                 <span class="badge text-bg-secondary nonSelectable">Files</span>
               </div>
 
-              <ul id="favouritesList" class="list-group">
+              <ul id="favouritesList" class="list-group user-list">
 
               </ul>
 
             </div>
           </div>
         </div>
-        <div class="col-12 col-lg-8 ">
-          <button id="btnDeleteAccount" class="btn btn-danger btn-sm pe-2 ps-2">
+        <div class="col-12 col-lg-8 text-center">
+          <button
+            id="btnDeleteAccount"
+            class="btn btn-primary btn-sm btn-sm px-4 py-2 user-delete-btn"
+          >
             Delete account
           </button>
         </div>
@@ -96,7 +100,7 @@
                   <div class="col-12">
                     <div class="p-3 rounded background-grey border">
                       <h4 class="h6 mb-2 questionText">Reported Files</h4>
-                      <ul id="reportedFileList" class="list-group">
+                      <ul id="reportedFileList" class="list-group user-list">
                       </ul>
                     </div>
                   </div>
@@ -104,7 +108,7 @@
                   <div class="col-12">
                     <div class="p-3 rounded background-grey border">
                       <h4 class="h6 mb-2 questionText">Blocked Users</h4>
-                      <ul id="blockedUsersList" class="list-group">
+                      <ul id="blockedUsersList" class="list-group user-list">
                       </ul>
                     </div>
                   </div>

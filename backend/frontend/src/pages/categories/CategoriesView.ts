@@ -122,7 +122,7 @@ export class CategoriesView {
 
         <div style="margin-top:6px;">
           <button class = "btn btn-primary p-2" data-action="download"><i class="bi bi-download"></i></button>
-          <button class = "btn btn-primary p-2" data-action="report">${reportBtnText}</button>
+          <button class = "btn btn-primary p-2" data-action="report" ${f.getIsReported() ? "disabled" : ""}>${reportBtnText}</button>
 
           <button class = "btn btn-primary p-2" data-action="rate" data-value="GOOD"><i class="bi bi-hand-thumbs-up-fill"></i></button>
           <button class = "btn btn-primary p-2" data-action="rate" data-value="MEDIUM"><i class="bi bi-dash"></i></button>
@@ -254,6 +254,8 @@ bindReportClick(handler: (fileId: number) => void): void {
   this.fileList.addEventListener("click", (ev) => {
     const btn = (ev.target as HTMLElement)?.closest("button[data-action='report']");
     if (!btn) return;
+
+    if((btn as HTMLButtonElement).disabled) return;
 
     const li = btn.closest("li[data-file-id]") as HTMLLIElement | null;
     if (!li) return;

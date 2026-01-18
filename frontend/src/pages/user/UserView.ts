@@ -152,9 +152,9 @@ export class UserView {
         </div>
 
         <div class="d-flex gap-2">
-          <button class="btn btn-outline-secondary btn-sm" data-action="unreport">Unreport</button>
-          <button class="btn btn-outline-danger btn-sm" data-action="delete">Delete</button>
-          <button class="btn btn-primary btn-sm " data-action="block">Block user</button>
+          <button class="btn btn-primary p-2" data-action="unreport">Unreport</button>
+          <button class="btn btn-danger p-2" data-action="delete">Delete</button>
+          <button class="btn btn-danger p-2 " data-action="block">Block user</button>
         </div>
       `;
 
@@ -227,7 +227,7 @@ export class UserView {
 
       li.innerHTML = `
         <b>${u.getName()}</b> (${u.getEmail()})
-        <button data-action="unblock">Unblock</button>
+        <button class = "btn btn-primary p-2" data-action="unblock">Unblock</button>
       `;
       this.blockedUsersList.appendChild(li);
     }
@@ -262,8 +262,8 @@ export class UserView {
       li.innerHTML = `
         <span><b>${item.name}</b></span>
         <div style="margin-top:6px;">
-          <button class="btn btn-primary btn-sm " data-action="download">Download</button>
-          <button data-action="unfavourite">Unfavourite</button>
+          <button class="btn btn-primary p-2" data-action="download">Download</button>
+          <button class = "btn btn-primary p-2" data-action="unfavourite">Unfavourite</button>
         </div>
       `;
 

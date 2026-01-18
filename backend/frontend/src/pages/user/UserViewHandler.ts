@@ -26,6 +26,8 @@ export type UserService = {
   setBlocked(
     userId: string,
     blocked: boolean,
+    name: string,
+    profilePictureName: string | null,
     success: () => void,
     error: (e: any) => void
   ): void;
@@ -104,12 +106,12 @@ export class UserViewHandler {
           (_e) => this.view.setProfileImage(null)
         );
 
-        this.view.bindReportedFileActions((action, fileId, uploaderId) => {
-          this.onReportedAction(action, fileId, uploaderId);
+        this.view.bindReportedFileActions((action, fileId, uploaderId, fileName, uploaderName, uploaderPic) => {
+          this.onReportedAction(action, fileId, uploaderId, fileName, uploaderName, uploaderPic);
         });
 
-        this.view.bindBlockedUserActions((action, userId) => {
-          this.onBlockedAction(action, userId);
+        this.view.bindBlockedUserActions((action, userId, userName, userPic) => {
+          this.onBlockedAction(action, userId, userName, userPic);
         });
 
       this.view.bindFavouriteAction((fileId, action) => {
@@ -219,9 +221,12 @@ export class UserViewHandler {
   }
 
   private onReportedAction(
-    action: "unreport" | "delete",
+    action: "unreport" | "delete" | "block",
     fileId: number,
-    fileName: string
+    uploaderId: string,
+    fileName: string,
+    uploaderName: string,
+    uploaderPic: string | null
   ): void {
     if (action === "unreport") {
       this.fileService.reportFile(
@@ -243,14 +248,33 @@ export class UserViewHandler {
         () => this.loadAdminData(),
         (s) => this.view.showError(`Delete failed: ${String(s)}`)
       );
+      return;
+    }
+
+    if (action === "block") {
+      const ok = confirm(`Block this user (${uploaderId})?`);
+      if (!ok) return;
+
+      this.userService.setBlocked(
+      uploaderId,
+      true,
+      uploaderName,
+      uploaderPic || null,
+      () => this.loadAdminData(),
+      (e) => this.view.showError(`Block failed: ${String(e)}`)
+    );
     }
   }
 
 
-  private onBlockedAction(action: "unblock", userId: string): void {
-    this.userService.setBlocked(userId, false,
+  private onBlockedAction(action: "unblock", userId: string, userName: string, userPic: string | null): void {
+    this.userService.setBlocked(
+      userId,
+      false,
+      userName,
+      userPic,
       () => this.loadAdminData(),
-      (s) => this.view.showError(`Unblock failed: ${String(s)}`)
+      (e) => this.view.showError(`Unblock failed: ${String(e)}`)
     );
   }
 

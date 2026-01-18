@@ -69,7 +69,13 @@ class FileHttpService {
     {
       httpService.sendRequest(HttpMethod.METHOD_PUT, this.URL_FILE_API_BASE + "/" + fileId + "/report", null,
                               null, null, null, false, accessTokenUtil.getAccessToken(),
-                              (resp: any) => success(converter.convertFileEntityToFile(converter.convertFileEntityToFile(fileId))),
+                              (resp: any) =>
+                              {
+                                let file:File = converter.convertFileEntityToFile(converter.convertFileEntityToFile(fileId));
+                                file.setIsReported(true);
+
+                                success(file);
+                              },
                               (err: any) => error(err));
     }
 
