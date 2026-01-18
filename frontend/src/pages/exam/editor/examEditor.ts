@@ -69,6 +69,13 @@ function saveExam(exam:Exam, nameInputElement:HTMLInputElement, questionEditorVi
     }
 }
 
+function deleteExam(exam:Exam):void
+{
+    serviceFactory.getService(ServiceName.EXAM).deleteExam(exam.getId(),
+    () => { locationUtil.redirectToMainPage(); },
+    (error:ServiceError) => { locationUtil.redirectToMainPage(); });
+}
+
 function addTrueFalseQuestion(question:TrueFalseQuestion|null, questionEditorViewHandlers:any[]):void
 {
     let trueFalseQuestionEditorViewHandler = new TrueFalseQuestionEditorViewHandler(new TrueFalseQuestionEditorView());
@@ -136,11 +143,20 @@ function loadPage(exam:Exam):void
     });
 
     const saveButton:HTMLButtonElement = document.getElementById("saveButton") as HTMLButtonElement;
+    const deleteButton:HTMLButtonElement = document.getElementById("deleteButton") as HTMLButtonElement;
 
     saveButton!.addEventListener("click", () =>
     {
         saveButton!.disabled = true;
+        deleteButton!.disabled = true;
         saveExam(exam, nameInputElement, questionEditorViewHandlers);
+    });
+
+    deleteButton!.addEventListener("click", () =>
+    {
+        saveButton!.disabled = true;
+        deleteButton!.disabled = true;
+        deleteExam(exam);
     });
 }
 

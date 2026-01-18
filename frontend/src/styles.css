@@ -52,6 +52,28 @@
     --bs-btn-disabled-border-color: #139779;
 }
 
+.btn-danger
+{
+    --bs-btn-color: #FFFFFF;
+
+    --bs-btn-bg: #583E23;
+    --bs-btn-border-color: #583E23;
+    
+    --bs-btn-hover-color: #FFFFFF;
+    --bs-btn-hover-bg: #81582D;
+    --bs-btn-hover-border-color: #81582D;
+    
+    --bs-btn-focus-shadow-rgb: #81582D;
+    
+    --bs-btn-active-color: #FFFFFF;
+    --bs-btn-active-bg: #A97237;
+    --bs-btn-active-border-color: #A97237;
+
+    --bs-btn-disabled-color: #FFFFFF;
+    --bs-btn-disabled-bg: #583E23;
+    --bs-btn-disabled-border-color: #583E23;
+}
+
 .form-control
 {
     --bs-form-control-focus-border-color: #005D59;
