@@ -122,37 +122,39 @@ export class UserView {
     this.reportedFileList.innerHTML = "";
 
     if (!files || files.length === 0) {
-      this.reportedFileList.innerHTML = `<li class="list-group-item text-muted">No reported files</li>`;
+      this.reportedFileList.innerHTML =
+        `<li class="list-group-item text-muted">No reported files</li>`;
       return;
     }
 
     for (const f of files) {
-      const uploader = (f as any).getUploader?.() ?? (f as any).uploader; // je nach VO
-      const uploaderName =
-        uploader?.getName?.() ?? uploader?.name ?? "unknown";
-      const uploaderEmail =
-        uploader?.getEmail?.() ?? uploader?.email ?? "";
+      const uploader = (f as any).getUploader?.() ?? (f as any).uploader;
+
+      const uploaderName = uploader?.getName?.() ?? uploader?.name ?? "unknown";
+      const uploaderEmail = uploader?.getEmail?.() ?? uploader?.email ?? "";
+      const uploaderId = uploader?.getId?.() ?? uploader?.id ?? "";
+      const uploaderPic = uploader?.profilepicturename ?? uploader?.getProfilePictureName?.() ?? null;
 
       const li = document.createElement("li");
       li.className = "list-group-item d-flex justify-content-between align-items-start";
       li.setAttribute("data-file-id", String(f.getId()));
-      li.setAttribute("data-uploader-id", String(uploader?.getId?.() ?? uploader?.id ?? ""));
-      li.setAttribute("data-file-id", String(f.getId()));
       li.setAttribute("data-file-name", f.getName());
+      li.setAttribute("data-uploader-id", String(uploaderId));
+      li.setAttribute("data-uploader-name", uploaderName);
+      li.setAttribute("data-uploader-pic", uploaderPic ?? "");
 
       li.innerHTML = `
         <div class="me-3">
           <div class="fw-semibold">${f.getName()}</div>
-          <div class="small text-muted">Uploader: ${uploaderName}${uploaderEmail ? ` (${uploaderEmail})` : ""}</div>
+          <div class="small text-muted">
+            Uploader: ${uploaderName}${uploaderEmail ? ` (${uploaderEmail})` : ""}
+          </div>
         </div>
 
         <div class="d-flex gap-2">
-          <button class="btn btn-outline-secondary btn-sm" data-action="unreport">
-            Unreport
-          </button>
-          <button class="btn btn-outline-danger btn-sm" data-action="delete">
-            Delete
-          </button>
+          <button class="btn btn-outline-secondary btn-sm" data-action="unreport">Unreport</button>
+          <button class="btn btn-outline-danger btn-sm" data-action="delete">Delete</button>
+          <button class="btn btn-primary btn-sm " data-action="block">Block user</button>
         </div>
       `;
 
@@ -160,44 +162,54 @@ export class UserView {
     }
   }
 
-    bindReportedFileActions(
-      handler: (action: "delete" | "unreport", fileId: number, fileName: string) => void
-    ): void {
-    this.reportedFileList.addEventListener("click", (ev) => {
-      const btn = (ev.target as HTMLElement).closest("button[data-action]") as HTMLButtonElement | null;
+  bindReportedFileActions(
+    handler: (action: "unreport" | "delete" | "block", fileId: number, uploaderId: string, fileName: string, uploaderName: string, uploaderPic: string) => void
+  ): void {
+    this.reportedFileList.addEventListener("click", (e) => {
+      const btn = (e.target as HTMLElement).closest("button[data-action]") as HTMLButtonElement | null;
       if (!btn) return;
+
+      const action = btn.getAttribute("data-action") as any;
+      if (action !== "unreport" && action !== "delete" && action !== "block") return;
 
       const li = btn.closest("li[data-file-id]") as HTMLLIElement | null;
       if (!li) return;
 
-      const action = btn.getAttribute("data-action") as "unreport" | "delete";
       const fileId = Number(li.getAttribute("data-file-id"));
       const uploaderId = String(li.getAttribute("data-uploader-id") ?? "");
       const fileName = String(li.getAttribute("data-file-name") ?? "");
+      const uploaderName = String(li.getAttribute("data-uploader-name") ?? "");
+      const uploaderPic = String(li.getAttribute("data-uploader-pic") ?? "");
 
-      if (!Number.isFinite(fileId)) return;
-
-      handler(action, fileId, fileName);
+      if (!Number.isFinite(fileId) || !uploaderId) return;
+      handler(action, fileId, uploaderId, fileName, uploaderName, uploaderPic);
     });
   }
+
 
   bindBlockedUserActions(
-    handler: (action: "unblock", userId: string) => void
+    handler: (action: "unblock", userId: string, userName: string, userPic: string | null) => void
   ): void {
     this.blockedUsersList.addEventListener("click", (e) => {
-      const btn = (e.target as HTMLElement).closest("button");
+      const btn = (e.target as HTMLElement).closest("button[data-action]") as HTMLButtonElement | null;
       if (!btn) return;
 
-      const action = btn.getAttribute("data-action") as any;
-      const li = btn.closest("li");
+      const action = btn.getAttribute("data-action");
+      if (action !== "unblock") return;
+
+      const li = btn.closest("li[data-user-id]") as HTMLLIElement | null;
       if (!li) return;
 
-      const userId = li.getAttribute("data-user-id");
-      if (!userId) return;
+      const userId = String(li.getAttribute("data-user-id") ?? "");
+      const userName = String(li.getAttribute("data-user-name") ?? "");
+      const userPicAttr = String(li.getAttribute("data-user-pic") ?? "");
+      const userPic = userPicAttr.length > 0 ? userPicAttr : null;
 
-      handler(action, userId);
+      if (!userId) return;
+      handler("unblock", userId, userName, userPic);
     });
   }
+
 
   renderBlockedUsers(users: any[]): void {
     this.blockedUsersList.innerHTML = "";
@@ -210,6 +222,9 @@ export class UserView {
     for (const u of users) {
       const li = document.createElement("li");
       li.setAttribute("data-user-id", String(u.getId()));
+      li.setAttribute("data-user-name", u.getName());
+      li.setAttribute("data-user-pic", (u as any).getProfilePictureName?.() ?? (u as any).profilepicturename ?? "");
+
       li.innerHTML = `
         <b>${u.getName()}</b> (${u.getEmail()})
         <button data-action="unblock">Unblock</button>
@@ -247,7 +262,7 @@ export class UserView {
       li.innerHTML = `
         <span><b>${item.name}</b></span>
         <div style="margin-top:6px;">
-          <button data-action="download">Download</button>
+          <button class="btn btn-primary btn-sm " data-action="download">Download</button>
           <button data-action="unfavourite">Unfavourite</button>
         </div>
       `;
