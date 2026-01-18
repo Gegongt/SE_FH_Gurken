@@ -79,3 +79,16 @@ CREATE TABLE public.favourite (
   CONSTRAINT favourite_user_fk FOREIGN KEY (userid) REFERENCES public."User"(id) ON DELETE CASCADE,
   CONSTRAINT favourite_file_fk FOREIGN KEY (fileid) REFERENCES public.file(id) ON DELETE CASCADE
 );
+
+CREATE TYPE public.rating_value AS ENUM ('BAD', 'MEDIUM', 'GOOD');
+
+CREATE TABLE public.rating (
+  id serial4 NOT NULL,
+  userid text NOT NULL,
+  fileid int4 NOT NULL,
+  rating public.rating_value NOT NULL,
+  CONSTRAINT rating_pk PRIMARY KEY (id),
+  CONSTRAINT rating_user_fk FOREIGN KEY (userid) REFERENCES public."User"(id) ON DELETE CASCADE,
+  CONSTRAINT rating_file_fk FOREIGN KEY (fileid) REFERENCES public.file(id) ON DELETE CASCADE,
+  CONSTRAINT rating_unique_user_file UNIQUE (userid, fileid)
+);
