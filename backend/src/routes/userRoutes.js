@@ -2,8 +2,104 @@ const express = require("express");
 const requireAuth = require("../middlewares/requireAuth");
 const userController = require("../controllers/userController");
 const checkBlocked = require("../middlewares/checkBlocked");
+const upload = require("../middlewares/uploadSingle");
 
 const router = express.Router();
+
+/**
+ * @swagger
+ * /users/profilepicture:
+ *   put:
+ *     tags: [User]
+ *     summary: Upload profile picture (current user)
+ *     description: >
+ *       Uploads/updates the profile picture of the currently authenticated user.
+ *       Uses multipart/form-data with field name `file`.
+ *       The file is stored on the server and the user's `profilepicturename` is updated in the database.
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required: [file]
+ *             properties:
+ *               file:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Updated user (profile picture name updated)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                   example: "1WEAjHYMHOYeMegeMKZlhMwMgEm2"
+ *                 email:
+ *                   type: string
+ *                   example: "filiplukic9@gmail.com"
+ *                 name:
+ *                   type: string
+ *                   example: "lelek"
+ *                 isadmin:
+ *                   type: boolean
+ *                   example: true
+ *                 isblocked:
+ *                   type: boolean
+ *                   example: false
+ *                 profilepicturename:
+ *                   type: string
+ *                   nullable: true
+ *                   example: "Meldezettel.jpg"
+ *       400:
+ *         description: Missing file or invalid file type
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden (blocked user)
+ *       500:
+ *         description: Internal server error
+ *
+ *   get:
+ *     tags: [User]
+ *     summary: Get profile picture (current user)
+ *     description: >
+ *       Returns the profile picture of the currently authenticated user.
+ *       Note: This endpoint requires Authorization header (Bearer token).
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Profile picture image bytes
+ *         content:
+ *           image/jpeg:
+ *             schema:
+ *               type: string
+ *               format: binary
+ *           image/png:
+ *             schema:
+ *               type: string
+ *               format: binary
+ *           image/webp:
+ *             schema:
+ *               type: string
+ *               format: binary
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden (blocked user)
+ *       404:
+ *         description: Profile picture not found
+ *       500:
+ *         description: Internal server error
+ */
+router.get("/profilepicture", requireAuth, checkBlocked, userController.getMyProfilePicture);
+router.put("/profilepicture", requireAuth, checkBlocked, upload.single("file"), userController.uploadProfilePicture);
 
 /**
  * @swagger

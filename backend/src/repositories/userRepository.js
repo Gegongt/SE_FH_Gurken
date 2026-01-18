@@ -44,7 +44,7 @@ async function createIfNotExists({ id, email, name, profilepicturename }) {
 
 async function updateById(id, name, profilepicturename, isblocked) {
   const sql = `
-    UPDATE public."User"
+    UPDATE ${TABLE}
     SET
       name = $2,
       profilepicturename = $3,
@@ -60,7 +60,7 @@ async function updateById(id, name, profilepicturename, isblocked) {
 
 async function deleteById(id) {
   const { rowCount } = await pool.query(
-    `DELETE FROM public."User" WHERE id = $1`,
+    `DELETE FROM ${TABLE} WHERE id = $1`,
     [id]
   );
 
@@ -70,7 +70,7 @@ async function deleteById(id) {
 async function findByBlocked(isBlocked) {
   const { rows } = await pool.query(
     `SELECT *
-     FROM public."User"
+     FROM ${TABLE}
      WHERE isblocked = $1`,
     [isBlocked]
   );
@@ -78,4 +78,17 @@ async function findByBlocked(isBlocked) {
   return rows;
 };
 
-module.exports = { findById, createIfNotExists, updateById, deleteById, findByBlocked };
+async function updateProfilePictureName(userId, profilepicturename) {
+  const { rows } = await pool.query(
+    `
+    UPDATE ${TABLE}
+    SET profilepicturename = $2
+    WHERE id = $1
+    RETURNING *
+    `,
+    [userId, profilepicturename]
+  );
+  return rows[0] ?? null;
+};
+
+module.exports = { findById, createIfNotExists, updateById, deleteById, findByBlocked, updateProfilePictureName };

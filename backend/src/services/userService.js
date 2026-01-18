@@ -38,4 +38,8 @@ async function listUsersByBlocked(isBlocked) {
   return userRepository.findByBlocked(isBlocked);
 }
 
-module.exports = { createUser, getUserById, updateUser, deleteUser, listUsersByBlocked };
+async function updateProfilePictureName(userId, profilepicturename) {
+  return userRepository.updateProfilePictureName(userId, profilepicturename);
+};
+
+module.exports = { createUser, getUserById, updateUser, deleteUser, listUsersByBlocked, updateProfilePictureName };
