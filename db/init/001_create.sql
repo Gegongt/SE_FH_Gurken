@@ -71,3 +71,11 @@ CREATE TABLE public.question (
   CONSTRAINT question_pk PRIMARY KEY (id),
   CONSTRAINT question_exam_fk FOREIGN KEY (examid) REFERENCES public.exam(id) ON DELETE CASCADE
 );
+
+CREATE TABLE public.favourite (
+  userid text NOT NULL,
+  fileid int4 NOT NULL,
+  CONSTRAINT favourite_pk PRIMARY KEY (userid, fileid),
+  CONSTRAINT favourite_user_fk FOREIGN KEY (userid) REFERENCES public."User"(id) ON DELETE CASCADE,
+  CONSTRAINT favourite_file_fk FOREIGN KEY (fileid) REFERENCES public.file(id) ON DELETE CASCADE
+);

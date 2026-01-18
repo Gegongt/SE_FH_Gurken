@@ -7,6 +7,7 @@ const subcategoryRoutes = require("./subcategoryRoutes")
 const examRoutes = require("./examRoutes")
 const fileRoutes = require("./fileRoutes")
 const questionRoutes = require("./questionRoutes")
+const favouriteRoutes = require("./favouriteRoutes")
 
 router.use("/users", userRoutes);
 router.use("/auth", authRoutes);
@@ -15,5 +16,6 @@ router.use("/subcategories", subcategoryRoutes);
 router.use("/exams", examRoutes);
 router.use("/files", fileRoutes);
 router.use("/questions", questionRoutes);
+router.use("/favourites", favouriteRoutes);
 
 module.exports = router;
