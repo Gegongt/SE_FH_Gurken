@@ -193,3 +193,18 @@ header a
     background-color: white;
     border-radius: 4px;
 }
+
+*
+{
+    user-select: none;
+}
+
+input
+{
+    user-select: auto;
+}
+
+.mouse-clickable
+{
+    cursor: pointer;
+}

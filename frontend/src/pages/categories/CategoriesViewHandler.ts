@@ -5,6 +5,12 @@ import { RatingSummary, RatingValue } from "../../vo/RatingSummary.js";
 import { Subcategory } from "../../vo/Subcategory.js";
 import { Exam } from "../../vo/Exam.js";
 import { locationUtil } from "../../util/LocationUtil.js";
+import { User } from "../../vo/User.js";
+import {
+  RatingRowDTO,
+  computeSummaryFromRows,
+  getUserRatingFromRows
+} from "../../util/RatingDtoUtil.js";
 
 type Navigator = {
   redirectToExamExecutorPage(id: number): void;
@@ -12,6 +18,13 @@ type Navigator = {
   redirectToLoginPage(): void;
   redirectToUserPage(): void;
   redirectToMainPage(): void;
+};
+
+export type UserService = {
+   getCurrentUser(
+    success: (u: User) => void,
+    error: (e: any) => void
+  ): void;
 };
 
 export type CategoryService = {
@@ -47,19 +60,54 @@ export type FileService = {
 
   reportFile(
     fileId: number,
+    name: string,
     reported: boolean,
     success: (updated: File) => void,
     error: (status: any) => void
   ): void;
+
+  downloadFile(
+    fileId: number,
+    success: (filename?: string) => void,
+    error: (status: any) => void
+  ): void;
+
+  deleteFile(
+    fileId: number,
+    success: () => void,
+    error: (status: any) => void
+  ): void;
+
 };
 
 export type RatingService = {
-  getSummary(fileId: number, success: (s: RatingSummary) => void, error: (status:any)=>void): void;
-    setUserRating(fileId: number, userId: number, value: RatingValue,
-    success: (s: RatingSummary) => void,
-    error: (status:any) => void
+  listByFile(
+    fileId: number,
+    success: (rows: RatingRowDTO[]) => void,
+    error: (status: any) => void
+  ): void;
+
+  create(
+    fileId: number,
+    value: "BAD" | "MEDIUM" | "GOOD",
+    success: () => void,
+    error: (status: any) => void
+  ): void;
+
+  update(
+    ratingId: number,
+    value: "BAD" | "MEDIUM" | "GOOD",
+    success: () => void,
+    error: (status: any) => void
+  ): void;
+
+  remove(
+    ratingId: number,
+    success: () => void,
+    error: (status: any) => void
   ): void;
 };
+
 
 export type ExamService = {
   getExams(
@@ -69,24 +117,28 @@ export type ExamService = {
   ): void;
 };
 
-export type FavouritesService = {
-  getFavourites(userId: number, success: (files: File[]) => void, error: (e:any)=>void): void;
-  addFavourite(userId: number, file: File, success: ()=>void, error:(e:any)=>void): void;
-  removeFavourite(userId: number, fileId: number, success: ()=>void, error:(e:any)=>void): void;
-};
+export type FavouriteDTO = { userId: string; fileId: number };
 
+export type FavouritesService = {
+  getFavourites(userId: string, success: (favs: FavouriteDTO[]) => void, error: (e:any)=>void): void;
+  addFavourite(userId: string, fileId: number, success: ()=>void, error:(e:any)=>void): void;
+  removeFavourite(userId: string, fileId: number, success: ()=>void, error:(e:any)=>void): void;
+};
 
 
 console.log("CategoriesViewHandler init()");
 
 export class CategoriesViewHandler {
-  private currentUserId = 1;
+  private currentUserUid: string | null = null;
+  private currentUserIsAdmin: boolean = false;
   private allCategories: Category[] = [];
   private selectedSubcategoryId: number | null = null;
   private currentFiles: File[] = [];
   private currentExams: Exam[] = [];
+  
 
   constructor(
+    private userService: UserService,
     private view: CategoriesView,
     private categoryService: CategoryService,
     private subcategoryService: SubcategoryService,
@@ -111,12 +163,32 @@ export class CategoriesViewHandler {
     this.view.bindDownloadClick((fileId) => this.onDownloadClicked(fileId));
     this.view.bindCreateExam(() => this.onCreateExamClicked());
     this.view.bindFavouriteClick((fileId) => this.onFavouriteClicked(fileId));
+    this.view.bindDeleteClick((fileId) => this.onDeleteClicked(fileId));
 
 
     this.view.bindExamAction((examId, action) => {
       if (action === "edit") this.nav.redirectToExamEditorPage(examId);
       if (action === "execute") this.nav.redirectToExamExecutorPage(examId);
     });
+
+    this.userService.getCurrentUser(
+  (u) => {
+    this.currentUserUid = String(u.getId());
+    this.currentUserIsAdmin = (u.getIsAdmin?.() ?? false) === true;
+
+    if (this.selectedSubcategoryId != null) {
+      this.reloadFiles(this.selectedSubcategoryId);
+    }
+  },
+   (_e) => {
+      this.currentUserUid = null;
+      this.currentUserIsAdmin = false;
+
+      if (this.selectedSubcategoryId != null) {
+        this.reloadFiles(this.selectedSubcategoryId);
+      }
+    }
+  );
 
     this.categoryService.getCategories(
       true,
@@ -129,6 +201,10 @@ export class CategoriesViewHandler {
         this.view.renderError(`Failed to load categories: ${String(status)}`);
       }
     );
+  }
+
+  public setCurrentUser(uid: string): void {
+    this.currentUserUid = uid;
   }
 
   private onSearch(text: string): void {
@@ -214,53 +290,131 @@ private reloadFiles(subcategoryId: number): void {
     true,
     (files) => {
       this.currentFiles = files;
-      this.view.renderFiles(this.currentFiles);
+
+      // init view-model flags
+      for (const f of this.currentFiles) {
+        (f as any).fav = false;
+        (f as any).canDelete = false;
+
+        // ratings VM
+        (f as any).ratingSummary = null;
+        (f as any).myRatingId = null;      // <- wichtig für PUT/DELETE
+        (f as any).myRatingValue = null;   // <- optional fürs Button-Highlight
+      }
+
+      // canDelete bestimmen
+      for (const f of this.currentFiles) {
+        const uploaderId =
+          (f as any).uploader?.id ??
+          (f as any).getUploader?.()?.getId?.() ??
+          (f as any).getUploader?.()?.id ??
+          null;
+
+        const isOwner =
+          this.currentUserUid != null && String(uploaderId) === String(this.currentUserUid);
+
+        const isAdmin = this.currentUserIsAdmin === true;
+        (f as any).canDelete = isAdmin || isOwner;
+      }
+
+      const renderNow = () => this.view.renderFiles(this.currentFiles);
+
+      // 1) ratings laden -> summary + myRatingId/myRatingValue setzen
+      this.loadRatingsForCurrentFiles(() => {
+        // 2) favourites laden (falls user eingeloggt)
+        if (!this.currentUserUid) {
+          renderNow();
+          return;
+        }
+
+        this.favouritesService.getFavourites(
+          this.currentUserUid,
+          (favs) => {
+            const favSet = new Set(favs.map((x: any) => Number(x.fileid ?? x.fileId)));
+            for (const f of this.currentFiles) {
+              (f as any).fav = favSet.has(f.getId());
+            }
+            renderNow();
+          },
+          (_e) => renderNow()
+        );
+      });
     },
-    (status) => {
-      this.view.renderError(`Failed to load files: ${String(status)}`);
-    }
+    (status) => this.view.renderError(`Failed to load files: ${String(status)}`)
   );
 }
 
-
-  private onRateClicked(fileId: number, value: RatingValue): void {
-    this.ratingService.setUserRating(
-      fileId,
-      this.currentUserId,
-      value,
-      (summary) => {
-        const f = this.currentFiles.find(x => x.getId() === fileId);
-        if (f) f.setRatingSummary(summary);
-        this.view.renderFiles(this.currentFiles);
-      },
-      (status) => this.view.renderError(`Rating failed: ${String(status)}`)
-    );
+private loadRatingsForCurrentFiles(done: () => void): void {
+  const files = this.currentFiles;
+  if (!files || files.length === 0) {
+    done();
+    return;
   }
 
-  private onReportClicked(fileId: number): void {
-    const f = this.currentFiles.find(x => x.getId() === fileId);
-    if (!f) return;
+  let remaining = files.length;
 
-    const newValue = !f.getIsReported();
+  const tick = () => {
+    remaining--;
+    if (remaining <= 0) done();
+  };
 
-    this.fileService.reportFile(
-      fileId,
-      newValue,
-      (updated) => {
-        f.setIsReported(updated.getIsReported());
-        this.view.renderFiles(this.currentFiles);
+  for (const f of files) {
+    this.ratingService.listByFile(
+      f.getId(),
+      (rows) => {
+        (f as any).ratingSummary = computeSummaryFromRows(rows);
+
+        const mine = getUserRatingFromRows(rows, this.currentUserUid ?? null);
+        (f as any).myRatingId = mine.ratingId;
+        (f as any).myRatingValue = mine.value;
+
+        tick();
       },
-      (status) => {
-        this.view.renderError(`Report failed: ${String(status)}`);
-      }
+      (_e) => tick()
     );
   }
+}
+
+
+private onReportClicked(fileId: number): void {
+  const f = this.currentFiles.find(x => x.getId() === fileId);
+  if (!f) return;
+
+  const newReported = !f.getIsReported();
+
+
+  if (newReported === false && !this.currentUserIsAdmin) {
+    this.view.renderError("Only admins can unreport files.");
+    return; 
+  }
+
+  const name = f.getName();
+  if (!name || typeof name !== "string") {
+    this.view.renderError("Cannot update file: missing filename.");
+    return;
+  }
+
+  this.fileService.reportFile(
+    fileId,
+    name,
+    newReported,
+    (updated) => {
+      f.setIsReported(updated.getIsReported());
+      if (updated.getName?.()) f.setName(updated.getName());
+      this.view.renderFiles(this.currentFiles);
+    },
+    (status) => this.view.renderError(`Report failed: ${String(status)}`)
+  );
+}
 
   private onDownloadClicked(fileId: number): void {
-    //BaseURL
-    const url = `/api/files/${fileId}/download`;
-    //Browser download
-    window.open(url, "_blank");
+    this.fileService.downloadFile(
+      fileId,
+      (filename) => {
+        console.log("Downloaded:", filename);
+      },
+      (err) => this.view.renderError(`Download failed: ${String(err)}`)
+    );
   }
 
   private reloadExams(subcategoryId: number): void {
@@ -271,6 +425,7 @@ private reloadFiles(subcategoryId: number): void {
         this.view.renderExams(this.currentExams);
       },
       (status) => this.view.renderError(`Failed to load exams: ${String(status)}`)
+      
     );
   }
 
@@ -279,10 +434,16 @@ private reloadFiles(subcategoryId: number): void {
       this.view.renderError("Please select a subcategory first.");
       return;
     }
-    this.nav.redirectToExamEditorPage(null, this.selectedSubcategoryId); // erstellen (ohne id)
+    this.nav.redirectToExamEditorPage(null, this.selectedSubcategoryId); 
   }
 
   private onFavouriteClicked(fileId: number): void {
+    const uid = this.currentUserUid;
+    if (!uid) {
+      this.view.renderError("Not logged in.");
+      return;
+    }
+
     const f = this.currentFiles.find(x => x.getId() === fileId);
     if (!f) return;
 
@@ -294,11 +455,79 @@ private reloadFiles(subcategoryId: number): void {
     };
 
     if (!isFav) {
-      this.favouritesService.addFavourite(this.currentUserId, f, done, (e)=>this.view.renderError(String(e)));
+      this.favouritesService.addFavourite(uid, fileId, done, (e) => this.view.renderError(String(e)));
     } else {
-      this.favouritesService.removeFavourite(this.currentUserId, fileId, done, (e)=>this.view.renderError(String(e)));
+      this.favouritesService.removeFavourite(uid, fileId, done, (e) => this.view.renderError(String(e)));
     }
   }
+
+ private onDeleteClicked(fileId: number): void {
+  const f = this.currentFiles.find(x => x.getId() === fileId);
+  if (!f) return;
+
+  const canDelete = (f as any).canDelete === true;
+  if (!canDelete) {
+    this.view.renderError("You are not allowed to delete this file.");
+    return;
+  }
+
+  const ok = confirm("Delete this file?");
+  if (!ok) return;
+
+  this.fileService.deleteFile(
+    fileId,
+    () => {
+
+      this.currentFiles = this.currentFiles.filter(x => x.getId() !== fileId);
+      this.view.renderFiles(this.currentFiles);
+
+      if (this.selectedSubcategoryId != null) {
+        this.reloadFiles(this.selectedSubcategoryId);
+      }
+    },
+    (e) => this.view.renderError(`Delete failed: ${String(e)}`)
+  );
+}
+
+private onRateClicked(fileId: number, value: "BAD"|"MEDIUM"|"GOOD"): void {
+  if (!this.currentUserUid) {
+    this.view.renderError("You must be logged in to rate.");
+    return;
+  }
+
+  this.ratingService.listByFile(
+    fileId,
+    (rows) => {
+      const mine = rows.find(r => String(r.userid) === String(this.currentUserUid));
+
+      const mineValue =
+        mine?.ratingisgood ? "GOOD" :
+        mine?.ratingismedium ? "MEDIUM" :
+        mine?.ratingisbad ? "BAD" : null;
+
+      const refresh = () => {
+        // danach Summary neu laden + UI refreshen (so wie du es jetzt schon machst)
+        this.reloadFiles(this.selectedSubcategoryId!);
+      };
+
+      if (!mine) {
+        this.ratingService.create(fileId, value, refresh, (e) => this.view.renderError(`Rating failed: ${String(e)}`));
+        return;
+      }
+
+      // gleiches Rating nochmal => entfernen
+      if (mineValue === value) {
+        this.ratingService.remove(mine.id, refresh, (e) => this.view.renderError(`Delete rating failed: ${String(e)}`));
+        return;
+      }
+
+      // anderes Rating => ändern
+      this.ratingService.update(mine.id, value, refresh, (e) => this.view.renderError(`Update rating failed: ${String(e)}`));
+    },
+    (e) => this.view.renderError(`Load ratings failed: ${String(e)}`)
+  );
+}
+
 
 
 }

@@ -13,6 +13,9 @@ export class CategoriesView {
   private fileList: HTMLUListElement;
   private examList: HTMLUListElement;
   private btnCreateExam: HTMLButtonElement;
+  private errorBox = document.getElementById("pageError") as HTMLDivElement;
+  private errorText = document.getElementById("pageErrorText") as HTMLSpanElement;
+  private errorTimeout: number | null = null;
 
   constructor() {
     const search = document.getElementById("categorySearch");
@@ -80,6 +83,7 @@ export class CategoriesView {
 
     for (const s of subcategories) {
       const li = document.createElement("li");
+      li.classList.add("mouse-clickable");
       li.textContent = s.getName();
       li.setAttribute("data-id", String(s.getId()));
       this.subcategoryList.appendChild(li);
@@ -98,28 +102,36 @@ export class CategoriesView {
       const li = document.createElement("li");
       li.setAttribute("data-file-id", String(f.getId()));
 
-      const summary = f.getRatingSummary();
       const isFav = (f as any).fav === true;
-      const favBtnText = isFav ? "Unfavourite" : "Favourite";
-      const reportedText = f.getIsReported() ? "Reported" : "Not reported";
-      const reportBtnText = f.getIsReported() ? "Unreport" : "Report";
+      const favBtnText = isFav ? `<i class="bi bi-bookmark-fill"></i>` : `<i class="bi bi-bookmark"></i>`;
 
+      const reportedText = f.getIsReported() ? `<i class="bi bi-flag-fill"></i>` : `<i class="bi bi-flag"></i>`;
+      const reportBtnText = f.getIsReported() ? `<i class="bi bi-flag-fill"></i>` : `<i class="bi bi-flag"></i>`;
+
+      const canDelete = (f as any).canDelete === true;
+
+      const summary = (f as any).ratingSummary;
       const scoreText = summary
-        ? `Score: ${summary.score} (${summary.overall}) | 👍 ${summary.good} 😐 ${summary.medium} 👎 ${summary.bad}`
+        ? `Score: ${summary.score} (${summary.overall}) | <i class="bi bi-hand-thumbs-up-fill"></i> ${summary.good} <i class="bi bi-dash"></i> ${summary.medium} <i class="bi bi-hand-thumbs-down-fill"></i> ${summary.bad}`
         : "Score: -";
 
       li.innerHTML = `
         <span>
           <b>${f.getName()}</b> | ${scoreText} | <i>${reportedText}</i>
         </span>
+
         <div style="margin-top:6px;">
-          <button data-action="download">Download</button>
-          <button data-action="report">${reportBtnText}</button>
+          <button class = "btn btn-primary p-2" data-action="download"><i class="bi bi-download"></i></button>
+          <button class = "btn btn-primary p-2" data-action="report">${reportBtnText}</button>
+
+          <button class = "btn btn-primary p-2" data-action="rate" data-value="GOOD"><i class="bi bi-hand-thumbs-up-fill"></i></button>
+          <button class = "btn btn-primary p-2" data-action="rate" data-value="MEDIUM"><i class="bi bi-dash"></i></button>
+          <button class = "btn btn-primary p-2" data-action="rate" data-value="BAD"><i class="bi bi-hand-thumbs-down-fill"></i></button>
           
-          <button data-action="rate" data-value="BAD">Bad</button>
-          <button data-action="rate" data-value="MEDIUM">Medium</button>
-          <button data-action="rate" data-value="GOOD">Good</button>
-          <button data-action="favourite">${favBtnText}</button>
+
+          <button class = "btn btn-primary p-2" data-action="favourite">${favBtnText}</button>
+
+          ${canDelete ? `<button data-action="delete" class="btn btn-danger p-2"><i class="bi bi-trash-fill"></i></button>` : ``}
         </div>
       `;
 
@@ -136,10 +148,30 @@ export class CategoriesView {
    this.fileList.innerHTML = "<li>Loading files...</li>";
   }
 
-  renderError(msg: string): void {
+  renderError(msg: string, autoHideMs = 4000): void {
     console.error(msg);
-    this.subcategoryList.innerHTML = `<li style="color:red;">${msg}</li>`;
+
+    this.errorText.textContent = msg;
+    this.errorBox.style.display = "block";
+    this.errorBox.classList.add("show");
+
+    if (this.errorTimeout) {
+      window.clearTimeout(this.errorTimeout);
+    }
+
+    this.errorTimeout = window.setTimeout(() => {
+      this.hideError();
+    }, autoHideMs);
   }
+
+hideError(): void {
+  this.errorBox.classList.remove("show");
+  this.errorBox.classList.add("fade");
+
+  setTimeout(() => {
+    this.errorBox.style.display = "none";
+  }, 200);
+}
 
   enableActions(enable: boolean): void {
     console.log("enableActions:", enable);
@@ -218,21 +250,21 @@ export class CategoriesView {
     });
   }
 
-  bindReportClick(handler: (fileId: number) => void): void {
-    this.fileList.addEventListener("click", (e) => {
-      const target = e.target as HTMLElement;
-      const btn = target.closest("button");
-      if (!btn) return;
+bindReportClick(handler: (fileId: number) => void): void {
+  this.fileList.addEventListener("click", (ev) => {
+    const btn = (ev.target as HTMLElement)?.closest("button[data-action='report']");
+    if (!btn) return;
 
-      if (btn.getAttribute("data-action") !== "report") return;
+    const li = btn.closest("li[data-file-id]") as HTMLLIElement | null;
+    if (!li) return;
 
-      const li = btn.closest("li");
-      const idStr = li?.getAttribute("data-file-id");
-      if (!idStr) return;
+    const fileId = Number(li.getAttribute("data-file-id"));
+    if (!Number.isFinite(fileId)) return;
 
-      handler(Number(idStr));
-    });
-  }
+    handler(fileId);
+  });
+}
+
 
   bindDownloadClick(handler: (fileId: number) => void): void {
     this.fileList.addEventListener("click", (e) => {
@@ -265,8 +297,8 @@ export class CategoriesView {
       li.innerHTML = `
         <span><b>${ex.getName()}</b></span>
         <div style="margin-top:6px;">
-          <button data-action="execute">Execute</button>
-          <button data-action="edit">Edit</button>
+          <button class = "btn btn-primary p-2" data-action="execute"><i class="bi bi-caret-right"></i></button>
+          <button class = "btn btn-primary p-2" data-action="edit"><i class="bi bi-pencil-fill"></i></button>
         </div>
       `;
       this.examList.appendChild(li);
@@ -309,6 +341,22 @@ export class CategoriesView {
       handler(Number(idStr));
     });
   }
+
+  bindDeleteClick(handler: (fileId: number) => void): void {
+    this.fileList.addEventListener("click", (ev) => {
+      const btn = (ev.target as HTMLElement)?.closest("button[data-action='delete']") as HTMLButtonElement | null;
+      if (!btn) return;
+
+      const li = btn.closest("li[data-file-id]") as HTMLLIElement | null;
+      if (!li) return;
+
+      const fileId = Number(li.getAttribute("data-file-id"));
+      if (!Number.isFinite(fileId)) return;
+
+      handler(fileId);
+    });
+  }
+
 
 
 }
