@@ -20,6 +20,9 @@ async function create(req, res) {
 
     return res.status(result.created ? 201 : 200).json(result);
   } catch (e) {
+    if (err?.code === "23505" && err?.constraint === "user_name_unique") {
+      return res.status(409).json({ error: "Username already taken" });
+    }
     const status = e.status || 500;
     return res.status(status).json({ error: e.message });
   }
@@ -39,7 +42,7 @@ async function whoami(req, res) {
 
 async function update(req, res) {
   try {
-    const userId = req.params.userId || req.dbUser.id
+    const userId = req.params.userId || req.dbUser.id;
 
     const isSelf = userId === req.dbUser.id;
     const isAdmin = req.dbUser.isadmin;
@@ -51,25 +54,28 @@ async function update(req, res) {
     const { name, profilepicturename, isblocked } = req.body ?? {};
 
     if (name === undefined || profilepicturename === undefined) {
-      return res.status(400).json({ message: "Missing name/profilepicturename" });
+      return res
+        .status(400)
+        .json({ message: "Missing name/profilepicturename" });
     }
 
-    const isblockedOrNull = isAdmin && isblocked !== undefined ? isblocked : null;
+    const isblockedOrNull =
+      isAdmin && isblocked !== undefined ? isblocked : null;
 
     const updated = await userService.updateUser(
       userId,
       name,
       profilepicturename,
-      isblockedOrNull
+      isblockedOrNull,
     );
 
     if (!updated) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    return res.status(200).json(updated)
+    return res.status(200).json(updated);
   } catch (err) {
-    console.log(err)
+    console.log(err);
     return res.status(500).json({ message: "Internal server error" });
   }
 }
@@ -86,7 +92,7 @@ async function remove(req, res) {
 
     const isSelf = userId === dbUser.id;
     const isAdmin = dbUser.isadmin;
-    
+
     if (!isSelf && !isAdmin) {
       return res.status(403).json({ message: "Forbidden" });
     }
@@ -118,12 +124,16 @@ async function list(req, res) {
     const query = req.query?.isBlocked;
 
     if (query === undefined) {
-      return res.status(400).json({ message: "Query param isBlocked is required (true|false)" });
+      return res
+        .status(400)
+        .json({ message: "Query param isBlocked is required (true|false)" });
     }
 
     const blockedBool = String(query).toLowerCase();
     if (blockedBool !== "true" && blockedBool !== "false") {
-      return res.status(400).json({ message: "isBlocked must be 'true' or 'false'" });
+      return res
+        .status(400)
+        .json({ message: "isBlocked must be 'true' or 'false'" });
     }
 
     const isBlocked = blockedBool === "true";
@@ -156,7 +166,10 @@ async function uploadProfilePicture(req, res) {
     const finalPath = path.join(dir, String(dbUser.id));
     await fs.rename(req.file.path, finalPath);
 
-    const updated = await userService.updateProfilePictureName(dbUser.id, req.file.originalname);
+    const updated = await userService.updateProfilePictureName(
+      dbUser.id,
+      req.file.originalname,
+    );
 
     return res.status(200).json(updated);
   } catch (err) {
@@ -191,7 +204,12 @@ async function getMyProfilePicture(req, res) {
     const user = await userService.getUserById(dbUser.id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    const filePath = path.join(process.cwd(), "uploads", "profilepictures", String(dbUser.id));
+    const filePath = path.join(
+      process.cwd(),
+      "uploads",
+      "profilepictures",
+      String(dbUser.id),
+    );
 
     try {
       await fs.access(filePath);
@@ -209,4 +227,12 @@ async function getMyProfilePicture(req, res) {
   }
 }
 
-module.exports = { create, whoami, update, remove, list, uploadProfilePicture, getMyProfilePicture };
+module.exports = {
+  create,
+  whoami,
+  update,
+  remove,
+  list,
+  uploadProfilePicture,
+  getMyProfilePicture,
+};
