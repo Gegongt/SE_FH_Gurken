@@ -65,18 +65,29 @@ class FileHttpService {
   ): void {
     const body = { name, isreported: reported };
 
-    httpService.sendRequest(
-      HttpMethod.METHOD_PUT,
-      `${this.URL_FILE_API_BASE}/${fileId}`,
-      null,
-      body,
-      HttpContentType.CONTENT_TYPE_JSON,
-      "json",
-      false,
-      accessTokenUtil.getAccessToken(),
-      (resp: any) => success(converter.convertFileEntityToFile(resp)),
-      (err: any) => error(err)
-    );
+    if(reported)
+    {
+      httpService.sendRequest(HttpMethod.METHOD_PUT, this.URL_FILE_API_BASE + "/" + fileId + "/report", null,
+                              null, null, null, false, accessTokenUtil.getAccessToken(),
+                              (resp: any) => success(converter.convertFileEntityToFile(converter.convertFileEntityToFile(fileId))),
+                              (err: any) => error(err));
+    }
+
+    else
+    {
+      httpService.sendRequest(
+        HttpMethod.METHOD_PUT,
+        `${this.URL_FILE_API_BASE}/${fileId}`,
+        null,
+        body,
+        HttpContentType.CONTENT_TYPE_JSON,
+        "json",
+        false,
+        accessTokenUtil.getAccessToken(),
+        (resp: any) => success(converter.convertFileEntityToFile(resp)),
+        (err: any) => error(err)
+      );
+    }
   }
 
 
