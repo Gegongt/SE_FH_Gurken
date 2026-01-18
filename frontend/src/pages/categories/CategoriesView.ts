@@ -83,6 +83,7 @@ export class CategoriesView {
 
     for (const s of subcategories) {
       const li = document.createElement("li");
+      li.classList.add("mouse-clickable");
       li.textContent = s.getName();
       li.setAttribute("data-id", String(s.getId()));
       this.subcategoryList.appendChild(li);
