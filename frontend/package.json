@@ -3,13 +3,16 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy:clean": "node -e \"require('fs').rmSync('../backend/frontend',{recursive:true,force:true})\"",
+    "deploy": "npm run deploy:clean && tsc && cpx \"dist/**/*\" ../backend/frontend/dist && cpx \"images/**/*\" ../backend/frontend/images && cpx \"src/styles.css\" ../backend/frontend/src && cpx \"src/pages/**/*\" ../backend/frontend/src/pages"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "cpx": "^1.5.0",
     "typescript": "^5.9.3",
     "vite": "^7.3.1"
   },
