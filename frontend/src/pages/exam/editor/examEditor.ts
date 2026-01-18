@@ -48,7 +48,6 @@ function saveExam(exam:Exam, nameInputElement:HTMLInputElement, questionEditorVi
         (error:ServiceError) =>
         {
             console.log("Error: " + error);
-            alert("Error! Saving failed!");
             locationUtil.redirectToMainPage();
         });
     }
@@ -63,7 +62,6 @@ function saveExam(exam:Exam, nameInputElement:HTMLInputElement, questionEditorVi
         (error:ServiceError) =>
         {
             console.log("Error: " + error);
-            alert("Error! Saving failed!");
             locationUtil.redirectToMainPage();
         });
     }
