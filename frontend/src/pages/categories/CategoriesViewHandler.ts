@@ -25,7 +25,6 @@ export type CategoryService = {
 export type SubcategoryService = {
   getSubcategories(
     categoryId: number,
-    shallow: boolean,
     success: (subs: Subcategory[]) => void,   
     error: (status: any) => void
   ): void;
@@ -168,10 +167,10 @@ export class CategoriesViewHandler {
 
     this.subcategoryService.getSubcategories(
       categoryId,
-      true,
       (subs: any[]) => this.view.renderSubcategories(subs as any),
-      (status) => this.view.renderError(`Failed to load subcategories: ${String(status)}`)
+      (status: any) => this.view.renderError(`Failed to load subcategories: ${String(status)}`)
     );
+
   }
 
   private onSubcategoryClicked(subcategoryId: number): void {
@@ -202,51 +201,28 @@ export class CategoriesViewHandler {
         this.reloadFiles(subId);
       },
       (status) => {
-        this.view.renderError(`Upload failed: ${String(status)}`);
+        console.log("UPLOAD ERROR raw:", status);
+         this.view.renderError(`Upload failed: ${JSON.stringify(status)}`);
       }
     );
   }
 
-  private reloadFiles(subcategoryId: number): void {
-    this.view.renderFilesLoading();
+private reloadFiles(subcategoryId: number): void {
+  this.view.renderFilesLoading();
 
-    this.fileService.getFiles(
-      subcategoryId,
-      true,
-      (files) => {
-        this.currentFiles = files;
+  this.fileService.getFiles(
+    subcategoryId,
+    true,
+    (files) => {
+      this.currentFiles = files;
+      this.view.renderFiles(this.currentFiles);
+    },
+    (status) => {
+      this.view.renderError(`Failed to load files: ${String(status)}`);
+    }
+  );
+}
 
-       this.favouritesService.getFavourites(
-       this.currentUserId,
-        (favs) => {
-          const favSet = new Set(favs.map(f => f.getId()));
-          for (const f of this.currentFiles) {
-            (f as any).fav = favSet.has(f.getId());
-          }
-          this.view.renderFiles(this.currentFiles);
-        },
-        (_e) => {
-          this.view.renderFiles(this.currentFiles);
-        }
-       );
-
-        this.view.renderFiles(this.currentFiles);
-        for (const f of this.currentFiles) {
-          this.ratingService.getSummary(
-            f.getId(),
-            (summary) => {
-              f.setRatingSummary(summary);
-              this.view.renderFiles(this.currentFiles);
-            },
-            (_status) => {}
-          );
-        }
-      },
-      (status) => {
-        this.view.renderError(`Failed to load files: ${String(status)}`);
-      }
-    );
-  }
 
   private onRateClicked(fileId: number, value: RatingValue): void {
     this.ratingService.setUserRating(

@@ -13,6 +13,8 @@ import { QuestionEntityType } from "../QuestionEntityType.js";
 import { SubcategoryEntity } from "../SubcategoryEntity.js";
 import { TrueFalseQuestionEntity } from "../TrueFalseQuestionEntity.js";
 import { UserEntity } from "../UserEntity.js";
+import { File } from "../../../vo/File.js";
+import { FileEntity } from "../FileEntity.js";
 
 class Converter
 {
@@ -81,12 +83,45 @@ class Converter
 
     convertUserEntityToUser(userEntity:UserEntity):User
     {
-        return new User(userEntity.id, userEntity.isadmin, userEntity.email, UserEntity.name, userEntity.isblocked, userEntity.profilepicturename, []);
+        return new User(userEntity.id, userEntity.isadmin, userEntity.email, userEntity.name, userEntity.isblocked, userEntity.profilepicturename, []);
     }
 
     convertUserToUserEntity(user:User):UserEntity
     {
         return new UserEntity(user.getId(), user.getIsAdmin(), user.getEmail(), user.getName(), user.getIsBlocked(), user.getProfilePictureName());
+    }
+
+    convertFileEntityToFile(fileEntity: any): File {
+    let uploaderUser: User;
+
+    if (fileEntity.uploader) {
+        uploaderUser = this.convertUserEntityToUser(fileEntity.uploader);
+    } else {
+        const uid = fileEntity.uploaderid ?? fileEntity.uploaderId ?? null;
+
+        uploaderUser = new User(
+        uid ?? "unknown",
+        false,
+        "",
+        "unknown",
+        false,
+        null,
+        []
+        );
+    }
+
+    return new File(
+        fileEntity.id,
+        fileEntity.name,
+        fileEntity.isreported ?? fileEntity.isReported ?? false,
+        uploaderUser
+    );
+    }
+
+
+    convertFileToFileEntity(file:File, subcategoryId:number = -1):FileEntity
+    {
+        return new FileEntity(file.getId(), subcategoryId, file.getName(), this.convertUserToUserEntity(file.getUploader()),  file.getIsReported());
     }
 }
 

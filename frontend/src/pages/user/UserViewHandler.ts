@@ -6,15 +6,27 @@ export type UserService = {
   getCurrentUser(success: (u: User|null)=>void, error:(s:any)=>void): void;
   logout(success: ()=>void, error:(s:any)=>void): void;
   updateProfilePicture(file: globalThis.File, success: (url: string)=>void, error:(s:any)=>void): void;
+  deleteOwnUser(success: () => void, error: (e: any) => void): void;
 
   getReportedFiles(success:(files: File[])=>void, error:(s:any)=>void): void;
   acceptFile(fileId:number, success:()=>void, error:(s:any)=>void): void;
   deleteFile(fileId:number, success:()=>void, error:(s:any)=>void): void;
   blockUploaderOfFile(fileId:number, success:()=>void, error:(s:any)=>void): void;
 
-  getBlockedUsers(success:(users: User[])=>void, error:(s:any)=>void): void;
-  setBlocked(userId:number, blocked:boolean, success:()=>void, error:(s:any)=>void): void;
-  unblockUser(userId:number, success:()=>void, error:(s:any)=>void): void;
+  getBlockedUsers(
+    isBlocked: boolean,
+    success: (users: User[]) => void,
+    error: (e: any) => void
+  ): void;
+
+  setBlocked(
+    userId: string,
+    blocked: boolean,
+    success: () => void,
+    error: (e: any) => void
+  ): void;
+
+  unblockUser(userId: string, success:()=>void, error:(s:any)=>void): void;
 };
 
 export type FileService = {
@@ -61,7 +73,6 @@ export class UserViewHandler {
         this.currentUser = u;
         this.view.renderUser(u);
         this.view.renderFavourites(u.getFavourites());
-        this.view.showAdminPanel(u.getIsAdmin());
 
         this.view.bindReportedFileActions((action, fileId, uploaderId) => {
           this.onReportedAction(action, fileId, uploaderId);
@@ -85,7 +96,7 @@ export class UserViewHandler {
 
         this.view.bindChangeProfilePicClick();
         this.view.bindProfilePicSelected((file) => this.onProfilePicSelected(file));
-
+        this.view.bindDeleteAccountClick(() => this.onDeleteAccountClicked());
 
         const isAdmin = u.getIsAdmin?.() ?? false;
         this.view.showAdminPanel(isAdmin);
@@ -115,19 +126,16 @@ export class UserViewHandler {
 
 
   private loadAdminData(): void {
-    this.fileService.getReportedFiles(
-      (files) => this.view.renderReportedFiles(files),
-      (status) => this.view.showError(`Failed to load reported files: ${String(status)}`)
-    );
 
     this.userService.getBlockedUsers(
+      true, 
       (users) => this.view.renderBlockedUsers(users),
-      (status) => this.view.showError(`Failed to load blocked users: ${String(status)}`)
+      (err) => this.view.showError(`Failed to load blocked users`)
     );
   }
 
 
-  private onReportedAction(action: "accept" | "delete" | "block", fileId: number, uploaderId: number): void {
+  private onReportedAction(action: "accept" | "delete" | "block", fileId: number, uploaderId: string): void {
     if (action === "accept") {
       this.fileService.reportFile(fileId, false,
         () => this.loadAdminData(),
@@ -152,11 +160,24 @@ export class UserViewHandler {
     }
   }
 
-  private onBlockedAction(action: "unblock", userId: number): void {
+  private onBlockedAction(action: "unblock", userId: string): void {
     this.userService.setBlocked(userId, false,
       () => this.loadAdminData(),
       (s) => this.view.showError(`Unblock failed: ${String(s)}`)
     );
   }
+
+  private onDeleteAccountClicked(): void {
+    const ok = confirm("Really delete your account? This cannot be undone.");
+    if (!ok) return;
+
+    this.userService.deleteOwnUser(
+      () => {
+        window.location.href = "../login/login.html";
+      },
+      (err) => this.view.showError(`Delete failed: ${String(err)}`)
+    );
+  }
+
 
 }

@@ -8,6 +8,7 @@ export class UserView {
   private btnChange = document.getElementById("btnChangeProfilePic") as HTMLButtonElement;
   private picker = document.getElementById("profilePicPicker") as HTMLInputElement;
   private favouritesList: HTMLUListElement;
+  private btnDeleteAccount: HTMLButtonElement;
 
   private adminPanel= document.getElementById("adminPanel") as HTMLDivElement;
   private reportedFilesList = document.getElementById("reportedFilesList") as HTMLUListElement;
@@ -18,14 +19,17 @@ export class UserView {
     const picker = document.getElementById("profilePicPicker");
     this.roleLabel = document.getElementById("roleLabel")!;
     const favList = document.getElementById("favouritesList");
+    const delBtn = document.getElementById("btnDeleteAccount");
 
     if (!(btn instanceof HTMLButtonElement)) throw new Error("btnChangeProfilePic not found");
     if (!(picker instanceof HTMLInputElement)) throw new Error("profilePicPicker not found");
     if (!(favList instanceof HTMLUListElement)) throw new Error("favouritesList not found");
+    if (!(delBtn instanceof HTMLButtonElement)) throw new Error("btnDeleteAccount not found");
 
     this.btnChange = btn;
     this.picker = picker;
     this.favouritesList = favList;
+    this.btnDeleteAccount = delBtn;
   }
 
   renderUser(user: User): void {
@@ -117,7 +121,7 @@ export class UserView {
   }
 
   bindReportedFileActions(
-    handler: (action: "accept" | "delete" | "block", fileId: number, uploaderId: number) => void
+    handler: (action: "accept" | "delete" | "block", fileId: number, uploaderId: string) => void
   ): void {
     const list = document.getElementById("reportedFilesList");
     if (!list) return;
@@ -129,17 +133,16 @@ export class UserView {
 
       const action = btn.getAttribute("data-action") as any;
       const fileId = Number(btn.getAttribute("data-file-id"));
-      const uploaderId = Number(btn.getAttribute("data-uploader-id"));
+      const uploaderId = btn.getAttribute("data-uploader-id");
 
-      if (!action || !Number.isFinite(fileId) || !Number.isFinite(uploaderId)) return;
-
+      if (!action || !Number.isFinite(fileId) || !uploaderId) return;
       handler(action, fileId, uploaderId);
     });
   }
 
 
   bindBlockedUserActions(
-    handler: (action: "unblock", userId: number) => void
+    handler: (action: "unblock", userId: string) => void
   ): void {
     this.blockedUsersList.addEventListener("click", (e) => {
       const btn = (e.target as HTMLElement).closest("button");
@@ -149,8 +152,8 @@ export class UserView {
       const li = btn.closest("li");
       if (!li) return;
 
-      const userId = Number(li.getAttribute("data-user-id"));
-      if (!Number.isFinite(userId)) return;
+      const userId = li.getAttribute("data-user-id");
+      if (!userId) return;
 
       handler(action, userId);
     });
@@ -224,6 +227,10 @@ export class UserView {
 
       handler(Number(idStr), action);
     });
+  }
+
+  bindDeleteAccountClick(handler: () => void): void {
+    this.btnDeleteAccount.addEventListener("click", handler);
   }
   
 }

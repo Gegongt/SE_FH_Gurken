@@ -60,6 +60,10 @@ userService.getCurrentUser((user:User|null) =>
         },
     
         (error:ServiceError) => console.log(error));*/
+        console.log("USER service instance:", userService);
+        console.log("typeof getBlockedUsers:", typeof (userService as any).getBlockedUsers);
+        console.log("keys:", Object.getOwnPropertyNames(Object.getPrototypeOf(userService)));
+
 
         serviceFactory.getService(ServiceName.EXAM).createExam(new Exam(-1, "My exam", [], user), 5,
         (id:number) =>
