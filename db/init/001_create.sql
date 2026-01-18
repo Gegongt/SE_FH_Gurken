@@ -57,3 +57,17 @@ CREATE TABLE public.exam (
 	CONSTRAINT exam_subcategory_fk FOREIGN KEY (subcategoryid) REFERENCES public.subcategory(id) ON DELETE CASCADE,
 	CONSTRAINT exam_user_fk FOREIGN KEY (creatorid) REFERENCES public."User"(id) ON DELETE CASCADE
 );
+
+CREATE TYPE public.question_type AS ENUM ('MC_QUESTION', 'TRUE_FALSE_QUESTION');
+
+CREATE TABLE public.question (
+  id serial4 NOT NULL,
+  examid int4 NOT NULL,
+  question text NOT NULL,
+  questiontype public.question_type NOT NULL,
+  istrue bool NULL,
+  correctanswers text[] NULL,
+  wronganswers text[] NULL,
+  CONSTRAINT question_pk PRIMARY KEY (id),
+  CONSTRAINT question_exam_fk FOREIGN KEY (examid) REFERENCES public.exam(id) ON DELETE CASCADE
+);

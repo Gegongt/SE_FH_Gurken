@@ -1,6 +1,6 @@
 INSERT INTO public."User"
 (id, isadmin, email, "name", isblocked, profilepicturename)
-VALUES('1WEAjHYMHOYeMegeMKZlhMwMgEm2', true, 'filiplukic9@gmail.com', 'lelek', false, 's');
+VALUES('AkXKcLKiaHNVCW0dTlBhpCeILP72', true, 'filiplukic9@gmail.com', 'lelek', false, 's');
 INSERT INTO public."User"
 (id, isadmin, email, "name", isblocked, profilepicturename)
 VALUES('J4mRmXDUUkafdbPARjPioJE7SMC2', false, 'filiplukic8@gmail.com', 'lelek', false, 's');

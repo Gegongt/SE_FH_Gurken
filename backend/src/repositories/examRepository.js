@@ -102,3 +102,11 @@ exports.findById = async (examId) => {
 
   return rows[0] ?? null;
 };
+
+exports.findCreatorIdByExamId = async (examId) => {
+  const { rows } = await pool.query(
+    `SELECT creatorid FROM ${TABLE} WHERE id = $1`,
+    [examId]
+  );
+  return rows[0]?.creatorid ?? null;
+};
