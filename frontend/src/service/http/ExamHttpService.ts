@@ -10,6 +10,7 @@ import { ServiceError } from "../error/ServiceError.js";
 import { serviceFactory } from "../factory/ServiceFactory.js";
 import { ServiceName } from "../factory/ServiceName.js";
 import { accessTokenUtil } from "./AccessTokenUtil.js";
+import { errorUtil } from "./ErrorUtil.js";
 
 class ExamHttpService
 {
@@ -38,7 +39,7 @@ class ExamHttpService
                                     successCallback(exams);
                                 },
 
-                                (error:ServiceError) => errorCallback(error));
+                                (error:number) => errorCallback(errorUtil.getServiceError(error)));
     }
 
     getExam(examId:number, successCallback:(exam:Exam) => void, errorCallback:(error:ServiceError) => void):void
@@ -94,7 +95,7 @@ class ExamHttpService
                                     });
                                 },
 
-                                (error:any) => { errorCallback(new ServiceError("Error! Creation failed!")); });
+                                (error:number) => { errorCallback(errorUtil.getServiceError(error)); });
     }
 
     updateExam(exam:Exam, successCallback:() => void, errorCallback:(error:ServiceError) => void):void
@@ -125,7 +126,7 @@ class ExamHttpService
                                     });
                                 },
 
-                                (error:any) => { errorCallback(new ServiceError("Error! Update failed!")); });
+                                (error:number) => { errorCallback(errorUtil.getServiceError(error)); });
     }
 
     deleteExam(id:number, successCallback:() => void, errorCallback:(error:ServiceError) => void):void
@@ -133,7 +134,7 @@ class ExamHttpService
         httpService.sendRequest(HttpMethod.METHOD_DELETE, this.URL_EXAM_API_DELETE_EXAM + "/" + id, null,
                                 null, null, null, false, accessTokenUtil.getAccessToken(),
                                 (response:any) => { successCallback(); },
-                                (error:any) => { errorCallback(new ServiceError("Error! Delete failed!")); });
+                                (error:number) => { errorCallback(errorUtil.getServiceError(error)); });
     }
 }
 

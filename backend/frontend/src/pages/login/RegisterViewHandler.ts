@@ -1,3 +1,4 @@
+import { NotAuthorizedError } from "../../service/error/NotAuthorizedError.js";
 import { ServiceError } from "../../service/error/ServiceError.js";
 import { serviceFactory } from "../../service/factory/ServiceFactory.js";
 import { ServiceName } from "../../service/factory/ServiceName.js";
@@ -36,7 +37,14 @@ export class RegisterViewHandler
                                                             
                                                                (error:ServiceError) =>
                                                                {
-                                                                   this.registerView.showError("Failed to register!", this.parentElementId as string);
+                                                                let errorMessage = "Failed to register!";
+
+                                                                if(error instanceof NotAuthorizedError)
+                                                                {
+                                                                    errorMessage = "User already exists or password is to weak!";
+                                                                }
+
+                                                                this.registerView.showError(errorMessage, this.parentElementId as string);
                                                                })
         });
 

@@ -1,3 +1,4 @@
+import { NotAuthorizedError } from "../../service/error/NotAuthorizedError.js";
 import { ServiceError } from "../../service/error/ServiceError.js";
 import { serviceFactory } from "../../service/factory/ServiceFactory.js";
 import { ServiceName } from "../../service/factory/ServiceName.js";

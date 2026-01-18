@@ -36,7 +36,7 @@ class CategoryHttpService
                                     }
                                 },
 
-                                (error:ServiceError) =>
+                                (error:number) =>
                                 {
                                     errorCallback(error);
                                 }
