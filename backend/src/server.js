@@ -21,7 +21,7 @@ app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/api", apiRoutes)
 
 
-app.get("/", (req, res) => res.sendFile(path.join(frontendPath, "src", "pages", "login", "login.html")));
+app.get("/", (req, res) => res.redirect("/src/pages/login/login.html"));
 
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Backend listening on :${PORT}`);
