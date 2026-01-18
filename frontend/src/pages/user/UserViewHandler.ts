@@ -35,6 +35,12 @@ export type UserService = {
 
 export type FavouriteDTO = { userid: string; fileid: number };
 
+export type FavouriteItemVM = {
+  fileId: number;
+  name: string;
+};
+
+
 export type FavouritesService = {
   getFavourites(userId: string, success: (favs: FavouriteDTO[]) => void, error: (e: any) => void): void;
   removeFavourite(userId: string, fileId: number, success: () => void, error: (e: any) => void): void;
@@ -59,20 +65,25 @@ export type FileService = {
     error: (status: any) => void
   ): void;
 
-  reportFile(
-    fileId: number,
-    reported: boolean,
-    success: (updated: File) => void,
-    error: (status: any) => void
-  ): void;
+reportFile(
+  fileId: number,
+  name: string,
+  reported: boolean,
+  success: (updated: File) => void,
+  error: (status: any) => void
+): void;
+
 
   downloadFile(fileId: number, success: (filename?: string) => void, error: (status: any) => void): void;
+  getAllFiles(success: (files: File[]) => void, error: (status: any) => void): void;
 };
 
 
 export class UserViewHandler {
   private currentUser: User | null = null;
   private favouriteFileIds: number[] = [];
+  private favourites: FavouriteItemVM[] = [];
+
 
   constructor(private view: UserView, private userService: UserService, private favouritesService: FavouritesService, private fileService: FileService) {}
 
@@ -136,60 +147,6 @@ export class UserViewHandler {
     );
   }
 
-
-  updateProfilePicture(
-    file: globalThis.File,
-    success: (url: string) => void,
-    error: (s: any) => void
-  ): void {
-    const fd = new FormData();
-    fd.append("file", file); 
-
-    fetch("http://localhost:3000/api/users/profilepicture", {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${accessTokenUtil.getAccessToken()}`
-      },
-      body: fd
-    })
-      .then(async (r) => {
-        if (!r.ok) throw await r.text();
-        return r.json();
-      })
-      .then((_userJson) => {
-        this.getProfilePicture(success, error);
-      })
-      .catch((e) => error(e));
-  }
-
-  getProfilePicture(
-    success: (objectUrl: string) => void,
-    error: (e: any) => void
-  ): void {
-    fetch("http://localhost:3000/api/users/profilepicture", {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${accessTokenUtil.getAccessToken()}`
-      }
-    })
-      .then(async (r) => {
-        if (r.status === 404) {
-
-          success("");
-          return;
-        }
-        if (!r.ok) throw await r.text();
-        return r.blob();
-      })
-      .then((blob) => {
-        if (!blob) return;
-        const objectUrl = URL.createObjectURL(blob);
-        success(objectUrl);
-      })
-      .catch((e) => error(e));
-  }
-
-
   private onUnfavourite(fileId: number): void {
     const uid = this.currentUser ? String(this.currentUser.getId()) : null;
     if (!uid) {
@@ -201,12 +158,13 @@ export class UserViewHandler {
       uid,
       fileId,
       () => {
-        this.favouriteFileIds = this.favouriteFileIds.filter(id => id !== fileId);
-        this.view.renderFavourites(this.favouriteFileIds as any);
+        this.favourites = this.favourites.filter(x => x.fileId !== fileId);
+        this.view.renderFavourites(this.favourites as any);
       },
       (e) => this.view.showError(`Unfavourite failed: ${String(e)}`)
     );
   }
+
 
   private onDownload(fileId: number): void {
     this.fileService.downloadFile(
@@ -217,11 +175,15 @@ export class UserViewHandler {
   }
 
   private loadAdminData(): void {
-
     this.userService.getBlockedUsers(
       true, 
       (users) => this.view.renderBlockedUsers(users),
       (err) => this.view.showError(`Failed to load blocked users`)
+    );
+
+    this.fileService.getReportedFiles(
+      (files) => this.view.renderReportedFiles(files),
+      (err) => this.view.showError(`Failed to load reported files: ${String(err)}`)
     );
   }
 
@@ -232,38 +194,58 @@ export class UserViewHandler {
     this.favouritesService.getFavourites(
       uid,
       (rows) => {
-        this.favouriteFileIds = rows.map(r => Number(r.fileid));
-        this.view.renderFavourites(this.favouriteFileIds as any); 
+        const favIds = rows.map(r => Number(r.fileid));
+
+        this.fileService.getAllFiles(
+          (allFiles) => {
+            const nameById = new Map<number, string>();
+            for (const f of allFiles) nameById.set(f.getId(), f.getName());
+
+            this.favourites = favIds.map(id => ({
+              fileId: id,
+              name: nameById.get(id) ?? `File #${id}` 
+            }));
+
+            this.view.renderFavourites(this.favourites as any);
+          },
+          (_e) => {
+            this.favourites = favIds.map(id => ({ fileId: id, name: `File #${id}` }));
+            this.view.renderFavourites(this.favourites as any);
+          }
+        );
       },
       (e) => this.view.showError(`Failed to load favourites: ${String(e)}`)
     );
   }
 
-
-  private onReportedAction(action: "accept" | "delete" | "block", fileId: number, uploaderId: string): void {
-    if (action === "accept") {
-      this.fileService.reportFile(fileId, false,
+  private onReportedAction(
+    action: "unreport" | "delete",
+    fileId: number,
+    fileName: string
+  ): void {
+    if (action === "unreport") {
+      this.fileService.reportFile(
+        fileId,
+        fileName,
+        false,
         () => this.loadAdminData(),
-        (s) => this.view.showError(`Accept failed: ${String(s)}`)
+        (s) => this.view.showError(`Unreport failed: ${String(s)}`)
       );
       return;
     }
 
     if (action === "delete") {
-      this.fileService.deleteFile(fileId,
+      const ok = confirm("Delete this file?");
+      if (!ok) return;
+
+      this.fileService.deleteFile(
+        fileId,
         () => this.loadAdminData(),
         (s) => this.view.showError(`Delete failed: ${String(s)}`)
       );
-      return;
-    }
-
-    if (action === "block") {
-      this.userService.setBlocked(uploaderId, true,
-        () => this.loadAdminData(),
-        (s) => this.view.showError(`Block failed: ${String(s)}`)
-      );
     }
   }
+
 
   private onBlockedAction(action: "unblock", userId: string): void {
     this.userService.setBlocked(userId, false,

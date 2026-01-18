@@ -12,7 +12,7 @@ export class UserView {
   private btnDeleteAccount: HTMLButtonElement;
 
   private adminPanel= document.getElementById("adminPanel") as HTMLDivElement;
-  private reportedFilesList = document.getElementById("reportedFilesList") as HTMLUListElement;
+  private reportedFileList = document.getElementById("reportedFileList") as HTMLUListElement;
   private blockedUsersList = document.getElementById("blockedUsersList") as HTMLUListElement;
 
   constructor() {
@@ -118,49 +118,68 @@ export class UserView {
     alert(msg);
   }
 
-  renderReportedFiles(files: any[]): void {
-    this.reportedFilesList.innerHTML = "";
+  renderReportedFiles(files: File[]): void {
+    this.reportedFileList.innerHTML = "";
 
     if (!files || files.length === 0) {
-      this.reportedFilesList.innerHTML = "<li>No reported files.</li>";
+      this.reportedFileList.innerHTML = `<li class="list-group-item text-muted">No reported files</li>`;
       return;
     }
 
     for (const f of files) {
+      const uploader = (f as any).getUploader?.() ?? (f as any).uploader; // je nach VO
+      const uploaderName =
+        uploader?.getName?.() ?? uploader?.name ?? "unknown";
+      const uploaderEmail =
+        uploader?.getEmail?.() ?? uploader?.email ?? "";
+
       const li = document.createElement("li");
+      li.className = "list-group-item d-flex justify-content-between align-items-start";
       li.setAttribute("data-file-id", String(f.getId()));
-      li.setAttribute("data-uploader-id", String(f.getUploader().getId()));
+      li.setAttribute("data-uploader-id", String(uploader?.getId?.() ?? uploader?.id ?? ""));
+      li.setAttribute("data-file-id", String(f.getId()));
+      li.setAttribute("data-file-name", f.getName());
 
       li.innerHTML = `
-        <b>${f.getName()}</b> (Uploader: ${f.getUploader().getName()})
-        <button data-action="accept">Accept</button>
-        <button data-action="delete">Delete</button>
-        <button data-action="block">Block user</button>
+        <div class="me-3">
+          <div class="fw-semibold">${f.getName()}</div>
+          <div class="small text-muted">Uploader: ${uploaderName}${uploaderEmail ? ` (${uploaderEmail})` : ""}</div>
+        </div>
+
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-secondary btn-sm" data-action="unreport">
+            Unreport
+          </button>
+          <button class="btn btn-outline-danger btn-sm" data-action="delete">
+            Delete
+          </button>
+        </div>
       `;
-      this.reportedFilesList.appendChild(li);
+
+      this.reportedFileList.appendChild(li);
     }
   }
 
-  bindReportedFileActions(
-    handler: (action: "accept" | "delete" | "block", fileId: number, uploaderId: string) => void
-  ): void {
-    const list = document.getElementById("reportedFilesList");
-    if (!list) return;
-
-    list.addEventListener("click", (e) => {
-      const target = e.target as HTMLElement | null;
-      const btn = target?.closest("button");
+    bindReportedFileActions(
+      handler: (action: "delete" | "unreport", fileId: number, fileName: string) => void
+    ): void {
+    this.reportedFileList.addEventListener("click", (ev) => {
+      const btn = (ev.target as HTMLElement).closest("button[data-action]") as HTMLButtonElement | null;
       if (!btn) return;
 
-      const action = btn.getAttribute("data-action") as any;
-      const fileId = Number(btn.getAttribute("data-file-id"));
-      const uploaderId = btn.getAttribute("data-uploader-id");
+      const li = btn.closest("li[data-file-id]") as HTMLLIElement | null;
+      if (!li) return;
 
-      if (!action || !Number.isFinite(fileId) || !uploaderId) return;
-      handler(action, fileId, uploaderId);
+      const action = btn.getAttribute("data-action") as "unreport" | "delete";
+      const fileId = Number(li.getAttribute("data-file-id"));
+      const uploaderId = String(li.getAttribute("data-uploader-id") ?? "");
+      const fileName = String(li.getAttribute("data-file-name") ?? "");
+
+      if (!Number.isFinite(fileId)) return;
+
+      handler(action, fileId, fileName);
     });
   }
-
 
   bindBlockedUserActions(
     handler: (action: "unblock", userId: string) => void
@@ -213,20 +232,20 @@ export class UserView {
     });
   }
 
-  renderFavourites(fileIds: number[]): void {
+  renderFavourites(items: { fileId: number; name: string }[]): void {
     this.favouritesList.innerHTML = "";
 
-    if (fileIds.length === 0) {
+    if (items.length === 0) {
       this.favouritesList.innerHTML = "<li>No favourites yet</li>";
       return;
     }
 
-    for (const fileId of fileIds) {
+    for (const item of items) {
       const li = document.createElement("li");
-      li.setAttribute("data-file-id", String(fileId));
+      li.setAttribute("data-file-id", String(item.fileId));
 
       li.innerHTML = `
-        <span><b>File #${fileId}</b></span>
+        <span><b>${item.name}</b></span>
         <div style="margin-top:6px;">
           <button data-action="download">Download</button>
           <button data-action="unfavourite">Unfavourite</button>

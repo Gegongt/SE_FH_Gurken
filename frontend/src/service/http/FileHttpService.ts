@@ -58,11 +58,12 @@ class FileHttpService {
 
   reportFile(
     fileId: number,
+    name: string,
     reported: boolean,
     success: (updated: File) => void,
-    errorCallback: (status: any) => void
+    error: (status: any) => void
   ): void {
-    const body = { isreported: reported };
+    const body = { name, isreported: reported };
 
     httpService.sendRequest(
       HttpMethod.METHOD_PUT,
@@ -73,13 +74,11 @@ class FileHttpService {
       "json",
       false,
       accessTokenUtil.getAccessToken(),
-      (response: any) => {
-        const updated = converter.convertFileEntityToFile(response as FileEntity);
-        success(updated);
-      },
-      (error: any) => errorCallback(error)
+      (resp: any) => success(converter.convertFileEntityToFile(resp)),
+      (err: any) => error(err)
     );
   }
+
 
   downloadFile(
     fileId: number,
@@ -113,6 +112,71 @@ class FileHttpService {
         success(filename);
       })
       .catch((err) => error(err));
+  }
+
+  getAllFiles(
+    success: (files: File[]) => void,
+    error: (status: any) => void
+  ): void {
+    httpService.sendRequest(
+      HttpMethod.METHOD_GET,
+      "http://localhost:3000/api/files",
+      null,   
+      null,
+      null,
+      "json",
+      false,
+      accessTokenUtil.getAccessToken(),
+      (resp: any) => {
+        const arr = Array.isArray(resp) ? resp : (resp.files ?? []);
+        const files = arr.map((fe: any) => converter.convertFileEntityToFile(fe));
+        success(files);
+      },
+      (e: any) => error(e)
+    );
+  }
+
+  deleteFile(
+    fileId: number,
+    success: () => void,
+    error: (status: any) => void
+  ): void {
+    httpService.sendRequest(
+      HttpMethod.METHOD_DELETE,
+      `${this.URL_FILE_API_BASE}/${fileId}`, // -> /api/files/{fileId}
+      null,
+      null,
+      null,
+      null,
+      false,
+      accessTokenUtil.getAccessToken(),
+      () => success(),
+      (e: any) => error(e)
+    );
+  }
+
+  getReportedFiles(
+    success: (files: File[]) => void,
+    error: (status: any) => void
+  ): void {
+    const params = { reported: "true" };
+
+    httpService.sendRequest(
+      HttpMethod.METHOD_GET,
+      this.URL_FILE_API_BASE,   
+      params,
+      null,
+      null,
+      "json",
+      false,
+      accessTokenUtil.getAccessToken(),
+      (resp: any) => {
+        const arr = Array.isArray(resp) ? resp : (resp.files ?? []);
+        const files = arr.map((fe: any) => converter.convertFileEntityToFile(fe));
+        success(files);
+      },
+      (err: any) => error(err)
+    );
   }
 
 }

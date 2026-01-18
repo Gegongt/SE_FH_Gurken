@@ -55,6 +55,7 @@ export type FileService = {
 
   reportFile(
     fileId: number,
+    name: string,
     reported: boolean,
     success: (updated: File) => void,
     error: (status: any) => void
@@ -65,6 +66,13 @@ export type FileService = {
     success: (filename?: string) => void,
     error: (status: any) => void
   ): void;
+
+  deleteFile(
+    fileId: number,
+    success: () => void,
+    error: (status: any) => void
+  ): void;
+
 };
 
 export type RatingService = {
@@ -96,10 +104,12 @@ console.log("CategoriesViewHandler init()");
 
 export class CategoriesViewHandler {
   private currentUserUid: string | null = null;
+  private currentUserIsAdmin: boolean = false;
   private allCategories: Category[] = [];
   private selectedSubcategoryId: number | null = null;
   private currentFiles: File[] = [];
   private currentExams: Exam[] = [];
+  
 
   constructor(
     private userService: UserService,
@@ -127,6 +137,8 @@ export class CategoriesViewHandler {
     this.view.bindDownloadClick((fileId) => this.onDownloadClicked(fileId));
     this.view.bindCreateExam(() => this.onCreateExamClicked());
     this.view.bindFavouriteClick((fileId) => this.onFavouriteClicked(fileId));
+    this.view.bindDeleteClick((fileId) => this.onDeleteClicked(fileId));
+
 
     this.view.bindExamAction((examId, action) => {
       if (action === "edit") this.nav.redirectToExamEditorPage(examId);
@@ -136,16 +148,21 @@ export class CategoriesViewHandler {
     this.userService.getCurrentUser(
   (u) => {
     this.currentUserUid = String(u.getId());
+    this.currentUserIsAdmin = (u.getIsAdmin?.() ?? false) === true;
 
     if (this.selectedSubcategoryId != null) {
       this.reloadFiles(this.selectedSubcategoryId);
     }
   },
-  (_e) => {
-    this.currentUserUid = null;
-  }
-);
+   (_e) => {
+      this.currentUserUid = null;
+      this.currentUserIsAdmin = false;
 
+      if (this.selectedSubcategoryId != null) {
+        this.reloadFiles(this.selectedSubcategoryId);
+      }
+    }
+  );
 
     this.categoryService.getCategories(
       true,
@@ -240,7 +257,6 @@ export class CategoriesViewHandler {
   }
 
   private reloadFiles(subcategoryId: number): void {
-
     this.view.renderFilesLoading();
 
     this.fileService.getFiles(
@@ -248,52 +264,87 @@ export class CategoriesViewHandler {
       true,
       (files) => {
         this.currentFiles = files;
-        for (const f of this.currentFiles) (f as any).fav = false;
+
+        for (const f of this.currentFiles) {
+          (f as any).fav = false;
+          (f as any).canDelete = false;
+        }
+
+        for (const f of this.currentFiles) {
+          const uploaderId =
+            (f as any).uploader?.id ??
+            (f as any).getUploader?.()?.getId?.() ??
+            (f as any).getUploader?.()?.id ??
+            null;
+
+          const isOwner = this.currentUserUid != null && String(uploaderId) === String(this.currentUserUid);
+          const isAdmin = this.currentUserIsAdmin === true;
+
+          (f as any).canDelete = isAdmin || isOwner;
+        }
 
         if (!this.currentUserUid) {
           this.view.renderFiles(this.currentFiles);
           return;
         }
 
-    this.favouritesService.getFavourites(
-    this.currentUserUid,
-    (favs) => {
-      const favSet = new Set<number>(favs.map((x: any) => Number(x.fileid))); // !!! fileid
-      for (const f of this.currentFiles) {
-        (f as any).fav = favSet.has(f.getId());
-      }
-      this.view.renderFiles(this.currentFiles);
-    },
-    (_e) => this.view.renderFiles(this.currentFiles)
-  );
-
-
-        },
-        (status) => this.view.renderError(`Failed to load files: ${String(status)}`)
-      );
+        this.favouritesService.getFavourites(
+          this.currentUserUid,
+          (favs) => {
+            const favSet = new Set(favs.map(x => Number((x as any).fileid ?? (x as any).fileId)));
+            for (const f of this.currentFiles) {
+              (f as any).fav = favSet.has(f.getId());
+            }
+            this.view.renderFiles(this.currentFiles);
+          },
+          (_e) => {
+            this.view.renderFiles(this.currentFiles);
+          }
+        );
+      },
+      (status) => this.view.renderError(`Failed to load files: ${String(status)}`)
+    );
   }
+
 
   private onRateClicked(fileId: number, value: RatingValue): void {
   }
 
-  private onReportClicked(fileId: number): void {
-    const f = this.currentFiles.find(x => x.getId() === fileId);
-    if (!f) return;
+private onReportClicked(fileId: number): void {
+  const f = this.currentFiles.find(x => x.getId() === fileId);
+  if (!f) return;
 
-    const newValue = !f.getIsReported();
+  const newReported = !f.getIsReported();
 
-    this.fileService.reportFile(
-      fileId,
-      newValue,
-      (updated) => {
-        f.setIsReported(updated.getIsReported());
-        this.view.renderFiles(this.currentFiles);
-      },
-      (status) => {
-        this.view.renderError(`Report failed: ${String(status)}`);
-      }
-    );
+
+  if (newReported === false && !this.currentUserIsAdmin) {
+    this.view.renderError("Only admins can unreport files.");
+    return; 
   }
+
+  const name = f.getName();
+  if (!name || typeof name !== "string") {
+    this.view.renderError("Cannot update file: missing filename.");
+    return;
+  }
+
+  this.fileService.reportFile(
+    fileId,
+    name,
+    newReported,
+    (updated) => {
+      f.setIsReported(updated.getIsReported());
+      if (updated.getName?.()) f.setName(updated.getName());
+      this.view.renderFiles(this.currentFiles);
+    },
+    (status) => this.view.renderError(`Report failed: ${String(status)}`)
+  );
+}
+
+
+
+
+
 
   private onDownloadClicked(fileId: number): void {
     this.fileService.downloadFile(
@@ -313,6 +364,7 @@ export class CategoriesViewHandler {
         this.view.renderExams(this.currentExams);
       },
       (status) => this.view.renderError(`Failed to load exams: ${String(status)}`)
+      
     );
   }
 
@@ -321,7 +373,7 @@ export class CategoriesViewHandler {
       this.view.renderError("Please select a subcategory first.");
       return;
     }
-    this.nav.redirectToExamEditorPage(null, this.selectedSubcategoryId); // erstellen (ohne id)
+    this.nav.redirectToExamEditorPage(null, this.selectedSubcategoryId); 
   }
 
   private onFavouriteClicked(fileId: number): void {
@@ -347,4 +399,34 @@ export class CategoriesViewHandler {
       this.favouritesService.removeFavourite(uid, fileId, done, (e) => this.view.renderError(String(e)));
     }
   }
+
+ private onDeleteClicked(fileId: number): void {
+  const f = this.currentFiles.find(x => x.getId() === fileId);
+  if (!f) return;
+
+  const canDelete = (f as any).canDelete === true;
+  if (!canDelete) {
+    this.view.renderError("You are not allowed to delete this file.");
+    return;
+  }
+
+  const ok = confirm("Delete this file?");
+  if (!ok) return;
+
+  this.fileService.deleteFile(
+    fileId,
+    () => {
+
+      this.currentFiles = this.currentFiles.filter(x => x.getId() !== fileId);
+      this.view.renderFiles(this.currentFiles);
+
+      if (this.selectedSubcategoryId != null) {
+        this.reloadFiles(this.selectedSubcategoryId);
+      }
+    },
+    (e) => this.view.renderError(`Delete failed: ${String(e)}`)
+  );
+}
+
+
 }
