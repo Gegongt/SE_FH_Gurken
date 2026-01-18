@@ -271,4 +271,42 @@ router.get("/", requireAuth, checkBlocked, fileController.list);
 router.put("/:fileId", requireAuth, checkBlocked, fileController.update);
 router.delete("/:fileId", requireAuth, checkBlocked, fileController.remove);
 
+/**
+ * @swagger
+ * /files/{fileId}/download:
+ *   get:
+ *     tags: [File]
+ *     summary: Download a file (authenticated users)
+ *     description: Downloads the uploaded file as an attachment. Requires Bearer token (blocked users are forbidden).
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: fileId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: File id
+ *         example: 2
+ *     responses:
+ *       200:
+ *         description: File downloaded (attachment)
+ *         content:
+ *           application/octet-stream:
+ *             schema:
+ *               type: string
+ *               format: binary
+ *       400:
+ *         description: Invalid fileId
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden (blocked user)
+ *       404:
+ *         description: File not found
+ *       500:
+ *         description: Internal server error
+ */
+router.get("/:fileId/download", requireAuth, checkBlocked, fileController.download);
+
 module.exports = router;

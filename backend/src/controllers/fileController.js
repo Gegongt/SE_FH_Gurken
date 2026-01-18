@@ -167,4 +167,28 @@ async function remove(req, res) {
   }
 }
 
-module.exports = { create, list, update, remove };
+async function download(req, res) {
+  try {
+    const fileId = Number(req.params.fileId);
+    if (!Number.isInteger(fileId) || fileId <= 0) {
+      return res.status(400).json({ message: "fileId must be a positive number" });
+    }
+
+    const file = await fileService.getFileById(fileId);
+    if (!file) return res.status(404).json({ message: "File not found" });
+
+    const filePath = path.join(process.cwd(), "uploads", "files", String(fileId));
+    try {
+      await fs.access(filePath);
+    } catch {
+      return res.status(404).json({ message: "Uploaded file not found on server" });
+    }
+
+    return res.download(filePath, file.name || `file-${fileId}`);
+  } catch (err) {
+    console.error("download file error:", err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+module.exports = { create, list, update, remove, download };
