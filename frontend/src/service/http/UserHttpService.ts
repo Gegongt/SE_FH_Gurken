@@ -177,6 +177,55 @@ class UserHttpService
         );
     }
 
+    getProfilePicture(
+        success: (blobUrl: string | null) => void,
+        error: (e: any) => void
+        ): void {
+        fetch(this.URL_USERS_API_BASE + "/profilepicture", {
+            method: "GET",
+            headers: {
+            Authorization: `Bearer ${accessTokenUtil.getAccessToken()}`
+            }
+        })
+            .then(async (r) => {
+            if (r.status === 404) {
+                success(null);
+                return;
+            }
+            if (!r.ok) throw await r.text();
+
+            const blob = await r.blob();
+            const url = URL.createObjectURL(blob);
+            success(url);
+            })
+            .catch((e) => error(e));
+    }
+
+    updateProfilePicture(
+        file: globalThis.File,
+        successCallback: () => void,
+        errorCallback: (error: ServiceError) => void
+        ): void {
+        const fd = new FormData();
+        fd.append("file", file); // <- MUSS "file" heißen (Swagger + Controller)
+
+        fetch(this.URL_USERS_API_BASE + "/profilepicture", {
+            method: "PUT",
+            headers: {
+            Authorization: `Bearer ${accessTokenUtil.getAccessToken()}`
+            // KEIN Content-Type setzen bei FormData!
+            },
+            body: fd
+        })
+            .then(async (r) => {
+            if (!r.ok) throw await r.text();
+            // response ist updated user JSON, aber brauchen wir nicht zwingend
+            successCallback();
+            })
+            .catch((_e) => errorCallback(new ServiceError("Error! Upload profile picture failed!")));
+    }
+
+
 
 }
 

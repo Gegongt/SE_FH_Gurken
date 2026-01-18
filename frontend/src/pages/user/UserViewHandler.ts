@@ -1,11 +1,15 @@
 import { User } from "../../vo/User.js";
 import { File } from "../../vo/File.js";
 import { UserView } from "./UserView.js";
+import { accessTokenUtil } from "../../service/http/AccessTokenUtil.js";
 
 export type UserService = {
   getCurrentUser(success: (u: User|null)=>void, error:(s:any)=>void): void;
   logout(success: ()=>void, error:(s:any)=>void): void;
-  updateProfilePicture(file: globalThis.File, success: (url: string)=>void, error:(s:any)=>void): void;
+  updateProfilePicture(file: globalThis.File, success: ()=>void, error:(s:any)=>void): void;
+  getProfilePicture(success: (url: string | null) => void, error: (e:any)=>void): void;
+
+
   deleteOwnUser(success: () => void, error: (e: any) => void): void;
 
   getReportedFiles(success:(files: File[])=>void, error:(s:any)=>void): void;
@@ -27,6 +31,13 @@ export type UserService = {
   ): void;
 
   unblockUser(userId: string, success:()=>void, error:(s:any)=>void): void;
+};
+
+export type FavouriteDTO = { userid: string; fileid: number };
+
+export type FavouritesService = {
+  getFavourites(userId: string, success: (favs: FavouriteDTO[]) => void, error: (e: any) => void): void;
+  removeFavourite(userId: string, fileId: number, success: () => void, error: (e: any) => void): void;
 };
 
 export type FileService = {
@@ -54,13 +65,16 @@ export type FileService = {
     success: (updated: File) => void,
     error: (status: any) => void
   ): void;
+
+  downloadFile(fileId: number, success: (filename?: string) => void, error: (status: any) => void): void;
 };
 
 
 export class UserViewHandler {
   private currentUser: User | null = null;
+  private favouriteFileIds: number[] = [];
 
-  constructor(private view: UserView, private userService: UserService, private fileService: FileService) {}
+  constructor(private view: UserView, private userService: UserService, private favouritesService: FavouritesService, private fileService: FileService) {}
 
   init(): void {
     this.userService.getCurrentUser(
@@ -72,7 +86,12 @@ export class UserViewHandler {
 
         this.currentUser = u;
         this.view.renderUser(u);
-        this.view.renderFavourites(u.getFavourites());
+        this.loadFavourites();
+
+        this.userService.getProfilePicture(
+          (url) => this.view.setProfileImage(url),
+          (_e) => this.view.setProfileImage(null)
+        );
 
         this.view.bindReportedFileActions((action, fileId, uploaderId) => {
           this.onReportedAction(action, fileId, uploaderId);
@@ -82,17 +101,10 @@ export class UserViewHandler {
           this.onBlockedAction(action, userId);
         });
 
-        this.view.bindFavouriteAction((fileId, action) => {
-          if (action === "download") window.open(`/api/files/${fileId}/download`, "_blank");
-
-          if (action === "remove") {
-            this.userService.getCurrentUser((u) => {
-              if (!u) return;
-              u.removeFavourite(fileId);
-              this.view.renderFavourites(u.getFavourites());
-            }, () => {});
-          }
-        });
+      this.view.bindFavouriteAction((fileId, action) => {
+        if (action === "download") this.onDownload(fileId);
+        if (action === "unfavourite") this.onUnfavourite(fileId);
+      });
 
         this.view.bindChangeProfilePicClick();
         this.view.bindProfilePicSelected((file) => this.onProfilePicSelected(file));
@@ -114,16 +126,95 @@ export class UserViewHandler {
 
     this.userService.updateProfilePicture(
       file,
-      (url) => {
-        if (this.currentUser) {
-          this.view.renderUser(this.currentUser);
-        }
+      () => {
+        this.userService.getProfilePicture(
+          (url) => this.view.setProfileImage(url),
+          (_e) => this.view.setProfileImage(null)
+        );
       },
       (err) => this.view.showError(String(err))
     );
   }
 
 
+  updateProfilePicture(
+    file: globalThis.File,
+    success: (url: string) => void,
+    error: (s: any) => void
+  ): void {
+    const fd = new FormData();
+    fd.append("file", file); 
+
+    fetch("http://localhost:3000/api/users/profilepicture", {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${accessTokenUtil.getAccessToken()}`
+      },
+      body: fd
+    })
+      .then(async (r) => {
+        if (!r.ok) throw await r.text();
+        return r.json();
+      })
+      .then((_userJson) => {
+        this.getProfilePicture(success, error);
+      })
+      .catch((e) => error(e));
+  }
+
+  getProfilePicture(
+    success: (objectUrl: string) => void,
+    error: (e: any) => void
+  ): void {
+    fetch("http://localhost:3000/api/users/profilepicture", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessTokenUtil.getAccessToken()}`
+      }
+    })
+      .then(async (r) => {
+        if (r.status === 404) {
+
+          success("");
+          return;
+        }
+        if (!r.ok) throw await r.text();
+        return r.blob();
+      })
+      .then((blob) => {
+        if (!blob) return;
+        const objectUrl = URL.createObjectURL(blob);
+        success(objectUrl);
+      })
+      .catch((e) => error(e));
+  }
+
+
+  private onUnfavourite(fileId: number): void {
+    const uid = this.currentUser ? String(this.currentUser.getId()) : null;
+    if (!uid) {
+      this.view.showError("Not logged in.");
+      return;
+    }
+
+    this.favouritesService.removeFavourite(
+      uid,
+      fileId,
+      () => {
+        this.favouriteFileIds = this.favouriteFileIds.filter(id => id !== fileId);
+        this.view.renderFavourites(this.favouriteFileIds as any);
+      },
+      (e) => this.view.showError(`Unfavourite failed: ${String(e)}`)
+    );
+  }
+
+  private onDownload(fileId: number): void {
+    this.fileService.downloadFile(
+      fileId,
+      (_filename) => {},
+      (e) => this.view.showError(`Download failed: ${String(e)}`)
+    );
+  }
 
   private loadAdminData(): void {
 
@@ -131,6 +222,20 @@ export class UserViewHandler {
       true, 
       (users) => this.view.renderBlockedUsers(users),
       (err) => this.view.showError(`Failed to load blocked users`)
+    );
+  }
+
+  private loadFavourites(): void {
+    const uid = this.currentUser ? String(this.currentUser.getId()) : null;
+    if (!uid) return;
+
+    this.favouritesService.getFavourites(
+      uid,
+      (rows) => {
+        this.favouriteFileIds = rows.map(r => Number(r.fileid));
+        this.view.renderFavourites(this.favouriteFileIds as any); 
+      },
+      (e) => this.view.showError(`Failed to load favourites: ${String(e)}`)
     );
   }
 

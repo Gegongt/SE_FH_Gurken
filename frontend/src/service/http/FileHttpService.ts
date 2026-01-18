@@ -80,6 +80,41 @@ class FileHttpService {
       (error: any) => errorCallback(error)
     );
   }
+
+  downloadFile(
+    fileId: number,
+    success: (filename?: string) => void,
+    error: (e: any) => void
+  ): void {
+    fetch(`${this.URL_FILE_API_BASE}/${fileId}/download`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessTokenUtil.getAccessToken()}`,
+      },
+    })
+      .then(async (r) => {
+        if (!r.ok) throw await r.text();
+
+        const cd = r.headers.get("content-disposition") ?? "";
+        const match = /filename="?([^"]+)"?/i.exec(cd);
+        const filename = match?.[1] ?? `file_${fileId}`;
+
+        const blob = await r.blob();
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        URL.revokeObjectURL(url);
+        success(filename);
+      })
+      .catch((err) => error(err));
+  }
+
 }
 
 export let fileHttpService = new FileHttpService();

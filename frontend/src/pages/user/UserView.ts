@@ -3,6 +3,7 @@ import { File } from "../../vo/File.js";
 
 export class UserView {
   private profileImg = document.getElementById("profileImg") as HTMLImageElement;
+  private lastBlobUrl: string | null = null;
   private roleLabel: HTMLElement;
   private username = document.getElementById("username") as HTMLDivElement;
   private btnChange = document.getElementById("btnChangeProfilePic") as HTMLButtonElement;
@@ -36,11 +37,9 @@ export class UserView {
     this.roleLabel.textContent = user.getIsAdmin() ? "Admin" : "User";
     this.username.textContent = `Logged in as: ${user.getName()} (${user.getEmail()})`;
 
-    const pictureName = user.getProfilePictureName();
-    if (pictureName) {
-      this.profileImg.src = pictureName;
-    } else {
-      this.profileImg.src = "";
+    const img = document.getElementById("profileImg") as HTMLImageElement | null;
+    if (img) {
+      img.src = ""; 
     }
   }
 
@@ -48,6 +47,28 @@ export class UserView {
   showAdminPanel(show: boolean): void {
     this.adminPanel.style.display = show ? "block" : "none";
  }
+
+   renderProfilePicture(objectUrl: string): void {
+    const img = document.getElementById("profileImg") as HTMLImageElement;
+    if (!img) return;
+
+    if (!objectUrl) {
+      img.src = ""; 
+      return;
+    }
+    img.src = objectUrl;
+  }
+
+  setProfileImage(url: string | null): void {
+    const img = document.getElementById("profileImg") as HTMLImageElement | null;
+    if (!img) return;
+
+    if (this.lastBlobUrl) URL.revokeObjectURL(this.lastBlobUrl);
+    this.lastBlobUrl = url;
+
+    img.src = url ?? "";
+  }
+
 
 
   bindChangeProfilePic(handler: () => void): void {
@@ -192,34 +213,37 @@ export class UserView {
     });
   }
 
-  renderFavourites(files: import("../../vo/File.js").File[]): void {
+  renderFavourites(fileIds: number[]): void {
     this.favouritesList.innerHTML = "";
 
-    if (files.length === 0) {
+    if (fileIds.length === 0) {
       this.favouritesList.innerHTML = "<li>No favourites yet</li>";
       return;
     }
 
-    for (const f of files) {
+    for (const fileId of fileIds) {
       const li = document.createElement("li");
-      li.setAttribute("data-file-id", String(f.getId()));
+      li.setAttribute("data-file-id", String(fileId));
+
       li.innerHTML = `
-        <span><b>${f.getName()}</b></span>
-        <button data-action="remove">Remove</button>
-        <button data-action="download">Download</button>
+        <span><b>File #${fileId}</b></span>
+        <div style="margin-top:6px;">
+          <button data-action="download">Download</button>
+          <button data-action="unfavourite">Unfavourite</button>
+        </div>
       `;
+
       this.favouritesList.appendChild(li);
     }
   }
 
-  bindFavouriteAction(handler: (fileId: number, action: "remove" | "download") => void): void {
+  bindFavouriteAction(handler: (fileId: number, action: "download" | "unfavourite") => void): void {
     this.favouritesList.addEventListener("click", (e) => {
-      const target = e.target as HTMLElement;
-      const btn = target.closest("button");
+      const btn = (e.target as HTMLElement).closest("button");
       if (!btn) return;
 
       const action = btn.getAttribute("data-action");
-      if (action !== "remove" && action !== "download") return;
+      if (action !== "download" && action !== "unfavourite") return;
 
       const li = btn.closest("li");
       const idStr = li?.getAttribute("data-file-id");

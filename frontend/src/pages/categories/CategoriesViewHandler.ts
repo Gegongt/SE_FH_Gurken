@@ -5,6 +5,7 @@ import { RatingSummary, RatingValue } from "../../vo/RatingSummary.js";
 import { Subcategory } from "../../vo/Subcategory.js";
 import { Exam } from "../../vo/Exam.js";
 import { locationUtil } from "../../util/LocationUtil.js";
+import { User } from "../../vo/User.js";
 
 type Navigator = {
   redirectToExamExecutorPage(id: number): void;
@@ -12,6 +13,13 @@ type Navigator = {
   redirectToLoginPage(): void;
   redirectToUserPage(): void;
   redirectToMainPage(): void;
+};
+
+export type UserService = {
+   getCurrentUser(
+    success: (u: User) => void,
+    error: (e: any) => void
+  ): void;
 };
 
 export type CategoryService = {
@@ -51,6 +59,12 @@ export type FileService = {
     success: (updated: File) => void,
     error: (status: any) => void
   ): void;
+
+  downloadFile(
+    fileId: number,
+    success: (filename?: string) => void,
+    error: (status: any) => void
+  ): void;
 };
 
 export type RatingService = {
@@ -69,24 +83,26 @@ export type ExamService = {
   ): void;
 };
 
-export type FavouritesService = {
-  getFavourites(userId: number, success: (files: File[]) => void, error: (e:any)=>void): void;
-  addFavourite(userId: number, file: File, success: ()=>void, error:(e:any)=>void): void;
-  removeFavourite(userId: number, fileId: number, success: ()=>void, error:(e:any)=>void): void;
-};
+export type FavouriteDTO = { userId: string; fileId: number };
 
+export type FavouritesService = {
+  getFavourites(userId: string, success: (favs: FavouriteDTO[]) => void, error: (e:any)=>void): void;
+  addFavourite(userId: string, fileId: number, success: ()=>void, error:(e:any)=>void): void;
+  removeFavourite(userId: string, fileId: number, success: ()=>void, error:(e:any)=>void): void;
+};
 
 
 console.log("CategoriesViewHandler init()");
 
 export class CategoriesViewHandler {
-  private currentUserId = 1;
+  private currentUserUid: string | null = null;
   private allCategories: Category[] = [];
   private selectedSubcategoryId: number | null = null;
   private currentFiles: File[] = [];
   private currentExams: Exam[] = [];
 
   constructor(
+    private userService: UserService,
     private view: CategoriesView,
     private categoryService: CategoryService,
     private subcategoryService: SubcategoryService,
@@ -112,11 +128,24 @@ export class CategoriesViewHandler {
     this.view.bindCreateExam(() => this.onCreateExamClicked());
     this.view.bindFavouriteClick((fileId) => this.onFavouriteClicked(fileId));
 
-
     this.view.bindExamAction((examId, action) => {
       if (action === "edit") this.nav.redirectToExamEditorPage(examId);
       if (action === "execute") this.nav.redirectToExamExecutorPage(examId);
     });
+
+    this.userService.getCurrentUser(
+  (u) => {
+    this.currentUserUid = String(u.getId());
+
+    if (this.selectedSubcategoryId != null) {
+      this.reloadFiles(this.selectedSubcategoryId);
+    }
+  },
+  (_e) => {
+    this.currentUserUid = null;
+  }
+);
+
 
     this.categoryService.getCategories(
       true,
@@ -129,6 +158,10 @@ export class CategoriesViewHandler {
         this.view.renderError(`Failed to load categories: ${String(status)}`);
       }
     );
+  }
+
+  public setCurrentUser(uid: string): void {
+    this.currentUserUid = uid;
   }
 
   private onSearch(text: string): void {
@@ -206,35 +239,41 @@ export class CategoriesViewHandler {
     );
   }
 
-private reloadFiles(subcategoryId: number): void {
-  this.view.renderFilesLoading();
+  private reloadFiles(subcategoryId: number): void {
 
-  this.fileService.getFiles(
-    subcategoryId,
-    true,
-    (files) => {
-      this.currentFiles = files;
+    this.view.renderFilesLoading();
+
+    this.fileService.getFiles(
+      subcategoryId,
+      true,
+      (files) => {
+        this.currentFiles = files;
+        for (const f of this.currentFiles) (f as any).fav = false;
+
+        if (!this.currentUserUid) {
+          this.view.renderFiles(this.currentFiles);
+          return;
+        }
+
+    this.favouritesService.getFavourites(
+    this.currentUserUid,
+    (favs) => {
+      const favSet = new Set<number>(favs.map((x: any) => Number(x.fileid))); // !!! fileid
+      for (const f of this.currentFiles) {
+        (f as any).fav = favSet.has(f.getId());
+      }
       this.view.renderFiles(this.currentFiles);
     },
-    (status) => {
-      this.view.renderError(`Failed to load files: ${String(status)}`);
-    }
+    (_e) => this.view.renderFiles(this.currentFiles)
   );
-}
 
+
+        },
+        (status) => this.view.renderError(`Failed to load files: ${String(status)}`)
+      );
+  }
 
   private onRateClicked(fileId: number, value: RatingValue): void {
-    this.ratingService.setUserRating(
-      fileId,
-      this.currentUserId,
-      value,
-      (summary) => {
-        const f = this.currentFiles.find(x => x.getId() === fileId);
-        if (f) f.setRatingSummary(summary);
-        this.view.renderFiles(this.currentFiles);
-      },
-      (status) => this.view.renderError(`Rating failed: ${String(status)}`)
-    );
   }
 
   private onReportClicked(fileId: number): void {
@@ -257,10 +296,13 @@ private reloadFiles(subcategoryId: number): void {
   }
 
   private onDownloadClicked(fileId: number): void {
-    //BaseURL
-    const url = `/api/files/${fileId}/download`;
-    //Browser download
-    window.open(url, "_blank");
+    this.fileService.downloadFile(
+      fileId,
+      (filename) => {
+        console.log("Downloaded:", filename);
+      },
+      (err) => this.view.renderError(`Download failed: ${String(err)}`)
+    );
   }
 
   private reloadExams(subcategoryId: number): void {
@@ -283,6 +325,12 @@ private reloadFiles(subcategoryId: number): void {
   }
 
   private onFavouriteClicked(fileId: number): void {
+    const uid = this.currentUserUid;
+    if (!uid) {
+      this.view.renderError("Not logged in.");
+      return;
+    }
+
     const f = this.currentFiles.find(x => x.getId() === fileId);
     if (!f) return;
 
@@ -294,11 +342,9 @@ private reloadFiles(subcategoryId: number): void {
     };
 
     if (!isFav) {
-      this.favouritesService.addFavourite(this.currentUserId, f, done, (e)=>this.view.renderError(String(e)));
+      this.favouritesService.addFavourite(uid, fileId, done, (e) => this.view.renderError(String(e)));
     } else {
-      this.favouritesService.removeFavourite(this.currentUserId, fileId, done, (e)=>this.view.renderError(String(e)));
+      this.favouritesService.removeFavourite(uid, fileId, done, (e) => this.view.renderError(String(e)));
     }
   }
-
-
 }

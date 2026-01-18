@@ -7,6 +7,7 @@ import { HeaderView } from "../components/header/HeaderView.js";
 import { HeaderViewHandler } from "../components/header/HeaderViewHandler.js";
 
 
+const userService = serviceFactory.getService(ServiceName.USER);
 const categoryService = serviceFactory.getService(ServiceName.CATEGORY);
 const subcategoryService = serviceFactory.getService(ServiceName.SUBCATEGORY);
 const fileService = serviceFactory.getService(ServiceName.FILE);
@@ -18,5 +19,5 @@ headerViewHandler.render("header");
 
 const view = new CategoriesView();
 
-const handler = new CategoriesViewHandler(view, categoryService as any, subcategoryService as any, fileService as any, ratingService as any, examService as any, favouritesService as any, locationUtil);
+const handler = new CategoriesViewHandler(userService as any, view, categoryService as any, subcategoryService as any, fileService as any, ratingService as any, examService as any, favouritesService as any, locationUtil);
 handler.init();
