@@ -1,0 +1,1 @@
+{"version":3,"file":"QuestionEntity.js","sourceRoot":"","sources":["../../../src/http/entity/QuestionEntity.ts"],"names":[],"mappings":"AAEA,MAAM,OAAO,cAAc;IAOvB,YAAY,EAAS,EAAE,MAAa,EAAE,QAAe,EAAE,YAA+B;QAElF,IAAI,CAAC,EAAE,GAAG,EAAE,CAAC;QACb,IAAI,CAAC,MAAM,GAAG,MAAM,CAAC;QACrB,IAAI,CAAC,QAAQ,GAAG,QAAQ,CAAC;QACzB,IAAI,CAAC,YAAY,GAAG,YAAY,CAAC;IACrC,CAAC;CACJ"}

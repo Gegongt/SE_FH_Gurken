@@ -1,0 +1,1 @@
+{"version":3,"file":"ExamEntity.js","sourceRoot":"","sources":["../../../src/http/entity/ExamEntity.ts"],"names":[],"mappings":"AAEA,MAAM,OAAO,UAAU;IAOnB,YAAY,EAAS,EAAE,aAAoB,EAAE,IAAW,EAAE,OAAkB;QAExE,IAAI,CAAC,EAAE,GAAG,EAAE,CAAC;QACb,IAAI,CAAC,aAAa,GAAG,aAAa,CAAC;QACnC,IAAI,CAAC,IAAI,GAAG,IAAI,CAAC;QACjB,IAAI,CAAC,OAAO,GAAG,OAAO,CAAC;IAC3B,CAAC;CACJ"}

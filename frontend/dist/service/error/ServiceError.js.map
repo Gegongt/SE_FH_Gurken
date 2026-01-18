@@ -1,0 +1,1 @@
+{"version":3,"file":"ServiceError.js","sourceRoot":"","sources":["../../../src/service/error/ServiceError.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,QAAQ,EAAE,MAAM,yBAAyB,CAAC;AAEnD,MAAM,OAAO,YAAa,SAAQ,QAAQ;IAEtC,YAAY,OAAc;QAEtB,KAAK,CAAC,OAAO,CAAC,CAAC;IACnB,CAAC;CACJ"}

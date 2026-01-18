@@ -1,0 +1,1 @@
+{"version":3,"file":"SubcategoryEntity.js","sourceRoot":"","sources":["../../../src/http/entity/SubcategoryEntity.ts"],"names":[],"mappings":"AAAA,MAAM,OAAO,iBAAiB;IAM1B,YAAY,EAAS,EAAE,UAAiB,EAAE,IAAW;QAEjD,IAAI,CAAC,EAAE,GAAG,EAAE,CAAC;QACb,IAAI,CAAC,UAAU,GAAG,UAAU,CAAC;QAC7B,IAAI,CAAC,IAAI,GAAG,IAAI,CAAC;IACrB,CAAC;CACJ"}

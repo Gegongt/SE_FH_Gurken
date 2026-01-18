@@ -1,0 +1,1 @@
+{"version":3,"file":"NamedEntity.d.ts","sourceRoot":"","sources":["../../src/vo/NamedEntity.ts"],"names":[],"mappings":"AAAA,qBAAa,WAAW;IAEpB,OAAO,CAAC,EAAE;IACV,OAAO,CAAC,IAAI;gBADJ,EAAE,EAAE,MAAM,EACV,IAAI,EAAE,MAAM;IAGtB,KAAK,IAAI,MAAM;IAIf,OAAO,IAAI,MAAM;IAIjB,OAAO,CAAC,IAAI,EAAE,MAAM,GAAG,IAAI;CAG5B"}

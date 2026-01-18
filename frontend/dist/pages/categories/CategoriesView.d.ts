@@ -1,0 +1,46 @@
+import { Category } from "../../vo/Category.js";
+import { Subcategory } from "../../vo/Subcategory.js";
+import { File } from "../../vo/File.js";
+import { RatingValue } from "../../vo/RatingSummary.js";
+import { Exam } from "../../vo/Exam.js";
+export declare class CategoriesView {
+    private searchInput;
+    private categoryList;
+    private subcategoryList;
+    private btnUploadFile;
+    private filePicker;
+    private fileList;
+    private examList;
+    private btnCreateExam;
+    private errorBox;
+    private errorText;
+    private errorTimeout;
+    constructor();
+    bindSearch(handler: (text: string) => void): void;
+    bindCategoryClick(handler: (categoryId: number) => void): void;
+    renderCategories(categories: Category[]): void;
+    renderSubcategories(subcategories: Subcategory[]): void;
+    renderFiles(files: File[]): void;
+    renderSubcategoriesLoading(): void;
+    renderFilesLoading(): void;
+    renderError(msg: string, autoHideMs?: number): void;
+    hideError(): void;
+    enableActions(enable: boolean): void;
+    bindUploadClick(handler: () => void): void;
+    openFilePicker(): void;
+    bindFileSelected(handler: (file: globalThis.File) => void): void;
+    bindSubcategoryClick(handler: (subcategoryId: number) => void): void;
+    resetDetails(): void;
+    clearFiles(): void;
+    clearSubcategories(): void;
+    clearExams(): void;
+    bindRatingClick(handler: (fileId: number, value: RatingValue) => void): void;
+    bindReportClick(handler: (fileId: number) => void): void;
+    bindDownloadClick(handler: (fileId: number) => void): void;
+    renderExams(exams: Exam[]): void;
+    bindCreateExam(handler: () => void): void;
+    bindExamAction(handler: (examId: number, action: "execute" | "edit") => void): void;
+    bindFavouriteClick(handler: (fileId: number) => void): void;
+    bindDeleteClick(handler: (fileId: number) => void): void;
+}
+//# sourceMappingURL=CategoriesView.d.ts.map

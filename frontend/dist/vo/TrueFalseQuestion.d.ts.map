@@ -1,0 +1,1 @@
+{"version":3,"file":"TrueFalseQuestion.d.ts","sourceRoot":"","sources":["../../src/vo/TrueFalseQuestion.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,QAAQ,EAAE,MAAM,eAAe,CAAC;AAEzC,qBAAa,iBAAkB,SAAQ,QAAQ;IAE3C,OAAO,CAAC,MAAM,CAAS;gBAEX,EAAE,EAAC,MAAM,EAAE,QAAQ,EAAC,MAAM,EAAE,MAAM,EAAC,OAAO;IAOtD,SAAS,IAAG,OAAO;IAKnB,SAAS,CAAC,MAAM,EAAC,OAAO,GAAE,IAAI;CAIjC"}

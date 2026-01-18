@@ -1,0 +1,1 @@
+{"version":3,"file":"BlockedUserError.d.ts","sourceRoot":"","sources":["../../../src/service/error/BlockedUserError.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,YAAY,EAAE,MAAM,mBAAmB,CAAC;AAEjD,qBAAa,gBAAiB,SAAQ,YAAY;gBAEpC,OAAO,EAAC,MAAM;CAI3B"}

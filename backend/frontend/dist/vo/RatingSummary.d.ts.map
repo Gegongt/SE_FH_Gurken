@@ -1,0 +1,1 @@
+{"version":3,"file":"RatingSummary.d.ts","sourceRoot":"","sources":["../../src/vo/RatingSummary.ts"],"names":[],"mappings":"AAAA,MAAM,MAAM,WAAW,GAAG,KAAK,GAAG,QAAQ,GAAG,MAAM,CAAC;AAEpD,MAAM,MAAM,aAAa,GAAG;IAC1B,IAAI,EAAE,MAAM,CAAC;IACb,MAAM,EAAE,MAAM,CAAC;IACf,GAAG,EAAE,MAAM,CAAC;IACZ,KAAK,EAAE,MAAM,CAAC;IACd,OAAO,EAAE,WAAW,CAAC;CACtB,CAAC"}
