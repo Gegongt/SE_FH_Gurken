@@ -61,15 +61,16 @@ async function login(req, res) {
   }
 
   try {
+    let finalEmail = email;
     if (!email.includes("@")) {
       const userByName = await userService.getUserByName(email);
       if (!userByName) {
         return res.status(404).json({ error: "User not found" });
       }
-      email = userByName.email;
+      finalEmail = userByName.email;
     }
 
-    const firebaseResult = await authService.login(email, password);
+    const firebaseResult = await authService.login(finalEmail, password);
     const uid = firebaseResult.localId;
 
     const dbUser = await userService.getUserById(uid);

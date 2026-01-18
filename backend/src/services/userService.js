@@ -45,9 +45,9 @@ async function updateProfilePictureName(userId, profilepicturename) {
   return userRepository.updateProfilePictureName(userId, profilepicturename);
 }
 
-exports.getUserByName = async (name) => {
+async function getUserByName(name) {
   return userRepository.findByName(name);
-};
+}
 
 module.exports = {
   createUser,
@@ -56,4 +56,5 @@ module.exports = {
   deleteUser,
   listUsersByBlocked,
   updateProfilePictureName,
+  getUserByName,
 };

@@ -90,7 +90,7 @@ async function updateProfilePictureName(userId, profilepicturename) {
   return rows[0] ?? null;
 }
 
-exports.findByName = async (name) => {
+async function findByName(name) {
   const { rows } = await pool.query(
     `SELECT *
      FROM ${TABLE}
@@ -99,7 +99,7 @@ exports.findByName = async (name) => {
     [name],
   );
   return rows[0] ?? null;
-};
+}
 
 module.exports = {
   findById,
@@ -108,4 +108,5 @@ module.exports = {
   deleteById,
   findByBlocked,
   updateProfilePictureName,
+  findByName,
 };
