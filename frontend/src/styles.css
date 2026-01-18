@@ -6,6 +6,7 @@
     --bs-secondary: #139779;
 
     --bs-warning: #583E23;
+    --bs-secondary-rgb: 19, 151, 121;
 }
 
 .btn-primary
@@ -315,4 +316,9 @@ input
 ul li::marker
 {
   content: "🥒 ";
+}
+.input-group-text
+{
+  background-color: #005D59;
+  color: white;
 }
