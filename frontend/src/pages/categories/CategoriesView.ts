@@ -103,16 +103,16 @@ export class CategoriesView {
       li.setAttribute("data-file-id", String(f.getId()));
 
       const isFav = (f as any).fav === true;
-      const favBtnText = isFav ? "Unfavourite" : "Favourite";
+      const favBtnText = isFav ? `<i class="bi bi-bookmark-fill"></i>` : `<i class="bi bi-bookmark"></i>`;
 
-      const reportedText = f.getIsReported() ? "Reported" : "Not reported";
-      const reportBtnText = f.getIsReported() ? "Unreport" : "Report";
+      const reportedText = f.getIsReported() ? `<i class="bi bi-flag-fill"></i>` : `<i class="bi bi-flag"></i>`;
+      const reportBtnText = f.getIsReported() ? `<i class="bi bi-flag-fill"></i>` : `<i class="bi bi-flag"></i>`;
 
       const canDelete = (f as any).canDelete === true;
 
       const summary = (f as any).ratingSummary;
       const scoreText = summary
-        ? `Score: ${summary.score} (${summary.overall}) | 👍 ${summary.good} 😐 ${summary.medium} 👎 ${summary.bad}`
+        ? `Score: ${summary.score} (${summary.overall}) | <i class="bi bi-hand-thumbs-up-fill"></i> ${summary.good} <i class="bi bi-dash"></i> ${summary.medium} <i class="bi bi-hand-thumbs-down-fill"></i> ${summary.bad}`
         : "Score: -";
 
       li.innerHTML = `
@@ -121,17 +121,17 @@ export class CategoriesView {
         </span>
 
         <div style="margin-top:6px;">
-          <button data-action="download">Download</button>
-          <button data-action="report">${reportBtnText}</button>
+          <button class = "btn btn-primary p-2" data-action="download"><i class="bi bi-download"></i></button>
+          <button class = "btn btn-primary p-2" data-action="report">${reportBtnText}</button>
 
-          <button data-action="rate" data-value="GOOD">Good</button>
-          <button data-action="rate" data-value="MEDIUM">Medium</button>
-          <button data-action="rate" data-value="BAD">Bad</button>
+          <button class = "btn btn-primary p-2" data-action="rate" data-value="GOOD"><i class="bi bi-hand-thumbs-up-fill"></i></button>
+          <button class = "btn btn-primary p-2" data-action="rate" data-value="MEDIUM"><i class="bi bi-dash"></i></button>
+          <button class = "btn btn-primary p-2" data-action="rate" data-value="BAD"><i class="bi bi-hand-thumbs-down-fill"></i></button>
           
 
-          <button data-action="favourite">${favBtnText}</button>
+          <button class = "btn btn-primary p-2" data-action="favourite">${favBtnText}</button>
 
-          ${canDelete ? `<button data-action="delete" class="btn-danger">Delete</button>` : ``}
+          ${canDelete ? `<button data-action="delete" class="btn btn-danger p-2"><i class="bi bi-trash-fill"></i></button>` : ``}
         </div>
       `;
 
@@ -297,8 +297,8 @@ bindReportClick(handler: (fileId: number) => void): void {
       li.innerHTML = `
         <span><b>${ex.getName()}</b></span>
         <div style="margin-top:6px;">
-          <button data-action="execute">Execute</button>
-          <button data-action="edit">Edit</button>
+          <button class = "btn btn-primary p-2" data-action="execute"><i class="bi bi-caret-right"></i></button>
+          <button class = "btn btn-primary p-2" data-action="edit"><i class="bi bi-pencil-fill"></i></button>
         </div>
       `;
       this.examList.appendChild(li);
