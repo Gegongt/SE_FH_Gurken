@@ -65,13 +65,18 @@ export class LoginView
 
     showError(errorMessage:string, parentElementId:string)
     {
-        let errorArea:HTMLDivElement = document.createElement("div") as HTMLDivElement;
-        errorArea.classList.add("p-2", "mt-2", "mb-4", "d-flex", "justify-content-center", "align-items-center", "errorArea");
+        let errorArea:HTMLDivElement|null = document.getElementById("errorArea") as HTMLDivElement|null;
+
+        if(!errorArea)
+        {
+            errorArea = document.createElement("div") as HTMLDivElement;
+            errorArea.id = "errorArea";
+            errorArea.classList.add("p-2", "mt-2", "mb-4", "d-flex", "justify-content-center", "align-items-center", "errorArea");
+            document.getElementById(parentElementId)!.appendChild(errorArea);
+        }
         
         errorArea.innerHTML = `<p class = "p-2 m-0">${errorMessage}</p>`;
         errorArea.hidden = false;
-        
-        document.getElementById(parentElementId)!.appendChild(errorArea);
     }
 
     remove()

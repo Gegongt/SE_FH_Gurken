@@ -14,6 +14,8 @@ export class HeaderView
                         </a>
 
                         <a id = "homeLink" href = "#">Home</a>
+
+                        <a id = "profileLink" class = "ms-2" href = "#">Profile</a>
                     </apan>
 
                     <a id = "logoutLink" href = "#">Logout</a>
@@ -42,6 +44,11 @@ export class HeaderView
     bindLogoLink(address:string):void
     {
         this.bindLink("logoLink", address);
+    }
+
+    bindProfileLink(address:string):void
+    {
+        this.bindLink("profileLink", address);
     }
 
     bindHomeLink(address:string):void

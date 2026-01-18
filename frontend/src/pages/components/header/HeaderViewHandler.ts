@@ -19,6 +19,7 @@ export class HeaderViewHandler
 
         this.headerView.bindLogoLink(locationUtil.getMainPageAddress());
         this.headerView.bindHomeLink(locationUtil.getMainPageAddress());
+        this.headerView.bindProfileLink(locationUtil.getUserPageAddress());
         this.headerView.bindLogoutLink(() =>
                                        {
                                         serviceFactory.getService(ServiceName.USER).logout(() => locationUtil.redirectToLoginPage(),
