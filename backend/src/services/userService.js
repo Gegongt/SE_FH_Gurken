@@ -32,7 +32,9 @@ async function updateUser(userId, name, profilepicturename, isblockedOrNull) {
 async function deleteUser(userId) {
   try {
     await admin.auth().deleteUser(userId);
-  } catch (e) {}
+  } catch (e) {
+    console.log(e);
+  }
 
   return userRepository.deleteById(userId);
 }
