@@ -115,3 +115,27 @@ exports.setReportedTrue = async (fileId) => {
   if (rowCount === 0) return null;
   return exports.findById(fileId);
 };
+
+exports.findByUploaderId = async (uploaderId) => {
+  const { rows } = await pool.query(
+    `SELECT
+      f.id,
+      f.subcategoryid,
+      f."name",
+      f.isreported,
+      u.id AS "uid",
+      u.email,
+      u.name AS "uname",
+      u.isadmin,
+      u.isblocked,
+      u.profilepicturename
+    FROM public."file" f
+    JOIN public."User" u ON u.id = f.uploaderid
+    WHERE f.uploaderid = $1
+    ORDER BY f.id DESC
+    `,
+    [uploaderId]
+  );
+
+  return rows;
+};

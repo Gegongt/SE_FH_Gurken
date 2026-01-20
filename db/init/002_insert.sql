@@ -1,6 +1,6 @@
 INSERT INTO public."User"
 (id, isadmin, email, "name", isblocked, profilepicturename)
-VALUES('c8D2JcHUtcgeBJ2AcjmkNv1Ed9z2', true, 'filip.lukic@stud.hcw.ac.at', 'filip.lukic', false, NULL);
+VALUES('VOh6Pk75LoQjyETgTWWl8aR52r83', true, 'filip.lukic@stud.hcw.ac.at', 'filip.lukic', false, NULL);
 INSERT INTO public."User"
 (id, isadmin, email, "name", isblocked, profilepicturename)
 VALUES('WcMTIWP4jfXw6ZdCuYpabtUWqY92', true, 'sebastian.pfeiffer@stud.hcw.ac.at', 'sebastian.pfeiffer', false, NULL);

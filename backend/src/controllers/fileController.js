@@ -243,4 +243,19 @@ async function report(req, res) {
   }
 }
 
-module.exports = { create, list, update, remove, download, report };
+async function listByUser(req, res) {
+  try {
+    const userId = String(req.params.userId || "").trim();
+    if (!userId) {
+      return res.status(400).json({ message: "userId is required" });
+    }
+
+    const files = await fileService.getFilesByUploaderId(userId);
+    return res.status(200).json(files);
+  } catch (err) {
+    console.error("list files by user error:", err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+module.exports = { create, list, update, remove, download, report, listByUser };

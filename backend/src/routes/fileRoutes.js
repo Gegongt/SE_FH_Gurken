@@ -322,4 +322,6 @@ router.get(
 
 router.put("/:fileId/report", requireAuth, checkBlocked, fileController.report);
 
+router.get("/user/:userId", requireAuth, checkBlocked, fileController.listByUser);
+
 module.exports = router;

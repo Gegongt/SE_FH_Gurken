@@ -72,3 +72,8 @@ exports.deleteFileEverywhere = async (fileId) => {
 exports.reportFile = async (fileId) => {
   return fileRepository.setReportedTrue(fileId);
 };
+
+exports.getFilesByUploaderId = async (uploaderId) => {
+  const rows = await fileRepository.findByUploaderId(uploaderId);
+  return rows.map(mapRow);
+};
