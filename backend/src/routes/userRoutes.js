@@ -100,6 +100,8 @@ const router = express.Router();
  */
 router.get("/profilepicture", requireAuth, checkBlocked, userController.getMyProfilePicture);
 router.put("/profilepicture", requireAuth, checkBlocked, upload.single("file"), userController.uploadProfilePicture);
+router.delete("/profilepicture", requireAuth, checkBlocked, userController.deleteProfilePicture);
+
 
 /**
  * @swagger

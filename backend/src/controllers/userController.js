@@ -227,6 +227,32 @@ async function getMyProfilePicture(req, res) {
   }
 }
 
+async function deleteProfilePicture(req, res) {
+  try {
+    const dbUser = req.dbUser;
+    if (!dbUser) return res.status(500).json({ message: "dbUser missing" });
+
+    const filePath = path.join(process.cwd(), "uploads", "profilepictures", String(dbUser.id));
+
+    try {
+      await fs.unlink(filePath);
+    } catch (e) {
+      if (e?.code !== "ENOENT") {
+        console.warn("Failed to delete profile picture file:", e);
+        return res.status(500).json({ message: "Failed to delete profile picture" });
+      }
+    }
+
+    await userService.updateProfilePictureName(dbUser.id, null);
+
+    return res.status(204).send();
+  } catch (err) {
+    console.error("delete profile picture error:", err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+
 module.exports = {
   create,
   whoami,
@@ -235,4 +261,5 @@ module.exports = {
   list,
   uploadProfilePicture,
   getMyProfilePicture,
+  deleteProfilePicture
 };
