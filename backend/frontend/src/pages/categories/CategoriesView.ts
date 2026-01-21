@@ -101,6 +101,15 @@ export class CategoriesView {
     for (const f of files) {
       const li = document.createElement("li");
       li.setAttribute("data-file-id", String(f.getId()));
+      li.style.marginLeft = "18px";  
+      li.style.marginBottom = "12px";
+      li.style.listStyle = "none";
+      
+      const uploader = (f as any).getUploader?.() ?? (f as any).uploader;
+
+      const uploaderName = uploader?.getName?.() ?? uploader?.name ?? "unknown";
+      const uploaderEmail = uploader?.getEmail?.() ?? uploader?.email ?? "";
+      const uploaderId = uploader?.getId?.() ?? uploader?.id ?? "";
 
       const isFav = (f as any).fav === true;
       const favBtnText = isFav ? `<i class="bi bi-bookmark-fill"></i>` : `<i class="bi bi-bookmark"></i>`;
@@ -116,11 +125,11 @@ export class CategoriesView {
         : "Score: -";
 
       li.innerHTML = `
-        <span>
-          <b>${f.getName()}</b> | ${scoreText} | <i>${reportedText}</i>
-        </span>
+        <div class="fw-semibold mb-2">${f.getName()}</div>
+        <div class="small text-muted mb-2">${scoreText} | <i>${reportedText}</i></div>
+        <div class="small mb-2">Uploaded by: <a href="../userFiles/userFiles.html?id=${uploaderId}">${uploaderName}</a> (${uploaderEmail})</div>
 
-        <div style="margin-top:6px;">
+        <div style="margin-top:8px;">
           <button class = "btn btn-primary p-2" data-action="download"><i class="bi bi-download"></i></button>
           <button class = "btn btn-primary p-2" data-action="report" ${f.getIsReported() ? "disabled" : ""}>${reportBtnText}</button>
 

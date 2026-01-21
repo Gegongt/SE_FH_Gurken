@@ -17,6 +17,7 @@ declare class UserHttpService {
     deleteOwnUser(successCallback: () => void, errorCallback: (error: ServiceError) => void): void;
     getProfilePicture(success: (blobUrl: string | null) => void, error: (e: any) => void): void;
     updateProfilePicture(file: globalThis.File, successCallback: () => void, errorCallback: (error: ServiceError) => void): void;
+    deleteProfilePicture(successCallback: () => void, errorCallback: (error: ServiceError) => void): void;
 }
 export declare let userHttpService: UserHttpService;
 export {};

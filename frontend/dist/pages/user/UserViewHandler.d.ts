@@ -6,6 +6,7 @@ export type UserService = {
     logout(success: () => void, error: (s: any) => void): void;
     updateProfilePicture(file: globalThis.File, success: () => void, error: (s: any) => void): void;
     getProfilePicture(success: (url: string | null) => void, error: (e: any) => void): void;
+    deleteProfilePicture(success: () => void, error: (e: any) => void): void;
     deleteOwnUser(success: () => void, error: (e: any) => void): void;
     getReportedFiles(success: (files: File[]) => void, error: (s: any) => void): void;
     acceptFile(fileId: number, success: () => void, error: (s: any) => void): void;
@@ -53,5 +54,6 @@ export declare class UserViewHandler {
     private onReportedAction;
     private onBlockedAction;
     private onDeleteAccountClicked;
+    private onDeleteProfilePicClicked;
 }
 //# sourceMappingURL=UserViewHandler.d.ts.map

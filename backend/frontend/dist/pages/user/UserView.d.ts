@@ -9,6 +9,7 @@ export declare class UserView {
     private picker;
     private favouritesList;
     private btnDeleteAccount;
+    private btnDeleteProfilePic;
     private adminPanel;
     private reportedFileList;
     private blockedUsersList;
@@ -35,5 +36,7 @@ export declare class UserView {
     }[]): void;
     bindFavouriteAction(handler: (fileId: number, action: "download" | "unfavourite") => void): void;
     bindDeleteAccountClick(handler: () => void): void;
+    bindDeleteProfilePicClick(handler: () => void): void;
+    setDeleteProfilePicVisible(visible: boolean): void;
 }
 //# sourceMappingURL=UserView.d.ts.map

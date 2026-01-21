@@ -82,6 +82,13 @@ export class CategoriesView {
         for (const f of files) {
             const li = document.createElement("li");
             li.setAttribute("data-file-id", String(f.getId()));
+            li.style.marginLeft = "18px";
+            li.style.marginBottom = "12px";
+            li.style.listStyle = "none";
+            const uploader = f.getUploader?.() ?? f.uploader;
+            const uploaderName = uploader?.getName?.() ?? uploader?.name ?? "unknown";
+            const uploaderEmail = uploader?.getEmail?.() ?? uploader?.email ?? "";
+            const uploaderId = uploader?.getId?.() ?? uploader?.id ?? "";
             const isFav = f.fav === true;
             const favBtnText = isFav ? `<i class="bi bi-bookmark-fill"></i>` : `<i class="bi bi-bookmark"></i>`;
             const reportedText = f.getIsReported() ? `<i class="bi bi-flag-fill"></i>` : `<i class="bi bi-flag"></i>`;
@@ -92,11 +99,11 @@ export class CategoriesView {
                 ? `Score: ${summary.score} (${summary.overall}) | <i class="bi bi-hand-thumbs-up-fill"></i> ${summary.good} <i class="bi bi-dash"></i> ${summary.medium} <i class="bi bi-hand-thumbs-down-fill"></i> ${summary.bad}`
                 : "Score: -";
             li.innerHTML = `
-        <span>
-          <b>${f.getName()}</b> | ${scoreText} | <i>${reportedText}</i>
-        </span>
+        <div class="fw-semibold mb-2">${f.getName()}</div>
+        <div class="small text-muted mb-2">${scoreText} | <i>${reportedText}</i></div>
+        <div class="small mb-2">Uploaded by: <a href="../userFiles/userFiles.html?id=${uploaderId}">${uploaderName}</a> (${uploaderEmail})</div>
 
-        <div style="margin-top:6px;">
+        <div style="margin-top:8px;">
           <button class = "btn btn-primary p-2" data-action="download"><i class="bi bi-download"></i></button>
           <button class = "btn btn-primary p-2" data-action="report" ${f.getIsReported() ? "disabled" : ""}>${reportBtnText}</button>
 

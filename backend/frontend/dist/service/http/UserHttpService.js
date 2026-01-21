@@ -59,7 +59,7 @@ class UserHttpService {
         httpService.sendRequest(HttpMethod.METHOD_PUT, this.URL_USER_API_UPDATE_OWN_USER, null, converter.convertUserToUserEntity(updatedUser), HttpContentType.CONTENT_TYPE_JSON, null, false, accessTokenUtil.getAccessToken(), () => { successCallback(); }, (error) => { errorCallback(errorUtil.getServiceError(error)); });
     }
     getBlockedUsers(isBlocked, successCallback, errorCallback) {
-        const params = { isBlocked: String(isBlocked) }; // Swagger: isBlocked query param
+        const params = { isBlocked: String(isBlocked) };
         httpService.sendRequest(HttpMethod.METHOD_GET, this.URL_USERS_API_BASE, params, null, null, "json", false, accessTokenUtil.getAccessToken(), (response) => {
             const arr = Array.isArray(response) ? response : (response.users ?? []);
             const users = arr.map((ue) => converter.convertUserEntityToUser(ue));
@@ -104,22 +104,34 @@ class UserHttpService {
     }
     updateProfilePicture(file, successCallback, errorCallback) {
         const fd = new FormData();
-        fd.append("file", file); // <- MUSS "file" heißen (Swagger + Controller)
+        fd.append("file", file);
         fetch(this.URL_USERS_API_BASE + "/profilepicture", {
             method: "PUT",
             headers: {
                 Authorization: `Bearer ${accessTokenUtil.getAccessToken()}`
-                // KEIN Content-Type setzen bei FormData!
             },
             body: fd
         })
             .then(async (r) => {
             if (!r.ok)
                 throw await r.text();
-            // response ist updated user JSON, aber brauchen wir nicht zwingend
             successCallback();
         })
             .catch((_e) => errorCallback(new ServiceError("Error! Upload profile picture failed!")));
+    }
+    deleteProfilePicture(successCallback, errorCallback) {
+        fetch(this.URL_USERS_API_BASE + "/profilepicture", {
+            method: "DELETE",
+            headers: {
+                Authorization: `Bearer ${accessTokenUtil.getAccessToken()}`
+            }
+        })
+            .then(async (r) => {
+            if (!r.ok)
+                throw await r.text();
+            successCallback();
+        })
+            .catch((_e) => errorCallback(new ServiceError("Error! Delete profile picture failed!")));
     }
 }
 export let userHttpService = new UserHttpService();

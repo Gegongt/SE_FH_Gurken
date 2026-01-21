@@ -91,6 +91,13 @@ class FileHttpService {
             success(files);
         }, (err) => error(err));
     }
+    getFilesByUser(userId, success, error) {
+        httpService.sendRequest(HttpMethod.METHOD_GET, `${this.URL_FILE_API_BASE}/user/${encodeURIComponent(userId)}`, null, null, null, "json", false, accessTokenUtil.getAccessToken(), (resp) => {
+            const arr = Array.isArray(resp) ? resp : (resp.files ?? []);
+            const files = arr.map((fe) => converter.convertFileEntityToFile(fe));
+            success(files);
+        }, (err) => error(err));
+    }
 }
 export let fileHttpService = new FileHttpService();
 //# sourceMappingURL=FileHttpService.js.map

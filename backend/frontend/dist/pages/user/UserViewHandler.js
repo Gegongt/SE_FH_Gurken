@@ -17,7 +17,13 @@ export class UserViewHandler {
             this.currentUser = u;
             this.view.renderUser(u);
             this.loadFavourites();
-            this.userService.getProfilePicture((url) => this.view.setProfileImage(url), (_e) => this.view.setProfileImage(null));
+            this.userService.getProfilePicture((url) => {
+                this.view.setProfileImage(url);
+                this.view.setDeleteProfilePicVisible(url !== null && url !== "");
+            }, (_e) => {
+                this.view.setProfileImage(null);
+                this.view.setDeleteProfilePicVisible(false);
+            });
             this.view.bindReportedFileActions((action, fileId, uploaderId, fileName, uploaderName, uploaderPic) => {
                 this.onReportedAction(action, fileId, uploaderId, fileName, uploaderName, uploaderPic);
             });
@@ -33,6 +39,7 @@ export class UserViewHandler {
             this.view.bindChangeProfilePicClick();
             this.view.bindProfilePicSelected((file) => this.onProfilePicSelected(file));
             this.view.bindDeleteAccountClick(() => this.onDeleteAccountClicked());
+            this.view.bindDeleteProfilePicClick(() => this.onDeleteProfilePicClicked());
             const isAdmin = u.getIsAdmin?.() ?? false;
             this.view.showAdminPanel(isAdmin);
             if (u.getIsAdmin()) {
@@ -43,7 +50,13 @@ export class UserViewHandler {
     onProfilePicSelected(file) {
         this.view.showProfilePicturePreview(file);
         this.userService.updateProfilePicture(file, () => {
-            this.userService.getProfilePicture((url) => this.view.setProfileImage(url), (_e) => this.view.setProfileImage(null));
+            this.userService.getProfilePicture((url) => {
+                this.view.setProfileImage(url);
+                this.view.setDeleteProfilePicVisible(url !== null && url !== "");
+            }, (_e) => {
+                this.view.setProfileImage(null);
+                this.view.setDeleteProfilePicVisible(false);
+            });
         }, (err) => this.view.showError(String(err)));
     }
     onUnfavourite(fileId) {
@@ -114,6 +127,15 @@ export class UserViewHandler {
         this.userService.deleteOwnUser(() => {
             window.location.href = "../login/login.html";
         }, (err) => this.view.showError(`Delete failed: ${String(err)}`));
+    }
+    onDeleteProfilePicClicked() {
+        const ok = confirm("Really delete your profile picture?");
+        if (!ok)
+            return;
+        this.userService.deleteProfilePicture(() => {
+            this.view.setProfileImage(null);
+            this.view.setDeleteProfilePicVisible(false);
+        }, (err) => this.view.showError(String(err)));
     }
 }
 //# sourceMappingURL=UserViewHandler.js.map

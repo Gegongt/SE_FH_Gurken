@@ -12,19 +12,9 @@
   flex-wrap: wrap;
   justify-content: flex-end;
 }
-
-.user-profile-actions .btn {
-  flex: 1;
-  min-width: 150px;
-}
-
 #profileImg {
   object-fit: cover;
   background: rgba(255,255,255,0.6);
-}
-
-#btnDeleteProfilePic {
-  display: none;
 }
 
 .user-list .list-group-item {

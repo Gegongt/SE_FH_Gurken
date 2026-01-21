@@ -10,6 +10,7 @@ export class UserView {
   private picker = document.getElementById("profilePicPicker") as HTMLInputElement;
   private favouritesList: HTMLUListElement;
   private btnDeleteAccount: HTMLButtonElement;
+  private btnDeleteProfilePic = document.getElementById("btnDeleteProfilePic") as HTMLButtonElement;
 
   private adminPanel= document.getElementById("adminPanel") as HTMLDivElement;
   private reportedFileList = document.getElementById("reportedFileList") as HTMLUListElement;
@@ -21,16 +22,19 @@ export class UserView {
     this.roleLabel = document.getElementById("roleLabel")!;
     const favList = document.getElementById("favouritesList");
     const delBtn = document.getElementById("btnDeleteAccount");
+    const btnDeletePic = document.getElementById("btnDeleteProfilePic");
 
     if (!(btn instanceof HTMLButtonElement)) throw new Error("btnChangeProfilePic not found");
     if (!(picker instanceof HTMLInputElement)) throw new Error("profilePicPicker not found");
     if (!(favList instanceof HTMLUListElement)) throw new Error("favouritesList not found");
     if (!(delBtn instanceof HTMLButtonElement)) throw new Error("btnDeleteAccount not found");
+    if (!(this.btnDeleteProfilePic instanceof HTMLButtonElement)) throw new Error("btnDeleteProfilePic not found");
 
     this.btnChange = btn;
     this.picker = picker;
     this.favouritesList = favList;
     this.btnDeleteAccount = delBtn;
+
   }
 
   renderUser(user: User): void {
@@ -68,7 +72,6 @@ export class UserView {
 
     img.src = url ?? "";
   }
-
 
 
   bindChangeProfilePic(handler: () => void): void {
@@ -290,5 +293,12 @@ export class UserView {
   bindDeleteAccountClick(handler: () => void): void {
     this.btnDeleteAccount.addEventListener("click", handler);
   }
+
+  bindDeleteProfilePicClick(handler: () => void): void {
+    this.btnDeleteProfilePic.addEventListener("click", handler);
+  }
   
+  setDeleteProfilePicVisible(visible: boolean): void {
+    this.btnDeleteProfilePic.style.display = visible ? "block" : "none";
+  }
 }

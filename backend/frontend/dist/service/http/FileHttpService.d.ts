@@ -8,6 +8,7 @@ declare class FileHttpService {
     getAllFiles(success: (files: File[]) => void, error: (status: any) => void): void;
     deleteFile(fileId: number, success: () => void, error: (status: any) => void): void;
     getReportedFiles(success: (files: File[]) => void, error: (status: any) => void): void;
+    getFilesByUser(userId: string, success: (files: File[]) => void, error: (status: any) => void): void;
 }
 export declare let fileHttpService: FileHttpService;
 export {};

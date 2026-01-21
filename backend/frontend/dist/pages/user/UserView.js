@@ -5,6 +5,7 @@ export class UserView {
         this.username = document.getElementById("username");
         this.btnChange = document.getElementById("btnChangeProfilePic");
         this.picker = document.getElementById("profilePicPicker");
+        this.btnDeleteProfilePic = document.getElementById("btnDeleteProfilePic");
         this.adminPanel = document.getElementById("adminPanel");
         this.reportedFileList = document.getElementById("reportedFileList");
         this.blockedUsersList = document.getElementById("blockedUsersList");
@@ -13,6 +14,7 @@ export class UserView {
         this.roleLabel = document.getElementById("roleLabel");
         const favList = document.getElementById("favouritesList");
         const delBtn = document.getElementById("btnDeleteAccount");
+        const btnDeletePic = document.getElementById("btnDeleteProfilePic");
         if (!(btn instanceof HTMLButtonElement))
             throw new Error("btnChangeProfilePic not found");
         if (!(picker instanceof HTMLInputElement))
@@ -21,6 +23,8 @@ export class UserView {
             throw new Error("favouritesList not found");
         if (!(delBtn instanceof HTMLButtonElement))
             throw new Error("btnDeleteAccount not found");
+        if (!(this.btnDeleteProfilePic instanceof HTMLButtonElement))
+            throw new Error("btnDeleteProfilePic not found");
         this.btnChange = btn;
         this.picker = picker;
         this.favouritesList = favList;
@@ -243,6 +247,12 @@ export class UserView {
     }
     bindDeleteAccountClick(handler) {
         this.btnDeleteAccount.addEventListener("click", handler);
+    }
+    bindDeleteProfilePicClick(handler) {
+        this.btnDeleteProfilePic.addEventListener("click", handler);
+    }
+    setDeleteProfilePicVisible(visible) {
+        this.btnDeleteProfilePic.style.display = visible ? "block" : "none";
     }
 }
 //# sourceMappingURL=UserView.js.map

@@ -43,5 +43,3 @@ INSERT INTO public.subcategory (id, "name", categoryid) VALUES(21, 'Physik', 2);
 
 INSERT INTO public.subcategory (id, "name", categoryid) VALUES(22, 'Secretariat', 3);
 INSERT INTO public.subcategory (id, "name", categoryid) VALUES(23, 'Parking', 3);
-
-SELECT * FROM public."User";

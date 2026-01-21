@@ -93,3 +93,17 @@ CREATE TABLE public.rating (
   CONSTRAINT rating_file_fk FOREIGN KEY (fileid) REFERENCES public.file(id) ON DELETE CASCADE,
   CONSTRAINT rating_unique_user_file UNIQUE (userid, fileid)
 );
+
+DROP TABLE IF EXISTS public.chatmessage;
+
+CREATE TABLE public.chatmessage (
+	id serial4 NOT NULL,
+	subcategoryid int4 NOT NULL,
+	userid text NOT NULL,
+	"name" text NOT NULL,
+	"message" text NOT NULL,
+	created_at TIMESTAMPTZ DEFAULT NOW(),
+	CONSTRAINT chatmessage_pk PRIMARY KEY (id),
+	CONSTRAINT chatmessage_subcategory_fk FOREIGN KEY (subcategoryid) REFERENCES public.subcategory(id) ON DELETE CASCADE,
+	CONSTRAINT chatmessage_user_fk FOREIGN KEY (userid) REFERENCES public."User"(id) ON DELETE CASCADE
+);
