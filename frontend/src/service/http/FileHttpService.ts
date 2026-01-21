@@ -196,6 +196,28 @@ class FileHttpService {
     );
   }
 
-}
+ getFilesByUser(
+    userId: string,
+    success: (files: File[]) => void,
+    error: (status: any) => void
+  ): void {
+    httpService.sendRequest(
+      HttpMethod.METHOD_GET,
+      `${this.URL_FILE_API_BASE}/user/${encodeURIComponent(userId)}`,
+      null,   
+      null,   
+      null,   
+      "json",
+      false,
+      accessTokenUtil.getAccessToken(),
+      (resp: any) => {
+        const arr = Array.isArray(resp) ? resp : (resp.files ?? []);
+        const files = arr.map((fe: any) => converter.convertFileEntityToFile(fe));
+        success(files);
+      },
+      (err: any) => error(err)
+    );
+  }
 
+}
 export let fileHttpService = new FileHttpService();

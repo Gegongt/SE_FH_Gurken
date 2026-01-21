@@ -112,7 +112,7 @@ class UserHttpService
     successCallback: (users: User[]) => void,
     errorCallback: (error: ServiceError) => void
     ): void {
-    const params = { isBlocked: String(isBlocked) }; // Swagger: isBlocked query param
+    const params = { isBlocked: String(isBlocked) }; 
 
     httpService.sendRequest(
         HttpMethod.METHOD_GET,
@@ -212,26 +212,38 @@ class UserHttpService
         errorCallback: (error: ServiceError) => void
         ): void {
         const fd = new FormData();
-        fd.append("file", file); // <- MUSS "file" heißen (Swagger + Controller)
+        fd.append("file", file); 
 
         fetch(this.URL_USERS_API_BASE + "/profilepicture", {
             method: "PUT",
             headers: {
             Authorization: `Bearer ${accessTokenUtil.getAccessToken()}`
-            // KEIN Content-Type setzen bei FormData!
             },
             body: fd
         })
             .then(async (r) => {
             if (!r.ok) throw await r.text();
-            // response ist updated user JSON, aber brauchen wir nicht zwingend
             successCallback();
             })
             .catch((_e) => errorCallback(new ServiceError("Error! Upload profile picture failed!")));
     }
 
-
-
+    deleteProfilePicture(
+        successCallback: () => void,
+        errorCallback: (error: ServiceError) => void
+    ): void {
+        fetch(this.URL_USERS_API_BASE + "/profilepicture", {
+            method: "DELETE",
+            headers: {
+                Authorization: `Bearer ${accessTokenUtil.getAccessToken()}`
+            }
+        })
+            .then(async (r) => {
+                if (!r.ok) throw await r.text();
+                successCallback();
+            })
+            .catch((_e) => errorCallback(new ServiceError("Error! Delete profile picture failed!")));
+    }
 }
 
 export let userHttpService = new UserHttpService();

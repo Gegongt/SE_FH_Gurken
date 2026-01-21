@@ -8,7 +8,7 @@ export type UserService = {
   logout(success: ()=>void, error:(s:any)=>void): void;
   updateProfilePicture(file: globalThis.File, success: ()=>void, error:(s:any)=>void): void;
   getProfilePicture(success: (url: string | null) => void, error: (e:any)=>void): void;
-
+  deleteProfilePicture(success: () => void, error: (e: any) => void): void;
 
   deleteOwnUser(success: () => void, error: (e: any) => void): void;
 
@@ -102,8 +102,14 @@ export class UserViewHandler {
         this.loadFavourites();
 
         this.userService.getProfilePicture(
-          (url) => this.view.setProfileImage(url),
-          (_e) => this.view.setProfileImage(null)
+          (url) => {
+            this.view.setProfileImage(url);
+            this.view.setDeleteProfilePicVisible(url !== null && url !== "");
+          },
+          (_e) => {
+            this.view.setProfileImage(null);
+            this.view.setDeleteProfilePicVisible(false);
+          }
         );
 
         this.view.bindReportedFileActions((action, fileId, uploaderId, fileName, uploaderName, uploaderPic) => {
@@ -122,6 +128,7 @@ export class UserViewHandler {
         this.view.bindChangeProfilePicClick();
         this.view.bindProfilePicSelected((file) => this.onProfilePicSelected(file));
         this.view.bindDeleteAccountClick(() => this.onDeleteAccountClicked());
+        this.view.bindDeleteProfilePicClick(() => this.onDeleteProfilePicClicked());
 
         const isAdmin = u.getIsAdmin?.() ?? false;
         this.view.showAdminPanel(isAdmin);
@@ -141,8 +148,14 @@ export class UserViewHandler {
       file,
       () => {
         this.userService.getProfilePicture(
-          (url) => this.view.setProfileImage(url),
-          (_e) => this.view.setProfileImage(null)
+          (url) => {
+            this.view.setProfileImage(url);
+            this.view.setDeleteProfilePicVisible(url !== null && url !== "");
+          },
+          (_e) => {
+            this.view.setProfileImage(null);
+            this.view.setDeleteProfilePicVisible(false);
+          }
         );
       },
       (err) => this.view.showError(String(err))
@@ -266,7 +279,6 @@ export class UserViewHandler {
     }
   }
 
-
   private onBlockedAction(action: "unblock", userId: string, userName: string, userPic: string | null): void {
     this.userService.setBlocked(
       userId,
@@ -290,5 +302,16 @@ export class UserViewHandler {
     );
   }
 
+  private onDeleteProfilePicClicked(): void {
+    const ok = confirm("Really delete your profile picture?");
+    if (!ok) return;
 
+    this.userService.deleteProfilePicture(
+      () => {
+        this.view.setProfileImage(null);
+        this.view.setDeleteProfilePicVisible(false);
+      },
+      (err) => this.view.showError(String(err))
+    );
+  }
 }
