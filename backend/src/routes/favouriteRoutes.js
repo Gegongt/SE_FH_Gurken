@@ -3,6 +3,7 @@ const router = express.Router();
 
 const requireAuth = require("../middlewares/requireAuth");
 const checkBlocked = require("../middlewares/checkBlocked");
+const requireVerifiedEmail = require("../middlewares/requireVerifiedEmail")
 const favouriteController = require("../controllers/favouriteController");
 
 /**
@@ -127,8 +128,8 @@ const favouriteController = require("../controllers/favouriteController");
  *         description: Internal server error
  */
 
-router.get("/", requireAuth, checkBlocked, favouriteController.list);
-router.post("/", requireAuth, checkBlocked, favouriteController.create);
-router.delete("/", requireAuth, checkBlocked, favouriteController.remove);
+router.get("/", requireAuth, checkBlocked, requireVerifiedEmail, favouriteController.list);
+router.post("/", requireAuth, checkBlocked, requireVerifiedEmail, favouriteController.create);
+router.delete("/", requireAuth, checkBlocked, requireVerifiedEmail, favouriteController.remove);
 
 module.exports = router;

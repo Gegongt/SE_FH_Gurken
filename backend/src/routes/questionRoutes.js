@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const requireAuth = require("../middlewares/requireAuth");
 const checkBlocked = require("../middlewares/checkBlocked");
+const requireVerifiedEmail = require("../middlewares/requireVerifiedEmail")
 const questionController = require("../controllers/questionController");
 
 /**
@@ -114,7 +115,7 @@ const questionController = require("../controllers/questionController");
  *       500:
  *         description: Internal server error
  */
-router.post("/", requireAuth, checkBlocked, questionController.createMany);
+router.post("/", requireAuth, checkBlocked, requireVerifiedEmail, questionController.createMany);
 
 /**
  * @swagger
@@ -179,8 +180,8 @@ router.post("/", requireAuth, checkBlocked, questionController.createMany);
  *       500:
  *         description: Internal server error
  */
-router.delete("/:questionId", requireAuth, checkBlocked, questionController.remove);
-router.delete("/", requireAuth, checkBlocked, questionController.removeByExam);
+router.delete("/:questionId", requireAuth, checkBlocked, requireVerifiedEmail, questionController.remove);
+router.delete("/", requireAuth, checkBlocked, requireVerifiedEmail, questionController.removeByExam);
 
 /**
  * @swagger
@@ -247,6 +248,6 @@ router.delete("/", requireAuth, checkBlocked, questionController.removeByExam);
  *       500:
  *         description: Internal server error
  */
-router.get("/", requireAuth, checkBlocked, questionController.listByExam);
+router.get("/", requireAuth, checkBlocked, requireVerifiedEmail, questionController.listByExam);
 
 module.exports = router;

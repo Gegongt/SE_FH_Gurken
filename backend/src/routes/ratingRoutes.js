@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const requireAuth = require("../middlewares/requireAuth");
 const checkBlocked = require("../middlewares/checkBlocked");
+const requireVerifiedEmail = require("../middlewares/requireVerifiedEmail")
 const ratingController = require("../controllers/ratingController");
 
 /**
@@ -77,7 +78,7 @@ const ratingController = require("../controllers/ratingController");
  *       500:
  *         description: Internal server error
  */
-router.post("/", requireAuth, checkBlocked, ratingController.create);
+router.post("/", requireAuth, checkBlocked, requireVerifiedEmail, ratingController.create);
 
 /**
  * @swagger
@@ -133,7 +134,7 @@ router.post("/", requireAuth, checkBlocked, ratingController.create);
  *       500:
  *         description: Internal server error
  */
-router.get("/", requireAuth, checkBlocked, ratingController.listByFile);
+router.get("/", requireAuth, checkBlocked, requireVerifiedEmail, ratingController.listByFile);
 
 /**
  * @swagger
@@ -213,7 +214,7 @@ router.get("/", requireAuth, checkBlocked, ratingController.listByFile);
  *       500:
  *         description: Internal server error
  */
-router.put("/:ratingId", requireAuth, checkBlocked, ratingController.update);
+router.put("/:ratingId", requireAuth, checkBlocked, requireVerifiedEmail, ratingController.update);
 
 /**
  * @swagger
@@ -246,7 +247,7 @@ router.put("/:ratingId", requireAuth, checkBlocked, ratingController.update);
  *       500:
  *         description: Internal server error
  */
-router.delete("/:ratingId", requireAuth, checkBlocked, ratingController.remove);
+router.delete("/:ratingId", requireAuth, checkBlocked, requireVerifiedEmail, ratingController.remove);
 
 
 module.exports = router;

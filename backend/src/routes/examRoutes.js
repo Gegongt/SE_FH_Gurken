@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const requireAuth = require("../middlewares/requireAuth");
 const checkBlocked = require("../middlewares/checkBlocked");
+const requireVerifiedEmail = require("../middlewares/requireVerifiedEmail")
 const examController = require("../controllers/examController");
 
 /**
@@ -58,7 +59,7 @@ const examController = require("../controllers/examController");
  *       500:
  *         description: Internal server error
  */
-router.post("/", requireAuth, checkBlocked, examController.create);
+router.post("/", requireAuth, checkBlocked, requireVerifiedEmail, examController.create);
 
 /**
  * @swagger
@@ -127,7 +128,7 @@ router.post("/", requireAuth, checkBlocked, examController.create);
  *       500:
  *         description: Internal server error
  */
-router.get("/", requireAuth, checkBlocked, examController.list);
+router.get("/", requireAuth, checkBlocked, requireVerifiedEmail, examController.list);
 
 /**
  * @swagger
@@ -240,7 +241,7 @@ router.get("/", requireAuth, checkBlocked, examController.list);
  *       500:
  *         description: Internal server error
  */
-router.put("/:examId", requireAuth, checkBlocked, examController.update);
-router.delete("/:examId", requireAuth, checkBlocked, examController.remove);
+router.put("/:examId", requireAuth, checkBlocked, requireVerifiedEmail, examController.update);
+router.delete("/:examId", requireAuth, checkBlocked, requireVerifiedEmail, examController.remove);
 
 module.exports = router;

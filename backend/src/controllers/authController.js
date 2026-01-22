@@ -32,6 +32,8 @@ async function register(req, res) {
       profilepicturename: profilepicturename ?? null,
     });
 
+    await authService.sendVerifyEmail(firebaseResult.idToken).catch(console.warn);
+
     return res.status(201).json({
       userId: uid,
       accessToken: firebaseResult.idToken,

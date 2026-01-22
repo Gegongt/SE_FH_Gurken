@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const requireAuth = require("../middlewares/requireAuth");
 const checkBlocked = require("../middlewares/checkBlocked");
+const requireVerifiedEmail = require("../middlewares/requireVerifiedEmail")
 const upload = require("../middlewares/uploadSingle");
 const fileController = require("../controllers/fileController");
 
@@ -69,6 +70,7 @@ router.post(
   "/",
   requireAuth,
   checkBlocked,
+  requireVerifiedEmail,
   upload.single("file"),
   fileController.create,
 );
@@ -152,7 +154,7 @@ router.post(
  *       500:
  *         description: Internal server error
  */
-router.get("/", requireAuth, checkBlocked, fileController.list);
+router.get("/", requireAuth, checkBlocked, requireVerifiedEmail, fileController.list);
 
 /**
  * @swagger
@@ -274,8 +276,8 @@ router.get("/", requireAuth, checkBlocked, fileController.list);
  *         description: Internal server error
  */
 
-router.put("/:fileId", requireAuth, checkBlocked, fileController.update);
-router.delete("/:fileId", requireAuth, checkBlocked, fileController.remove);
+router.put("/:fileId", requireAuth, checkBlocked, requireVerifiedEmail, fileController.update);
+router.delete("/:fileId", requireAuth, checkBlocked, requireVerifiedEmail, fileController.remove);
 
 /**
  * @swagger
@@ -317,11 +319,12 @@ router.get(
   "/:fileId/download",
   requireAuth,
   checkBlocked,
+  requireVerifiedEmail,
   fileController.download,
 );
 
-router.put("/:fileId/report", requireAuth, checkBlocked, fileController.report);
+router.put("/:fileId/report", requireAuth, checkBlocked, requireVerifiedEmail, fileController.report);
 
-router.get("/user/:userId", requireAuth, checkBlocked, fileController.listByUser);
+router.get("/user/:userId", requireAuth, checkBlocked, requireVerifiedEmail, fileController.listByUser);
 
 module.exports = router;

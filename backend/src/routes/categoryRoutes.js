@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const requireAuth = require("../middlewares/requireAuth");
 const checkBlocked = require("../middlewares/checkBlocked");
+const requireVerifiedEmail = require("../middlewares/requireVerifiedEmail")
 const categoryController = require("../controllers/categoryController");
 
 /**
@@ -30,6 +31,6 @@ const categoryController = require("../controllers/categoryController");
  *       500:
  *         description: Internal server error
  */
-router.get("/", requireAuth, checkBlocked, categoryController.list);
+router.get("/", requireAuth, checkBlocked, requireVerifiedEmail, categoryController.list);
 
 module.exports = router;

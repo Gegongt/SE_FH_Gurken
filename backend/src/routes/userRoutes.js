@@ -2,6 +2,7 @@ const express = require("express");
 const requireAuth = require("../middlewares/requireAuth");
 const userController = require("../controllers/userController");
 const checkBlocked = require("../middlewares/checkBlocked");
+const requireVerifiedEmail = require("../middlewares/requireVerifiedEmail")
 const upload = require("../middlewares/uploadSingle");
 
 const router = express.Router();
@@ -98,9 +99,9 @@ const router = express.Router();
  *       500:
  *         description: Internal server error
  */
-router.get("/profilepicture", requireAuth, checkBlocked, userController.getMyProfilePicture);
-router.put("/profilepicture", requireAuth, checkBlocked, upload.single("file"), userController.uploadProfilePicture);
-router.delete("/profilepicture", requireAuth, checkBlocked, userController.deleteProfilePicture);
+router.get("/profilepicture", requireAuth, checkBlocked, requireVerifiedEmail, userController.getMyProfilePicture);
+router.put("/profilepicture", requireAuth, checkBlocked, requireVerifiedEmail, upload.single("file"), userController.uploadProfilePicture);
+router.delete("/profilepicture", requireAuth, checkBlocked, requireVerifiedEmail, userController.deleteProfilePicture);
 
 
 /**
@@ -147,7 +148,7 @@ router.delete("/profilepicture", requireAuth, checkBlocked, userController.delet
  *                     - isblocked
  *                     - profilepicturename
  */
-router.get("/whoami", requireAuth, checkBlocked, userController.whoami);
+router.get("/whoami", requireAuth, checkBlocked, requireVerifiedEmail, userController.whoami);
 
 /**
  * @swagger
@@ -217,7 +218,7 @@ router.get("/whoami", requireAuth, checkBlocked, userController.whoami);
  *       500:
  *         description: Internal server error
  */
-router.put("/", requireAuth, checkBlocked, userController.update)
+router.put("/", requireAuth, checkBlocked, requireVerifiedEmail, userController.update)
 
 /**
  * @swagger
@@ -294,7 +295,7 @@ router.put("/", requireAuth, checkBlocked, userController.update)
  *       500:
  *         description: Internal server error
  */
-router.put("/:userId", requireAuth, checkBlocked, userController.update)
+router.put("/:userId", requireAuth, checkBlocked, requireVerifiedEmail, userController.update)
 
 /**
  * @swagger
@@ -405,6 +406,6 @@ router.delete("/:userId", requireAuth, userController.remove);
  *       500:
  *         description: Internal server error
  */
-router.get("/", requireAuth, checkBlocked, userController.list);
+router.get("/", requireAuth, checkBlocked, requireVerifiedEmail, userController.list);
 
 module.exports = router;

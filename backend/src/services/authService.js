@@ -24,3 +24,10 @@ exports.login = async (email, password) => {
     throw e;
   }
 };
+
+exports.sendVerifyEmail = async (idToken) => {
+  const url = `https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${process.env.FIREBASE_API_KEY}`;
+  const payload = { requestType: "VERIFY_EMAIL", idToken };
+  const { data } = await axios.post(url, payload);
+  return data;
+};
