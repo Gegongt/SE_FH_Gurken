@@ -37,7 +37,7 @@ export class RegisterViewHandler
                                                             
                                                                (error:ServiceError) =>
                                                                {
-                                                                let errorMessage = "Failed to register!";
+                                                                let errorMessage = "Failed to register (make sure that your display name is unique and your email ends in stud.hcw.ac.at)!";
 
                                                                 if(error instanceof NotAuthorizedError)
                                                                 {

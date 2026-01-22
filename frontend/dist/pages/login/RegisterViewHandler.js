@@ -18,7 +18,7 @@ export class RegisterViewHandler {
         };
         this.registerView.bindRegisterButton((email, userName, password) => {
             serviceFactory.getService(ServiceName.USER).create(email, userName, password, switchToLoginView, (error) => {
-                let errorMessage = "Failed to register!";
+                let errorMessage = "Failed to register (make sure that your display name is unique and your email ends in stud.hcw.ac.at)!";
                 if (error instanceof NotAuthorizedError) {
                     errorMessage = "User already exists or password is to weak!";
                 }
