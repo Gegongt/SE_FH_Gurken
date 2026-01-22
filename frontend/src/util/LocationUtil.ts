@@ -5,6 +5,7 @@ class LocationUtil
     private URL_REDIRECT_USER_PAGE = this.URL_REDIRECT_BASE + "/user/user.html";
     private URL_REDIRECT_EXAM_EXECUTOR_PAGE = this.URL_REDIRECT_BASE + "/exam/executor/exam.html";
     private URL_REDIRECT_EXAM_EDITOR_PAGE = this.URL_REDIRECT_BASE + "/exam/editor/examEditor.html";
+    private URL_REDIRECT_CHAT_PAGE = this.URL_REDIRECT_BASE + "/chat/chat.html";
     private URL_REDIRECT_MAIN_PAGE = this.URL_REDIRECT_BASE + "/categories/categories.html";
 
     redirect(location:string, params?:any)
@@ -51,6 +52,11 @@ class LocationUtil
         this.redirect(this.URL_REDIRECT_EXAM_EDITOR_PAGE, params);
     }
 
+    redirectToChatPage(subcategoryId:number):void
+    {
+        this.redirect(this.URL_REDIRECT_CHAT_PAGE, { subcategoryId });
+    }
+
     getLoginPageAddress():string
     {
         return this.URL_REDIRECT_LOGIN_PAGE;
@@ -69,6 +75,11 @@ class LocationUtil
     getExamEditorAddress():string
     {
         return this.URL_REDIRECT_EXAM_EDITOR_PAGE;
+    }
+
+    getChatAddress():string
+    {
+        return this.URL_REDIRECT_CHAT_PAGE;
     }
 
     getMainPageAddress():string

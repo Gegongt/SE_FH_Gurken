@@ -1,78 +1,19 @@
 import { ServiceError } from "../../service/error/ServiceError.js";
 import { serviceFactory } from "../../service/factory/ServiceFactory.js";
 import { ServiceName } from "../../service/factory/ServiceName.js";
-import { accessTokenUtil } from "../../service/http/AccessTokenUtil.js";
 import { locationUtil } from "../../util/LocationUtil.js";
 import { urlUtil } from "../../util/URLUtil.js";
+import { ChatMessage } from "../../vo/ChatMessage.js";
 import { User } from "../../vo/User.js";
 import { HeaderView } from "../components/header/HeaderView.js";
 import { HeaderViewHandler } from "../components/header/HeaderViewHandler.js";
+import { ChatMessageView } from "./components/ChatMessageView.js";
+import { ChatMessageViewHandler } from "./components/ChatMessageViewHandler.js";
 
-declare const io: any; //from the socket library
-
-function loadSocket(subcategoryId:number):any
+function showMessage(chatMessage:ChatMessage, parentElementId:string)
 {
-  const socket = io({auth: {token: `Bearer ${accessTokenUtil.getAccessToken()}`}});
-
-  socket.on("connect", () =>
-  {
-    socket.emit("join_subcategory", { subcategoryId }, (ack: any) =>
-    {
-      if(!ack?.ok)
-      {
-        console.error("Join failed:", ack?.error);
-      }
-
-      else
-      {
-        console.log("Joined");
-      }
-    });
-  });
-
-  // 4) History bekommen
-  socket.on("history", (payload: any) =>
-  {
-    payload.messages.forEach((message:any) =>
-    {
-      showMessage(message, "chatMessages");
-    });
-    // payload = { subcategoryId, messages: [...] }
-    console.log("History:", payload.subcategoryId, payload.messages);
-  });
-
-  socket.on("message", (message:any) =>
-  {
-    showMessage(message.message, "chatMessages");
-  });
-
-  socket.on("connect_error", (err: any) =>
-  {
-    if(err.message)
-    {
-      console.error("Connection error: ", err?.message);        
-    }
-
-    else
-    {
-      console.error("Connecton error:");
-      console.log(err);
-    }
-  });
-
-  return socket;
-}
-
-function showMessage(chatMessage:any, parentElementId:string)
-{
-  let messageElement = document.createElement("div");
-  messageElement.innerHTML =
-  `
-    <div>
-      <p>${chatMessage.message}</p>
-    </div>`
-
-  document.getElementById(parentElementId)!.appendChild(messageElement);
+  let chatMessageViewHandler = new ChatMessageViewHandler(new ChatMessageView());
+  chatMessageViewHandler.render(chatMessage, parentElementId);
 }
 
 function loadPage(subcategoryId:number, user:User):void
@@ -80,7 +21,20 @@ function loadPage(subcategoryId:number, user:User):void
     let headerViewHandler = new HeaderViewHandler(new HeaderView());
     headerViewHandler.render("header");
 
-    let socket = loadSocket(subcategoryId);
+    let chatMessageService = serviceFactory.getHttpService(ServiceName.CHAT_MESSAGE);
+    chatMessageService.init(subcategoryId,
+    (messages:ChatMessage[]) =>
+    {
+      messages.forEach((message:ChatMessage) =>
+      {
+        showMessage(message, "chatMessages");
+      })
+    },
+  
+    (message:ChatMessage) =>
+    {
+      showMessage(message, "chatMessages");
+    });
 
     let messageInputField:HTMLInputElement = document.getElementById("messageInput") as HTMLInputElement;
     let sendButton:HTMLButtonElement = document.getElementById("sendButton") as HTMLButtonElement;
@@ -94,14 +48,7 @@ function loadPage(subcategoryId:number, user:User):void
         return;
       }
 
-      socket.emit("message",
-      {
-        userid: 123,
-        subcategoryId: subcategoryId,
-        name: user.getName(),
-        message: message
-      });
-
+      chatMessageService.sendMessage(new ChatMessage(-1, user.getId() as string, subcategoryId, user.getName(), message, undefined));
       messageInputField.value = "";
     });
 }
@@ -115,7 +62,7 @@ serviceFactory.getService(ServiceName.USER).getCurrentUser((user:User|null) =>
 
     const subcategoryId:number = Number(urlUtil.getParam("subcategoryId"));
 
-    if(!subcategoryId) //a new exam is being created
+    if(!subcategoryId)
     {
         locationUtil.redirectToMainPage();
     }

@@ -13,6 +13,7 @@ export class CategoriesView {
   private fileList: HTMLUListElement;
   private examList: HTMLUListElement;
   private btnCreateExam: HTMLButtonElement;
+  private btnOpenChat: HTMLButtonElement;
   private errorBox = document.getElementById("pageError") as HTMLDivElement;
   private errorText = document.getElementById("pageErrorText") as HTMLSpanElement;
   private errorTimeout: number | null = null;
@@ -32,6 +33,7 @@ export class CategoriesView {
     if (!(fileList instanceof HTMLUListElement)) throw new Error("fileList not found");
     if (!(examList instanceof HTMLUListElement)) throw new Error("examList not found");
     if (!(document.getElementById("btnCreateExam") instanceof HTMLButtonElement)) throw new Error("btnCreateExam not found");
+    if (!(document.getElementById("btnOpenChat") instanceof HTMLButtonElement)) throw new Error("btnOpenChat not found");
 
     this.searchInput = search;
     this.categoryList = catList;
@@ -41,7 +43,7 @@ export class CategoriesView {
     this.fileList = fileList as HTMLUListElement;
     this.examList = examList;
     this.btnCreateExam = document.getElementById("btnCreateExam") as HTMLButtonElement; 
-
+    this.btnOpenChat = document.getElementById("btnOpenChat") as HTMLButtonElement;
   }
 
   bindSearch(handler: (text: string) => void): void {
@@ -186,6 +188,7 @@ hideError(): void {
     console.log("enableActions:", enable);
     this.btnUploadFile.disabled = !enable;
     this.btnCreateExam.disabled = !enable;
+    this.btnOpenChat.disabled = !enable;
   }
 
   bindUploadClick(handler: () => void): void {
@@ -318,6 +321,10 @@ bindReportClick(handler: (fileId: number) => void): void {
 
   bindCreateExam(handler: () => void): void {
     this.btnCreateExam.addEventListener("click", handler);
+  }
+
+  bindOpenChat(handler: () => void):void {
+    this.btnOpenChat.addEventListener("click", handler);
   }
 
   bindExamAction(handler: (examId: number, action: "execute" | "edit") => void): void {

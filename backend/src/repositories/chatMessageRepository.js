@@ -4,10 +4,10 @@ const TABLE = 'public.chatmessage';
 
 exports.createChatMessage = async (subcategoryid, userid, name, message, created_at) => {
   const { rows } = await pool.query(
-    `INSERT INTO ${TABLE} (subcategoryid, userid, "name", "message", created_at)
-     VALUES ($1, $2, $3, $4, $5)
+    `INSERT INTO ${TABLE} (subcategoryid, userid, "name", "message")
+     VALUES ($1, $2, $3, $4)
      RETURNING *`,
-    [subcategoryid, userid, name, message, created_at]
+    [subcategoryid, userid, name, message]
   );
 
   return rows[0] ?? null;
@@ -30,5 +30,6 @@ exports.findBySubcategoryId = async (subcategoryId) => {
     `,
     [subcategoryId]
   );
+
   return rows;
 };

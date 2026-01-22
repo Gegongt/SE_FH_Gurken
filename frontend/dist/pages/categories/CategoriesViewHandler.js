@@ -33,6 +33,7 @@ export class CategoriesViewHandler {
         this.view.bindCreateExam(() => this.onCreateExamClicked());
         this.view.bindFavouriteClick((fileId) => this.onFavouriteClicked(fileId));
         this.view.bindDeleteClick((fileId) => this.onDeleteClicked(fileId));
+        this.view.bindOpenChat(() => this.onOpenChatClicked());
         this.view.bindExamAction((examId, action) => {
             if (action === "edit")
                 this.nav.redirectToExamEditorPage(examId);
@@ -213,6 +214,13 @@ export class CategoriesViewHandler {
             return;
         }
         this.nav.redirectToExamEditorPage(null, this.selectedSubcategoryId);
+    }
+    onOpenChatClicked() {
+        if (this.selectedSubcategoryId == null) {
+            this.view.renderError("Please select a subcategory first.");
+            return;
+        }
+        this.nav.redirectToChatPage(this.selectedSubcategoryId);
     }
     onFavouriteClicked(fileId) {
         const uid = this.currentUserUid;

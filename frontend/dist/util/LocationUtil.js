@@ -5,6 +5,7 @@ class LocationUtil {
         this.URL_REDIRECT_USER_PAGE = this.URL_REDIRECT_BASE + "/user/user.html";
         this.URL_REDIRECT_EXAM_EXECUTOR_PAGE = this.URL_REDIRECT_BASE + "/exam/executor/exam.html";
         this.URL_REDIRECT_EXAM_EDITOR_PAGE = this.URL_REDIRECT_BASE + "/exam/editor/examEditor.html";
+        this.URL_REDIRECT_CHAT_PAGE = this.URL_REDIRECT_BASE + "/chat/chat.html";
         this.URL_REDIRECT_MAIN_PAGE = this.URL_REDIRECT_BASE + "/categories/categories.html";
     }
     redirect(location, params) {
@@ -36,6 +37,9 @@ class LocationUtil {
             params.subcategoryId = subcategoryId;
         this.redirect(this.URL_REDIRECT_EXAM_EDITOR_PAGE, params);
     }
+    redirectToChatPage(subcategoryId) {
+        this.redirect(this.URL_REDIRECT_CHAT_PAGE, { subcategoryId });
+    }
     getLoginPageAddress() {
         return this.URL_REDIRECT_LOGIN_PAGE;
     }
@@ -47,6 +51,9 @@ class LocationUtil {
     }
     getExamEditorAddress() {
         return this.URL_REDIRECT_EXAM_EDITOR_PAGE;
+    }
+    getChatAddress() {
+        return this.URL_REDIRECT_CHAT_PAGE;
     }
     getMainPageAddress() {
         return this.URL_REDIRECT_MAIN_PAGE;

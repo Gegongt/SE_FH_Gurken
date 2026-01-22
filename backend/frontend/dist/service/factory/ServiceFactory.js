@@ -16,6 +16,7 @@ import { questionHttpService } from "../http/QuestionHttpService.js";
 import { fileHttpService } from "../http/FileHttpService.js";
 import { favouritesHttpService } from "../http/FavouritesHttpService.js";
 import { ratingHttpService } from "../http/RatingHttp.Service.js";
+import { ChatMessageHttpService } from "../http/ChatMessageHttpService.js";
 class ServiceFactory {
     constructor(serviceType) {
         this.serviceType = serviceType;
@@ -48,6 +49,7 @@ class ServiceFactory {
             case ServiceName.QUESTION: return questionHttpService;
             case ServiceName.EXAM: return examHttpService;
             case ServiceName.FAVOURITES: return favouritesHttpService;
+            case ServiceName.CHAT_MESSAGE: return new ChatMessageHttpService(); //this service is not a Singleton, it is unique for every chat participant
         }
     }
 }

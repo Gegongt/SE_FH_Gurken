@@ -8,5 +8,6 @@ export var ServiceName;
     ServiceName[ServiceName["QUESTION"] = 5] = "QUESTION";
     ServiceName[ServiceName["EXAM"] = 6] = "EXAM";
     ServiceName[ServiceName["FAVOURITES"] = 7] = "FAVOURITES";
+    ServiceName[ServiceName["CHAT_MESSAGE"] = 8] = "CHAT_MESSAGE";
 })(ServiceName || (ServiceName = {}));
 //# sourceMappingURL=ServiceName.js.map

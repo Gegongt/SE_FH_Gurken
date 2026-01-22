@@ -13,6 +13,8 @@ import { TrueFalseQuestionEntity } from "../TrueFalseQuestionEntity.js";
 import { UserEntity } from "../UserEntity.js";
 import { File } from "../../../vo/File.js";
 import { FileEntity } from "../FileEntity.js";
+import { ChatMessageEntity } from "../ChatMessageEntity.js";
+import { ChatMessage } from "../../../vo/ChatMessage.js";
 class Converter {
     convertCategoryEntityToCategory(categoryEntity) {
         return new Category(categoryEntity.id, categoryEntity.name);
@@ -71,6 +73,12 @@ class Converter {
     }
     convertFileToFileEntity(file, subcategoryId = -1) {
         return new FileEntity(file.getId(), subcategoryId, file.getName(), this.convertUserToUserEntity(file.getUploader()), file.getIsReported());
+    }
+    convertChatMessageEntityToChatMessage(chatMessageEntity) {
+        return new ChatMessage(chatMessageEntity.id, chatMessageEntity.userid, chatMessageEntity.subcategoryid, chatMessageEntity.name, chatMessageEntity.message, chatMessageEntity.created_at);
+    }
+    convertChatMessageToChatMessageEntity(chatMessage) {
+        return new ChatMessageEntity(chatMessage.getId(), chatMessage.getUserId(), chatMessage.getSubcategoryId(), chatMessage.getName(), chatMessage.getMessage(), chatMessage.getCreatedAt());
     }
 }
 export let converter = new Converter();

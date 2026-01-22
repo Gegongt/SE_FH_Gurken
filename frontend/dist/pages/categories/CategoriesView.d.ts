@@ -12,6 +12,7 @@ export declare class CategoriesView {
     private fileList;
     private examList;
     private btnCreateExam;
+    private btnOpenChat;
     private errorBox;
     private errorText;
     private errorTimeout;
@@ -39,6 +40,7 @@ export declare class CategoriesView {
     bindDownloadClick(handler: (fileId: number) => void): void;
     renderExams(exams: Exam[]): void;
     bindCreateExam(handler: () => void): void;
+    bindOpenChat(handler: () => void): void;
     bindExamAction(handler: (examId: number, action: "execute" | "edit") => void): void;
     bindFavouriteClick(handler: (fileId: number) => void): void;
     bindDeleteClick(handler: (fileId: number) => void): void;

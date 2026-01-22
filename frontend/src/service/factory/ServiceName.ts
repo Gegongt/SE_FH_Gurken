@@ -7,5 +7,6 @@ export enum ServiceName
   RATING,
   QUESTION,
   EXAM,
-  FAVOURITES
+  FAVOURITES,
+  CHAT_MESSAGE
 }

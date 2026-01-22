@@ -24,6 +24,8 @@ export class CategoriesView {
             throw new Error("examList not found");
         if (!(document.getElementById("btnCreateExam") instanceof HTMLButtonElement))
             throw new Error("btnCreateExam not found");
+        if (!(document.getElementById("btnOpenChat") instanceof HTMLButtonElement))
+            throw new Error("btnOpenChat not found");
         this.searchInput = search;
         this.categoryList = catList;
         this.subcategoryList = subList;
@@ -32,6 +34,7 @@ export class CategoriesView {
         this.fileList = fileList;
         this.examList = examList;
         this.btnCreateExam = document.getElementById("btnCreateExam");
+        this.btnOpenChat = document.getElementById("btnOpenChat");
     }
     bindSearch(handler) {
         this.searchInput.addEventListener("input", () => {
@@ -149,6 +152,7 @@ export class CategoriesView {
         console.log("enableActions:", enable);
         this.btnUploadFile.disabled = !enable;
         this.btnCreateExam.disabled = !enable;
+        this.btnOpenChat.disabled = !enable;
     }
     bindUploadClick(handler) {
         this.btnUploadFile.addEventListener("click", handler);
@@ -264,6 +268,9 @@ export class CategoriesView {
     }
     bindCreateExam(handler) {
         this.btnCreateExam.addEventListener("click", handler);
+    }
+    bindOpenChat(handler) {
+        this.btnOpenChat.addEventListener("click", handler);
     }
     bindExamAction(handler) {
         this.examList.addEventListener("click", (e) => {

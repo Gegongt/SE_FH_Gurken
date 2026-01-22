@@ -10,6 +10,8 @@ import { SubcategoryEntity } from "../SubcategoryEntity.js";
 import { UserEntity } from "../UserEntity.js";
 import { File } from "../../../vo/File.js";
 import { FileEntity } from "../FileEntity.js";
+import { ChatMessageEntity } from "../ChatMessageEntity.js";
+import { ChatMessage } from "../../../vo/ChatMessage.js";
 declare class Converter {
     convertCategoryEntityToCategory(categoryEntity: CategoryEntity): Category;
     convertCategoryToCategoryEntity(category: Category): CategoryEntity;
@@ -23,6 +25,8 @@ declare class Converter {
     convertUserToUserEntity(user: User): UserEntity;
     convertFileEntityToFile(fileEntity: any): File;
     convertFileToFileEntity(file: File, subcategoryId?: number): FileEntity;
+    convertChatMessageEntityToChatMessage(chatMessageEntity: ChatMessageEntity): ChatMessage;
+    convertChatMessageToChatMessageEntity(chatMessage: ChatMessage): ChatMessageEntity;
 }
 export declare let converter: Converter;
 export {};

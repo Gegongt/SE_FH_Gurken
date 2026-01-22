@@ -17,6 +17,7 @@ type Navigator = {
   redirectToExamEditorPage(id?: number | null, subcategoryId?:number|null): void;
   redirectToLoginPage(): void;
   redirectToUserPage(): void;
+  redirectToChatPage(subcategoryId:number):void;
   redirectToMainPage(): void;
 };
 
@@ -164,6 +165,7 @@ export class CategoriesViewHandler {
     this.view.bindCreateExam(() => this.onCreateExamClicked());
     this.view.bindFavouriteClick((fileId) => this.onFavouriteClicked(fileId));
     this.view.bindDeleteClick((fileId) => this.onDeleteClicked(fileId));
+    this.view.bindOpenChat(() => this.onOpenChatClicked());
 
 
     this.view.bindExamAction((examId, action) => {
@@ -435,6 +437,15 @@ private onReportClicked(fileId: number): void {
       return;
     }
     this.nav.redirectToExamEditorPage(null, this.selectedSubcategoryId); 
+  }
+
+  private onOpenChatClicked(): void {
+    if (this.selectedSubcategoryId == null) {
+      this.view.renderError("Please select a subcategory first.");
+      return;
+    }
+
+    this.nav.redirectToChatPage(this.selectedSubcategoryId);
   }
 
   private onFavouriteClicked(fileId: number): void {

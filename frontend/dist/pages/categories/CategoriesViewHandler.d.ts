@@ -10,6 +10,7 @@ type Navigator = {
     redirectToExamEditorPage(id?: number | null, subcategoryId?: number | null): void;
     redirectToLoginPage(): void;
     redirectToUserPage(): void;
+    redirectToChatPage(subcategoryId: number): void;
     redirectToMainPage(): void;
 };
 export type UserService = {
@@ -76,6 +77,7 @@ export declare class CategoriesViewHandler {
     private onDownloadClicked;
     private reloadExams;
     private onCreateExamClicked;
+    private onOpenChatClicked;
     private onFavouriteClicked;
     private onDeleteClicked;
     private onRateClicked;

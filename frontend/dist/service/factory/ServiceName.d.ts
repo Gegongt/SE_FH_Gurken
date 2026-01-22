@@ -6,6 +6,7 @@ export declare enum ServiceName {
     RATING = 4,
     QUESTION = 5,
     EXAM = 6,
-    FAVOURITES = 7
+    FAVOURITES = 7,
+    CHAT_MESSAGE = 8
 }
 //# sourceMappingURL=ServiceName.d.ts.map
