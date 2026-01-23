@@ -1,0 +1,1 @@
+{"version":3,"file":"ChatMessageViewHandler.js","sourceRoot":"","sources":["../../../../src/pages/chat/components/ChatMessageViewHandler.ts"],"names":[],"mappings":"AAGA,MAAM,OAAO,sBAAsB;IAI/B,YAAY,eAA+B;QAEvC,IAAI,CAAC,eAAe,GAAG,eAAe,CAAC;IAC3C,CAAC;IAED,MAAM,CAAC,WAAuB,EAAE,eAAsB;QAElD,IAAI,CAAC,eAAe,CAAC,MAAM,CAAC,WAAW,EAAE,eAAe,CAAC,CAAC;IAC9D,CAAC;CACJ"}
